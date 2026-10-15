@@ -20,6 +20,27 @@
   .dark body {
     @apply bg-gray-950 text-gray-200;
   }
+  @font-face {
+    font-family: 'Moti'; /* 这个名字后面要用，自己起名 */
+    src: url('@/assets/fonts/乐米野墨体.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'xuanzong';
+    src: url('@/assets/fonts/XuanZongTi.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'huoxie';
+    src: url('@/assets/fonts/ChillHuoKai_Regular.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+  }
 }
 
 * {

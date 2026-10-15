@@ -11,7 +11,13 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    HomeContent: typeof import('./src/components/business/home/HomeContent.vue')['default']
+    HomeContentLeft: typeof import('./src/components/business/home/HomeContentLeft.vue')['default']
+    HomeContentLeftBanner: typeof import('./src/components/business/home/HomeContentLeftBanner.vue')['default']
+    HomeContentRight: typeof import('./src/components/business/home/HomeContentRight.vue')['default']
     HomeCover: typeof import('./src/components/business/home/HomeCover.vue')['default']
+    HomeLantern: typeof import('./src/components/business/home/HomeLantern.vue')['default']
+    HomeLeafParticles: typeof import('./src/components/business/home/HomeLeafParticles.vue')['default']
     IconFont: typeof import('./src/components/common/IconFont.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']

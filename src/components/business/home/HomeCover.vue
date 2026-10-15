@@ -1,10 +1,12 @@
 <template>
-  <div class="w-full h-[600px] bg-pink-200 relative overflow-hidden">
+  <div class="w-full h-[600px] bg-pink-200 relative">
     <img
-      src="@/assets/images/back.jpg"
+      src="@/assets/images/back2.jpg"
       alt="Home Cover"
       class="w-full h-full object-cover object-center"
     />
+    <!-- 粒子层：在 img 之上，排在波浪 canvas 之前所以会被波浪遮住 -->
+    <HomeLeafParticles />
     <canvas
       ref="canobj"
       class="absolute bottom-0 left-0 w-full h-[200px] pointer-events-none"
@@ -14,7 +16,14 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
+import HomeLeafParticles from './HomeLeafParticles.vue'
 const canobj = ref<HTMLCanvasElement | null>(null)
+
+// 拉线/点击灯笼后把页面往下带一屏。
+// 想换成指定位置，可以给组件传 target（CSS 选择器），或在这里改成 router.push。
+function handlePull() {
+  window.scrollBy({ top: window.innerHeight * 0.92, behavior: 'smooth' })
+}
 
 let rafId: number | null = null
 let offset = 0
@@ -74,7 +83,8 @@ function resizeCanvas() {
     canvas.height = logicalH * dpr
     const ctx = canvas.getContext('2d')
     if (!ctx) return
-    ctx.scale(dpr, dpr)
+    // setTransform 而非 scale：getContext 返回同一个实例，反复 scale 会累乘
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
   }, 80)
 }
 
