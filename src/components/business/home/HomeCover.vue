@@ -7,6 +7,7 @@
     />
     <!-- 粒子层：在 img 之上，排在波浪 canvas 之前所以会被波浪遮住 -->
     <HomeLeafParticles />
+    <HomeCoverText />
     <canvas
       ref="canobj"
       class="absolute bottom-0 left-0 w-full h-[200px] pointer-events-none"
@@ -43,8 +44,18 @@ function drawWave(
   ctx.lineTo(logicalW, logicalH)
   ctx.lineTo(0, logicalH)
   ctx.closePath()
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.7)'
-  ctx.shadowColor = 'rgba(255, 255, 255, 0.7)' // 阴影颜色
+  if (document.documentElement.classList.contains('dark')) {
+    // 暗色主题：波浪换成内容区底色，顶部半透明、底部收严实，和下面的内容区无缝衔接
+    const grad = ctx.createLinearGradient(0, baseY - waveHeight, 0, logicalH)
+    grad.addColorStop(0, 'rgba(3, 7, 18, 0.55)')
+    grad.addColorStop(0.55, 'rgba(3, 7, 18, 0.92)')
+    grad.addColorStop(1, 'rgba(3, 7, 18, 1)')
+    ctx.fillStyle = grad
+    ctx.shadowColor = 'rgba(3, 7, 18, 0.9)'
+  } else {
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.7)'
+    ctx.shadowColor = 'rgba(255, 255, 255, 0.7)' // 阴影颜色
+  }
   ctx.shadowBlur = 60 // 阴影模糊大小
   ctx.shadowOffsetX = 3 // X偏移
   ctx.shadowOffsetY = -10 // Y偏移

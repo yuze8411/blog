@@ -4,7 +4,7 @@
     @mouseleave="openMenu = ''"
   >
     <div class="relative h-full flex items-center justify-center">
-      <div class="absolute top-1/2 -translate-y-1/2 left-[450px]">
+      <div class="absolute top-1/2 -translate-y-1/2 left-[450px] hidden 2x5l:block">
         <span
           class="text-[20px] font-[xuanzong] tracking-[14px] bg-gradient-to-r from-[#63f1fc] to-[#1a8bfd] bg-clip-text text-transparent"
           >雨落千山</span
@@ -107,7 +107,7 @@
         </li>
 
         <!-- 一级：游记（无下拉） -->
-        <li class="group relative h-full" @mouseenter="openMenu = ''">
+        <li class="group relative h-full hidden ssm:block" @mouseenter="openMenu = ''">
           <RouterLink
             to="/travel"
             class="h-full flex items-center gap-2 px-5 text-[17px] font-medium text-gray-700 hover:text-sky-500 dark:text-gray-300 dark:hover:text-sky-400 transition-colors"
@@ -121,7 +121,7 @@
         </li>
 
         <!-- 一级：探索（有下拉） -->
-        <li class="group relative h-full" @mouseenter="openMenu = 'explore'">
+        <li class="group relative h-full hidden sm:block" @mouseenter="openMenu = 'explore'">
           <RouterLink
             to="/explore"
             class="h-full flex items-center gap-2 px-5 text-[17px] font-medium text-gray-700 hover:text-sky-500 dark:text-gray-300 dark:hover:text-sky-400 transition-colors"
@@ -185,7 +185,7 @@
       </ul>
 
       <!-- 右侧：浅黑主题切换 -->
-      <div class="absolute right-[300px] top-1/2 -translate-y-1/2">
+      <div class="absolute right-[300px] top-1/2 -translate-y-1/2 hidden xl:block">
         <label class="switch">
           <input id="input" type="checkbox" :checked="isDark" @change="toggleTheme" />
           <div class="slider round">
