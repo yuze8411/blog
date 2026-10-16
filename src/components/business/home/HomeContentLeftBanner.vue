@@ -71,7 +71,7 @@ interface imgsrcItem {
   description: string
 }
 function getImgSrc(src: string) {
-  if (route.path.startsWith('http') || route.path.startsWith('https')) {
+  if (route.fullPath.startsWith('http') || route.fullPath.startsWith('https')) {
     return `/assets/images/banners/${src}`
   } else {
     return `/src/assets/images/banners/${src}`
