@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full h-[600px] bg-pink-200 relative">
+  <div class="w-full h-[600px] relative">
     <img
       src="@/assets/images/back2.jpg"
       alt="Home Cover"

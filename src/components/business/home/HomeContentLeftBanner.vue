@@ -59,29 +59,37 @@
 
 <script setup lang="ts">
 import { ref, watch, onMounted, onUnmounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import imgCsdn from '@/assets/images/banners/mycsdn.png'
 import imgGithub from '@/assets/images/banners/mygithub.png'
 import imgNote from '@/assets/images/banners/mynote.png'
 let router = useRouter()
+let route = useRoute()
 interface imgsrcItem {
   src: string
   text: string
   description: string
 }
+function getImgSrc(src: string) {
+  if (route.path.startsWith('http') || route.path.startsWith('https')) {
+    return `/assets/images/banners/${src}`
+  } else {
+    return `/src/assets/images/banners/${src}`
+  }
+}
 const imgStcArr: imgsrcItem[] = [
   {
-    src: '/src/assets/images/banners/mycsdn.png',
+    src: getImgSrc('mycsdn.png'),
     text: '这是我的CSDN博客，梦开始的地方',
     description: 'https://blog.csdn.net/2403_87566238?type=blog',
   },
   {
-    src: '/src/assets/images/banners/mygithub.png',
+    src: getImgSrc('mygithub.png'),
     text: '这是我的GitHub，咕咕嘎嘎！',
     description: 'https://github.com/yuze8411',
   },
   {
-    src: '/src/assets/images/banners/mynote.png',
+    src: getImgSrc('mynote.png'),
     text: '我的语雀笔记，一步一步积累',
     description: 'https://www.yuque.com/u54109278',
   },
@@ -95,7 +103,7 @@ watch(i, (newVal) => {
 let timer: number | null = null
 function toggleIndex(index: number) {
   i.value = index
-  clearInterval(timer as number)
+  if (timer) clearInterval(timer)
   timer = window.setInterval(() => {
     i.value = (i.value + 1) % imgStcArr.length
   }, 4000)
