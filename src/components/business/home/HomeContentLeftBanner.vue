@@ -2,13 +2,26 @@
   <div class="w-full h-[370px] rounded-[10px] relative overflow-hidden group">
     <transition name="fade" mode="out-in">
       <img
-        :key="i"
-        :src="imgSrc"
+        src="@/assets/images/banners/mycsdn.png"
         alt="Banner Image"
         class="w-full h-full object-cover rounded-[10px]"
+        v-if="i == 0"
       />
     </transition>
-
+    <transition name="fade" mode="out-in"
+      ><img
+        src="@/assets/images/banners/mygithub.png"
+        alt="Banner Image"
+        class="w-full h-full object-cover rounded-[10px]"
+        v-if="i == 1"
+    /></transition>
+    <transition name="fade" mode="out-in"
+      ><img
+        src="@/assets/images/banners/mynote.png"
+        alt="Banner Image"
+        class="w-full h-full object-cover rounded-[10px]"
+        v-if="i == 2"
+    /></transition>
     <div
       class="absolute w-full h-[60%] bg-[linear-gradient(to_top,#2c333e,transparent)] z-10 bottom-0 left-0"
     ></div>
@@ -60,47 +73,28 @@
 <script setup lang="ts">
 import { ref, watch, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import imgCsdn from '@/assets/images/banners/mycsdn.png'
-import imgGithub from '@/assets/images/banners/mygithub.png'
-import imgNote from '@/assets/images/banners/mynote.png'
 let router = useRouter()
 let route = useRoute()
 interface imgsrcItem {
-  src: string
   text: string
   description: string
 }
-function getImgSrc(src: string) {
-  let fullHref = window.location.href
-  if (fullHref.startsWith('http') || fullHref.startsWith('https')) {
-    return `/assets/images/banners/${src}`
-  } else {
-    return `/src/assets/images/banners/${src}`
-  }
-}
 const imgStcArr: imgsrcItem[] = [
   {
-    src: getImgSrc('mycsdn.png'),
     text: '这是我的CSDN博客，梦开始的地方',
     description: 'https://blog.csdn.net/2403_87566238?type=blog',
   },
   {
-    src: getImgSrc('mygithub.png'),
     text: '这是我的GitHub，咕咕嘎嘎！',
     description: 'https://github.com/yuze8411',
   },
   {
-    src: getImgSrc('mynote.png'),
     text: '我的语雀笔记，一步一步积累',
     description: 'https://www.yuque.com/u54109278',
   },
 ]
 const i = ref(0)
-const imgSrc = ref(imgStcArr[i.value]?.src ?? '')
 
-watch(i, (newVal) => {
-  imgSrc.value = imgStcArr[newVal]?.src ?? ''
-})
 let timer: number | null = null
 function toggleIndex(index: number) {
   i.value = index
