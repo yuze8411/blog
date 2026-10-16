@@ -19,18 +19,12 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import HomeLeafParticles from './HomeLeafParticles.vue'
 const canobj = ref<HTMLCanvasElement | null>(null)
 
-// 拉线/点击灯笼后把页面往下带一屏。
-// 想换成指定位置，可以给组件传 target（CSS 选择器），或在这里改成 router.push。
-function handlePull() {
-  window.scrollBy({ top: window.innerHeight * 0.92, behavior: 'smooth' })
-}
-
 let rafId: number | null = null
-let offset = 0
+let offset = 0 //
 let logicalW = 0
 let logicalH = 0
 let dpr = window.devicePixelRatio || 1
-
+// baseY是基线高度，phase是初始偏移
 function drawWave(
   ctx: CanvasRenderingContext2D,
   offset: number,

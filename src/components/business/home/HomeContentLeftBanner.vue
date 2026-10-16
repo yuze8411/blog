@@ -39,17 +39,19 @@
       </transition>
 
       <div class="mt-6 mb-4 flex gap-3 justify-center">
-        <span
-          v-for="(item, index) in imgStcArr"
-          :key="index"
-          class="w-[33px] h-[6px] rounded-[20px] bg-[rgb(128,132,140)] cursor-pointer hover:w-[50px] duration-[.4s]"
-          :class="
-            i === index
-              ? 'bg-[rgb(83,157,253)] w-[50px] hover:bg-[rgb(83,157,253)] shadow-lg shadow-[0_0_10px_#539dfd]'
-              : 'hover:bg-white'
-          "
-          @click="toggleIndex(index)"
-        ></span>
+        <div class="flex gap-3 justify-center w-[140px]">
+          <span
+            v-for="(item, index) in imgStcArr"
+            :key="index"
+            class="w-[33px] h-[6px] rounded-[20px] bg-[rgb(128,132,140)] cursor-pointer hover:w-[50px] duration-[.4s]"
+            :class="
+              i === index
+                ? 'bg-[rgb(83,157,253)] w-[50px] hover:bg-[rgb(83,157,253)] shadow-[0_0_10px_#539dfd]'
+                : 'hover:bg-white'
+            "
+            @click="toggleIndex(index)"
+          ></span>
+        </div>
       </div>
     </div>
   </div>
@@ -58,6 +60,9 @@
 <script setup lang="ts">
 import { ref, watch, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
+import imgCsdn from '@/assets/images/banners/mycsdn.png'
+import imgGithub from '@/assets/images/banners/mygithub.png'
+import imgNote from '@/assets/images/banners/mynote.png'
 let router = useRouter()
 interface imgsrcItem {
   src: string
