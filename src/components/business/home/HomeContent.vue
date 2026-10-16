@@ -1,6 +1,6 @@
 <template>
-  <div class="w-full bg-[rgb(250,250,250)] dark:bg-gray-950 h-[1000px]">
-    <div class="flex flex-wrap justify-between lg:w-[1000px] xl:w-[1250px] p-3 mx-auto">
+  <div class="w-full bg-[rgb(250,250,250)] dark:bg-gray-950">
+    <div class="flex flex-wrap justify-between lg:w-[1000px] xl:w-[1250px] p-3 mx-auto items-start">
       <HomeContentLeft></HomeContentLeft>
       <HomeContentRight></HomeContentRight>
     </div>
