@@ -71,7 +71,8 @@ interface imgsrcItem {
   description: string
 }
 function getImgSrc(src: string) {
-  if (route.fullPath.startsWith('http') || route.fullPath.startsWith('https')) {
+  let fullHref = window.location.href
+  if (fullHref.startsWith('http') || fullHref.startsWith('https')) {
     return `/assets/images/banners/${src}`
   } else {
     return `/src/assets/images/banners/${src}`
