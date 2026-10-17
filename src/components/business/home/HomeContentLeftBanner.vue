@@ -1,11 +1,14 @@
 <template>
-  <div class="w-full h-[370px] rounded-[10px] relative overflow-hidden group">
+  <div
+    class="w-full h-[370px] rounded-[10px] relative overflow-hidden group"
+    style="overflow-anchor: none"
+  >
     <transition name="fade" mode="out-in">
       <img
         src="@/assets/images/banners/mycsdn.png"
         alt="Banner Image"
         class="w-full h-full object-cover rounded-[10px]"
-        v-if="i == 0"
+        v-show="i == 0"
       />
     </transition>
     <transition name="fade" mode="out-in"
@@ -13,14 +16,14 @@
         src="@/assets/images/banners/mygithub.png"
         alt="Banner Image"
         class="w-full h-full object-cover rounded-[10px]"
-        v-if="i == 1"
+        v-show="i == 1"
     /></transition>
     <transition name="fade" mode="out-in"
       ><img
         src="@/assets/images/banners/mynote.png"
         alt="Banner Image"
         class="w-full h-full object-cover rounded-[10px]"
-        v-if="i == 2"
+        v-show="i == 2"
     /></transition>
     <div
       class="absolute w-full h-[60%] bg-[linear-gradient(to_top,#2c333e,transparent)] z-10 bottom-0 left-0"

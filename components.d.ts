@@ -11,13 +11,16 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    ElPagination: typeof import('element-plus/es')['ElPagination']
     HomeContent: typeof import('./src/components/business/home/HomeContent.vue')['default']
     HomeContentLeft: typeof import('./src/components/business/home/HomeContentLeft.vue')['default']
     HomeContentLeftBanner: typeof import('./src/components/business/home/HomeContentLeftBanner.vue')['default']
     HomeContentLeftBox: typeof import('./src/components/business/home/HomeContentLeftBox.vue')['default']
     HomeContentLeftBox1: typeof import('./src/components/business/home/HomeContentLeftBox1.vue')['default']
+    HomeContentLeftPages: typeof import('./src/components/business/home/HomeContentLeftPages.vue')['default']
     HomeContentRight: typeof import('./src/components/business/home/HomeContentRight.vue')['default']
     HomeContentRightMydata: typeof import('./src/components/business/home/HomeContentRightMydata.vue')['default']
+    HomeContentRightWeather: typeof import('./src/components/business/home/HomeContentRightWeather.vue')['default']
     HomeCover: typeof import('./src/components/business/home/HomeCover.vue')['default']
     HomeCoverText: typeof import('./src/components/business/home/HomeCoverText.vue')['default']
     HomeLeafParticles: typeof import('./src/components/business/home/HomeLeafParticles.vue')['default']

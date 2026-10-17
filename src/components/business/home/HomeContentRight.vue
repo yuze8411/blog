@@ -1,6 +1,7 @@
 <template>
   <div class="hidden lg:block lg:w-[31%] xl:w-[26%] transition-width relative dark:border-gray-700">
     <HomeContentRightMydata></HomeContentRightMydata>
+    <HomeContentRightWeather></HomeContentRightWeather>
   </div>
 </template>
 

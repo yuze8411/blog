@@ -1,7 +1,12 @@
 <template>
   <div class="w-full md:w-[90%] lg:w-[67%] xl:w-[72%] mx-auto transition-width">
     <HomeContentLeftBanner></HomeContentLeftBanner>
-    <HomeContentLeftBox v-for="item of articleData" :article="item"></HomeContentLeftBox>
+    <HomeContentLeftBox
+      v-for="(item, index) of articleData"
+      :article="item"
+      :index="index"
+    ></HomeContentLeftBox>
+    <HomeContentLeftPages :total="articleData.length"></HomeContentLeftPages>
   </div>
 </template>
 
@@ -16,7 +21,6 @@ interface ArticleProps {
   comment: number
   eyes: number
   tags: string[]
-  articleType: number
 }
 
 let articleData: ArticleProps[] = [
@@ -30,7 +34,6 @@ let articleData: ArticleProps[] = [
     comment: 1231,
     eyes: 3213,
     tags: ['前端', 'baas', 'vercel'],
-    articleType: 1,
   },
   {
     textId: '2',
@@ -42,7 +45,6 @@ let articleData: ArticleProps[] = [
     comment: 1231,
     eyes: 3213,
     tags: ['前端', 'baas', 'vercel'],
-    articleType: 1,
   },
   {
     textId: '3',
@@ -54,7 +56,6 @@ let articleData: ArticleProps[] = [
     comment: 1231,
     eyes: 3213,
     tags: ['前端', 'baas', 'vercel'],
-    articleType: 1,
   },
 ]
 </script>
