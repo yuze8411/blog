@@ -16,7 +16,6 @@ declare module 'vue' {
     HomeContentLeft: typeof import('./src/components/business/home/HomeContentLeft.vue')['default']
     HomeContentLeftBanner: typeof import('./src/components/business/home/HomeContentLeftBanner.vue')['default']
     HomeContentLeftBox: typeof import('./src/components/business/home/HomeContentLeftBox.vue')['default']
-    HomeContentLeftBox1: typeof import('./src/components/business/home/HomeContentLeftBox1.vue')['default']
     HomeContentLeftPages: typeof import('./src/components/business/home/HomeContentLeftPages.vue')['default']
     HomeContentRight: typeof import('./src/components/business/home/HomeContentRight.vue')['default']
     HomeContentRightMydata: typeof import('./src/components/business/home/HomeContentRightMydata.vue')['default']

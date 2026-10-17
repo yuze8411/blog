@@ -1,36 +1,302 @@
 <template>
-  <div class="relative h-[300px] border-[1px] border-gray-300 rounded-[10px] mt-3"></div>
+  <div
+    class="relative min-h-[300px] border-[1px] border-gray-300 rounded-[10px] mt-3 p-5 pb-8 overflow-hidden dark:border-gray-700"
+  >
+    <!-- 背景图：模糊 + 渐变遮罩，保证内容可读 -->
+    <div class="absolute inset-0 z-0 pointer-events-none" aria-hidden="true">
+      <img
+        src="@/assets/images/demoTextImages/demo.jpg"
+        alt=""
+        class="w-full h-full object-cover scale-105 blur-[1.5px] opacity-50 dark:opacity-30"
+      />
+      <div
+        class="absolute inset-0 bg-gradient-to-b from-white/45 via-white/65 to-white/85 dark:from-gray-950/55 dark:via-gray-950/75 dark:to-gray-950/90"
+      ></div>
+    </div>
+
+    <div class="relative z-10 flex items-center justify-between">
+      <span class="text-[16px] font-[huoxie] text-gray-700 dark:text-gray-300">实时天气</span>
+      <span v-if="updateTimeText" class="text-[12px] text-gray-400">
+        {{ updateTimeText }} 更新
+      </span>
+    </div>
+
+    <!-- 加载中 / 出错 -->
+    <div
+      v-if="status !== 'success'"
+      class="relative z-10 h-[220px] flex flex-col items-center justify-center gap-3"
+    >
+      <template v-if="status === 'loading'">
+        <span
+          class="w-6 h-6 rounded-full border-2 border-sky-300 border-t-transparent animate-spin"
+        ></span>
+        <span class="text-[14px] font-[huoxie] text-gray-500 dark:text-gray-400">
+          正在定位并获取天气…
+        </span>
+      </template>
+      <template v-else>
+        <span class="text-[14px] font-[huoxie] text-gray-500 dark:text-gray-400">
+          {{ errorMessage }}
+        </span>
+        <button
+          type="button"
+          class="text-[13px] text-sky-500 hover:text-sky-600 dark:text-sky-400 dark:hover:text-sky-300 duration-300"
+          @click="getPositionAndWeather"
+        >
+          重新获取
+        </button>
+      </template>
+    </div>
+
+    <!-- 天气内容 -->
+    <template v-else>
+      <div class="relative z-10 mt-4 flex items-center justify-between">
+        <div class="flex items-end gap-2">
+          <span class="text-[52px] leading-none font-[huoxie] text-gray-800 dark:text-gray-100">
+            {{ temperatureText }}
+          </span>
+          <div class="mb-1 flex flex-col">
+            <span class="text-[18px] leading-tight font-[huoxie] text-gray-700 dark:text-gray-200">
+              {{ conditionText }}
+            </span>
+            <span class="mt-[2px] text-[12px] text-gray-400">体感 {{ feelsLikeText }}</span>
+          </div>
+        </div>
+        <span class="text-[42px] leading-none select-none" aria-hidden="true">
+          {{ weatherEmoji }}
+        </span>
+      </div>
+
+      <div class="relative z-10 mt-4 h-[1px] bg-gray-200 dark:bg-gray-700"></div>
+
+      <!-- 基本天气信息 -->
+      <div class="relative z-10 mt-3 grid grid-cols-2 gap-x-5 gap-y-2 text-[13px] font-[huoxie]">
+        <div class="flex items-center justify-between">
+          <span class="text-gray-400">湿度</span>
+          <span class="text-gray-600 dark:text-gray-300">{{ humidityText }}</span>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="text-gray-400">风力</span>
+          <span class="text-gray-600 dark:text-gray-300">{{ windText }}</span>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="text-gray-400">降水</span>
+          <span class="text-gray-600 dark:text-gray-300">{{ precipitationText }}</span>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="text-gray-400">能见度</span>
+          <span class="text-gray-600 dark:text-gray-300">{{ visibilityText }}</span>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="text-gray-400">气压</span>
+          <span class="text-gray-600 dark:text-gray-300">{{ pressureText }}</span>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="text-gray-400">紫外线</span>
+          <span class="text-gray-600 dark:text-gray-300">{{ uvText }}</span>
+        </div>
+      </div>
+
+      <!-- 外出建议 -->
+      <div class="relative z-10 mt-4 rounded-[8px] bg-sky-50/70 px-3 py-2.5 dark:bg-sky-900/20">
+        <p class="text-[12px] text-sky-500 dark:text-sky-400">外出建议</p>
+        <p class="mt-1 text-[13px] leading-relaxed font-[huoxie] text-gray-600 dark:text-gray-300">
+          {{ outingAdvice }}
+        </p>
+      </div>
+    </template>
+  </div>
 </template>
+
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
-import axios from 'axios'
-let isAllow = ref()
-// 获取经纬度信息
-function getPostion() {
+import { computed, onMounted, ref } from 'vue'
+import { getCurrentWeather, type CurrentWeather, type WeatherValue } from '@/api/weather'
+
+type Status = 'loading' | 'success' | 'error'
+
+const status = ref<Status>('loading')
+const weather = ref<CurrentWeather>()
+const errorMessage = ref('')
+
+const COMPASS_TEXT = ['北风', '东北风', '东风', '东南风', '南风', '西南风', '西风', '西北风']
+const PRECIPITATION_TEXT: Record<string, string> = {
+  rain: '雨',
+  snow: '雪',
+  ice: '冰',
+  mixed: '雨夹雪',
+}
+
+const conditionText = computed(() => weather.value?.condition?.text ?? '--')
+
+function valueText(value: WeatherValue | undefined): string {
+  if (typeof value?.value !== 'number') return '--'
+  return `${Math.round(value.value)}${value.unit ?? ''}`
+}
+
+const temperatureText = computed(() => valueText(weather.value?.temperature))
+const feelsLikeText = computed(() => valueText(weather.value?.feelsLike))
+
+const humidityText = computed(() => {
+  const humidity = weather.value?.humidity
+  if (typeof humidity !== 'number') return '--'
+  // 和风 v1 返回 0~1 的小数
+  const percent = humidity <= 1 ? humidity * 100 : humidity
+  return `${Math.round(percent)}%`
+})
+
+const windText = computed(() => {
+  const wind = weather.value?.wind
+  const degree = wind?.direction?.degree
+  const direction =
+    typeof degree === 'number' ? (COMPASS_TEXT[Math.round(degree / 45) % 8] ?? '') : ''
+
+  if (typeof wind?.scale === 'number') return `${direction} ${wind.scale}级`.trim()
+  if (typeof wind?.speed?.value === 'number') {
+    return `${direction} ${wind.speed.value.toFixed(1)}${wind.speed.unit ?? 'm/s'}`.trim()
+  }
+  return '--'
+})
+
+const precipitationText = computed(() => {
+  const precipitation = weather.value?.precipitation
+  const type = precipitation?.type
+  if (!type || type === 'none' || type === 'unknown') return '无'
+
+  const typeText = PRECIPITATION_TEXT[type] ?? ''
+  const amount = precipitation?.amount?.value
+  const amountText =
+    typeof amount === 'number' ? `${amount.toFixed(1)}${precipitation?.amount?.unit ?? 'mm'}` : ''
+
+  return [typeText, amountText].filter(Boolean).join(' ') || '有降水'
+})
+
+const visibilityText = computed(() => {
+  const value = weather.value?.visibility?.value
+  if (typeof value !== 'number') return '--'
+  return value >= 1000 ? `${(value / 1000).toFixed(1)}km` : `${Math.round(value)}m`
+})
+
+const pressureText = computed(() => valueText(weather.value?.pressure))
+
+const uvText = computed(() => {
+  const uv = weather.value?.uvIndex
+  if (typeof uv !== 'number') return '--'
+  const level = uv <= 2 ? '弱' : uv <= 5 ? '中等' : uv <= 7 ? '强' : uv <= 10 ? '很强' : '极强'
+  return `${Math.round(uv)} ${level}`
+})
+
+const updateTimeText = computed(() => {
+  const raw = weather.value?.updateTime
+  if (!raw) return ''
+  const date = new Date(raw)
+  if (Number.isNaN(date.getTime())) return ''
+  return date.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
+})
+
+const attributionUrl = computed(() => {
+  const first = weather.value?.metadata?.attributions?.[0]
+  if (typeof first === 'string') return first
+  if (first?.url) return first.url
+  return 'https://www.qweather.com'
+})
+
+const weatherEmoji = computed(() => {
+  const code = Number(weather.value?.condition?.code)
+  if (!Number.isFinite(code)) return '🌤️'
+  if (code >= 200 && code < 300) return '🌬️'
+  if (code >= 300 && code < 400) return '🌧️'
+  if (code >= 400 && code < 500) return '❄️'
+  if (code >= 500 && code < 600) return '🌫️'
+  if (code >= 150 && code <= 153) return '🌙'
+  if (code === 100) return '☀️'
+  if (code === 104) return '☁️'
+  return '🌤️'
+})
+
+/** 综合气温、体感、风速、降水给出外出建议 */
+const outingAdvice = computed(() => {
+  const current = weather.value
+  if (!current) return ''
+
+  const tips: string[] = []
+  const precipType = current.precipitation?.type ?? 'none'
+  const precipAmount = current.precipitation?.amount?.value ?? 0
+  const feelsLike = current.feelsLike?.value ?? current.temperature?.value
+  const windScale = current.wind?.scale ?? 0
+  const visibility = current.visibility?.value
+  const uv = current.uvIndex ?? 0
+
+  // 降水
+  if (precipType === 'snow' || precipType === 'ice') {
+    tips.push('有降雪或结冰，路面湿滑，注意保暖防滑')
+  } else if (precipType === 'rain' || precipType === 'mixed') {
+    tips.push(precipAmount >= 10 ? '雨势较大，尽量减少外出并带好雨具' : '有降雨，出门记得带伞')
+  }
+
+  // 体感温度
+  if (typeof feelsLike === 'number') {
+    if (feelsLike <= 0) tips.push('体感寒冷，穿厚外套并做好保暖')
+    else if (feelsLike < 10) tips.push('体感偏冷，建议穿厚外套')
+    else if (feelsLike < 18) tips.push('体感微凉，加件薄外套即可')
+    else if (feelsLike < 26) tips.push('体感舒适，适合外出活动')
+    else if (feelsLike < 32) tips.push('体感偏热，注意补水防晒')
+    else tips.push('体感炎热，尽量避开午后高温时段')
+  }
+
+  // 风力 / 能见度 / 紫外线
+  if (windScale >= 6) tips.push('风力较大，外出注意防风')
+  else if (windScale >= 4) tips.push('有一定风力，留意高空坠物')
+
+  if (typeof visibility === 'number' && visibility < 1000) {
+    tips.push('能见度较低，出行注意交通安全')
+  } else if (uv >= 6) {
+    tips.push('紫外线较强，做好防晒')
+  }
+
+  if (!tips.length) tips.push('天气平稳，适合外出')
+  return `${tips.slice(0, 3).join('；')}。`
+})
+
+function getPositionAndWeather() {
+  status.value = 'loading'
+  errorMessage.value = ''
+
+  if (!navigator.geolocation) {
+    status.value = 'error'
+    errorMessage.value = '当前浏览器不支持定位'
+    return
+  }
+
   navigator.geolocation.getCurrentPosition(
     async (pos) => {
-      isAllow.value = true
-      const coords = pos.coords
-      let lat = coords.latitude
-      let lon = coords.longitude
-      const res = await axios.get('/api/weather', {
-        params: { lat, lon },
-      })
-      console.log(res.data)
+      try {
+        weather.value = await getCurrentWeather(pos.coords.latitude, pos.coords.longitude)
+        status.value = 'success'
+      } catch (err) {
+        console.error('天气获取失败：', err)
+        status.value = 'error'
+        errorMessage.value = '天气获取失败，请稍后再试'
+      }
     },
     (err) => {
-      isAllow.value = false
-      console.log(err.code, err.message)
+      console.warn('定位失败：', err.code, err.message)
+      status.value = 'error'
+      errorMessage.value =
+        err.code === 1 // PERMISSION_DENIED
+          ? '定位权限被拒绝，无法获取天气'
+          : '定位失败，无法获取天气'
     },
     {
-      enableHighAccuracy: false, // 开启高精度（耗电、慢，GPS优先）
+      enableHighAccuracy: false, // 高精度定位更慢更耗电，查天气没必要
       timeout: 10000, // 超时时间 10s
-      maximumAge: 0, // 不使用缓存的旧定位
+      maximumAge: 10 * 60 * 1000, // 复用 10 分钟内的定位结果
     },
   )
 }
+
 onMounted(() => {
-  getPostion()
+  getPositionAndWeather()
 })
 </script>
+
 <style scoped></style>
