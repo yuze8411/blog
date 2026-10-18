@@ -1,8 +1,7 @@
 <template>
   <div
-    class="relative min-h-[300px] border-[1px] border-gray-300 rounded-[10px] mt-3 p-5 pb-8 overflow-hidden dark:border-gray-700"
+    class="relative min-h-[300px] border border-gray-200/80 rounded-[10px] mt-3 p-5 pb-8 overflow-hidden shadow-[0_2px_10px_rgba(0,0,0,0.04)] dark:border-gray-700/60 dark:shadow-[0_2px_12px_rgba(0,0,0,0.3)]"
   >
-    <!-- 背景图：模糊 + 渐变遮罩，保证内容可读 -->
     <div class="absolute inset-0 z-0 pointer-events-none" aria-hidden="true">
       <img
         src="@/assets/images/demoTextImages/demo.jpg"
@@ -139,7 +138,6 @@ const feelsLikeText = computed(() => valueText(weather.value?.feelsLike))
 const humidityText = computed(() => {
   const humidity = weather.value?.humidity
   if (typeof humidity !== 'number') return '--'
-  // 和风 v1 返回 0~1 的小数
   const percent = humidity <= 1 ? humidity * 100 : humidity
   return `${Math.round(percent)}%`
 })

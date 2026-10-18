@@ -1,5 +1,7 @@
 <template>
-  <div class="relative h-[370px] border-[1px] border-gray-300 rounded-[10px]">
+  <div
+    class="relative h-[370px] border border-gray-200/80 rounded-[10px] shadow-[0_2px_10px_rgba(0,0,0,0.04)] dark:border-gray-700/60 dark:shadow-[0_2px_12px_rgba(0,0,0,0.3)]"
+  >
     <div class="absolute top-0 left-0 -z-1">
       <img
         src="@/assets/images/8385-mountains-55067_1920 (1).png"

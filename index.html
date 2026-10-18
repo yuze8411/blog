@@ -1,11 +1,77 @@
 <!DOCTYPE html>
-<html lang="">
+<html lang="zh-CN">
 
 <head>
   <meta charset="UTF-8">
-  <link rel="icon" href="/src/assets/images/mycover.jpg">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>雨落千山的个人博客</title>
+
+  <!-- ============ 基础 SEO ============ -->
+  <!-- 如更换自定义域名，请同步修改 canonical、og:url、og:image、twitter:image 及 public/robots.txt、public/sitemap.xml -->
+  <title>雨落千山 | 个人博客 · 前端开发 · 技术笔记 · 生活记录</title>
+  <meta name="description" content="雨落千山的个人博客，记录前端开发笔记、Vue3 工程实践、科技产品体验、生活感悟与旅行游记。保持热爱，奔赴山海。">
+  <meta name="keywords" content="雨落千山,个人博客,前端开发,Vue3,技术博客,开发笔记,生活记录,旅行游记,科技产品,学习笔记">
+  <meta name="author" content="雨落千山">
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+  <link rel="canonical" href="https://blog-rho-gules.vercel.app/">
+
+  <!-- ============ 站点图标 / 主题色 ============ -->
+  <link rel="icon" type="image/jpeg" href="/cover.jpg">
+  <link rel="apple-touch-icon" href="/cover.jpg">
+  <meta name="theme-color" content="#2f4a77" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#111827" media="(prefers-color-scheme: dark)">
+
+  <!-- ============ Open Graph（微信、QQ、微博、飞书等分享卡片） ============ -->
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="zh_CN">
+  <meta property="og:site_name" content="雨落千山">
+  <meta property="og:title" content="雨落千山 | 个人博客 · 前端开发 · 技术笔记 · 生活记录">
+  <meta property="og:description" content="记录前端开发笔记、Vue3 工程实践、科技产品体验、生活感悟与旅行游记。保持热爱，奔赴山海。">
+  <meta property="og:url" content="https://blog-rho-gules.vercel.app/">
+  <meta property="og:image" content="https://blog-rho-gules.vercel.app/cover.jpg">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:width" content="1080">
+  <meta property="og:image:height" content="1080">
+  <meta property="og:image:alt" content="雨落千山的个人博客封面">
+
+  <!-- ============ Twitter / X 卡片 ============ -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="雨落千山 | 个人博客">
+  <meta name="twitter:description" content="记录前端开发笔记、Vue3 工程实践、科技产品体验、生活感悟与旅行游记。">
+  <meta name="twitter:image" content="https://blog-rho-gules.vercel.app/cover.jpg">
+  <meta name="twitter:image:alt" content="雨落千山的个人博客封面">
+
+  <!-- ============ 结构化数据（搜索引擎 / 社交平台识别站点与作者） ============ -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebSite",
+          "@id": "https://blog-rho-gules.vercel.app/#website",
+          "url": "https://blog-rho-gules.vercel.app/",
+          "name": "雨落千山的个人博客",
+          "alternateName": "雨落千山",
+          "description": "记录前端开发笔记、Vue3 工程实践、科技产品体验、生活感悟与旅行游记。",
+          "inLanguage": "zh-CN",
+          "publisher": { "@id": "https://blog-rho-gules.vercel.app/#person" }
+        },
+        {
+          "@type": "Person",
+          "@id": "https://blog-rho-gules.vercel.app/#person",
+          "name": "雨落千山",
+          "url": "https://blog-rho-gules.vercel.app/",
+          "image": "https://blog-rho-gules.vercel.app/cover.jpg",
+          "sameAs": [
+            "https://github.com/yuze8411",
+            "https://blog.csdn.net/2403_87566238",
+            "https://www.yuque.com/u54109278",
+            "https://space.bilibili.com/3546706316626107"
+          ]
+        }
+      ]
+    }
+  </script>
+
   <script>
     // 首屏渲染前应用主题，避免闪白/闪亮：优先本地保存，其次跟随系统
     try {

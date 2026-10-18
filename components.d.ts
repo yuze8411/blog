@@ -20,12 +20,14 @@ declare module 'vue' {
     HomeContentRight: typeof import('./src/components/business/home/HomeContentRight.vue')['default']
     HomeContentRightMydata: typeof import('./src/components/business/home/HomeContentRightMydata.vue')['default']
     HomeContentRightWeather: typeof import('./src/components/business/home/HomeContentRightWeather.vue')['default']
+    HomeContentRightWebdata: typeof import('./src/components/business/home/HomeContentRightWebdata.vue')['default']
     HomeCover: typeof import('./src/components/business/home/HomeCover.vue')['default']
     HomeCoverText: typeof import('./src/components/business/home/HomeCoverText.vue')['default']
     HomeLeafParticles: typeof import('./src/components/business/home/HomeLeafParticles.vue')['default']
     IconFont: typeof import('./src/components/common/IconFont.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    SiteFooter: typeof import('./src/components/common/SiteFooter.vue')['default']
     TopNavigation: typeof import('./src/components/common/TopNavigation.vue')['default']
   }
 }

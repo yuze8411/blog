@@ -4,6 +4,7 @@
       <HomeContentLeft></HomeContentLeft>
       <HomeContentRight></HomeContentRight>
     </div>
+    <SiteFooter></SiteFooter>
   </div>
 </template>
 

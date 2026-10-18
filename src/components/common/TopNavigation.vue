@@ -1,12 +1,17 @@
 <template>
   <nav
-    class="fixed top-0 left-0 w-full h-16 bg-[rgba(47, 74, 119,.9)] backdrop-blur-[5px] z-[100] dark:bg-gray-900/90 dark:shadow-gray-950 transition-colors duration-300"
+    class="fixed top-0 left-0 w-full h-16 z-[100] backdrop-blur-[6px] transition-all duration-300"
+    :class="
+      scrolled
+        ? 'bg-[rgba(47,74,119,0.94)] shadow-[0_6px_24px_rgba(15,35,65,0.28)] dark:bg-gray-900/95 dark:shadow-[0_6px_24px_rgba(0,0,0,0.5)]'
+        : 'bg-[rgba(47,74,119,0.45)] shadow-none dark:bg-gray-900/50'
+    "
     @mouseleave="openMenu = ''"
   >
     <div class="relative h-full flex items-center justify-center">
       <div class="absolute top-1/2 -translate-y-1/2 left-[450px] hidden 2x5l:block">
         <span
-          class="text-[20px] font-[xuanzong] tracking-[14px] bg-gradient-to-r from-[#63f1fc] to-[#1a8bfd] bg-clip-text text-transparent"
+          class="inline-block text-[24px] leading-none font-[xuanzong] tracking-[6px] bg-gradient-to-r from-white via-[#d6ecff] to-[#8ecbff] bg-clip-text text-transparent drop-shadow-[0_1px_5px_rgba(120,200,255,0.35)]"
           >雨落千山</span
         >
       </div>
@@ -260,7 +265,7 @@
 <script setup lang="ts">
 import { ref, watch, computed } from 'vue'
 import { useRoute } from 'vue-router'
-import { onMounted } from 'vue'
+import { onMounted, onUnmounted } from 'vue'
 // IconFont 由 unplugin-vue-components 自动注册为全局组件，无需手动导入
 
 const openMenu = ref('')
@@ -281,6 +286,22 @@ function isActive(item: { name: string; path: string }) {
 // 路由变化时收起二级导航
 watch(activePath, () => {
   openMenu.value = ''
+})
+
+// ---------- 滚动后加深导航栏背景并加阴影 ----------
+const scrolled = ref(false)
+
+function handleScroll() {
+  scrolled.value = window.scrollY > 20
+}
+
+onMounted(() => {
+  handleScroll()
+  window.addEventListener('scroll', handleScroll, { passive: true })
+})
+
+onUnmounted(() => {
+  window.removeEventListener('scroll', handleScroll)
 })
 
 // ---------- 浅黑主题切换 ----------
