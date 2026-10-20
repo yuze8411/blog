@@ -30,6 +30,7 @@
 - 特效：`particles.js` 粒子背景
 - UI 组件库：`Element Plus`
 - 第三方服务：和风天气 API（天气查询功能）
+- md文章编辑：md-editor-v3，文章渲染：markdown-it+shiki+配套插件
 
 ### ✅ 后端
 
