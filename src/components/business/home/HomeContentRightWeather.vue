@@ -109,11 +109,10 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
-import { getCurrentWeather, type CurrentWeather, type WeatherValue } from '@/api/weather'
+import { getCurrentWeather } from '@/api/weather'
+import type { CurrentWeather, WeatherStatus, WeatherValue } from '@/types'
 
-type Status = 'loading' | 'success' | 'error'
-
-const status = ref<Status>('loading')
+const status = ref<WeatherStatus>('loading')
 const weather = ref<CurrentWeather>()
 const errorMessage = ref('')
 

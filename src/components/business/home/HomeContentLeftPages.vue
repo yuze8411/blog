@@ -15,14 +15,9 @@
 <script setup lang="ts">
 // 首页文章展示分页，一次最多展示10个文章(不包含banner图)
 import { ref, watch } from 'vue'
+import type { PaginationProps } from '@/types'
 
-interface Props {
-  total: number
-  pageSize?: number
-  modelValue?: number
-}
-
-const props = withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<PaginationProps>(), {
   pageSize: 10,
   modelValue: 1,
 })

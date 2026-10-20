@@ -76,13 +76,10 @@
 <script setup lang="ts">
 import { ref, watch, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import type { CarouselItem } from '@/types'
 let router = useRouter()
 let route = useRoute()
-interface imgsrcItem {
-  text: string
-  description: string
-}
-const imgStcArr: imgsrcItem[] = [
+const imgStcArr: CarouselItem[] = [
   {
     text: '这是我的CSDN博客，梦开始的地方',
     description: 'https://blog.csdn.net/2403_87566238?type=blog',

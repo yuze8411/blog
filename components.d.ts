@@ -11,6 +11,12 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    ArticleContent: typeof import('./src/components/business/articleDetail/ArticleContent.vue')['default']
+    ArticleContentLeft: typeof import('./src/components/business/articleDetail/ArticleContentLeft.vue')['default']
+    ArticleContentRight: typeof import('./src/components/business/articleDetail/ArticleContentRight.vue')['default']
+    ArticleContentRightCatalog: typeof import('./src/components/business/articleDetail/ArticleContentRightCatalog.vue')['default']
+    ArticleData: typeof import('./src/components/business/articleDetail/ArticleData.vue')['default']
+    ArticleDataText: typeof import('./src/components/business/articleDetail/ArticleDataText.vue')['default']
     ElPagination: typeof import('element-plus/es')['ElPagination']
     HomeContent: typeof import('./src/components/business/home/HomeContent.vue')['default']
     HomeContentLeft: typeof import('./src/components/business/home/HomeContentLeft.vue')['default']

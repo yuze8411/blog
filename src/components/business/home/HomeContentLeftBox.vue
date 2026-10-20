@@ -107,22 +107,9 @@
   </div>
 </template>
 <script setup lang="ts">
-import { toRefs, ref } from 'vue'
-interface Article {
-  textId: string
-  coverSrc: string
-  title: string
-  content: string
-  time: string
-  comment: number
-  eyes: number
-  tags: string[]
-}
-interface Props {
-  article: Article
-  index: number
-}
-const props = defineProps<Props>()
+import type { ArticleCardProps } from '@/types'
+
+const props = defineProps<ArticleCardProps>()
 </script>
 <style scoped>
 .left_clip {

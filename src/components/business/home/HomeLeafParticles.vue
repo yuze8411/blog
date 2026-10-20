@@ -4,6 +4,7 @@
 
 <script setup lang="ts">
 import { onMounted, onBeforeUnmount, ref } from 'vue'
+import type { Leaf } from '@/types'
 
 const canvasRef = ref<HTMLCanvasElement | null>(null)
 
@@ -14,24 +15,6 @@ const LEAF_HALF_W = 13 // 精灵中叶子的半宽
 
 const MAX_LEAVES = 100 // 同屏最多几片（“别太多”）
 const TOP_SPAWN_RATIO = 0.4 // 从顶部左半边出现的比例，其余从左侧边框出现
-
-interface Leaf {
-  x0: number
-  y0: number
-  cx: number // 弧线控制点
-  cy: number
-  x1: number
-  y1: number
-  t: number // 0 -> 1 的滑动进度
-  speed: number // 每秒进度
-  duration: number
-  size: number // 初始半高（px）
-  rot: number
-  spin: number
-  wobbleAmp: number
-  wobbleFreq: number
-  wobblePhase: number
-}
 
 let sprite: HTMLCanvasElement | null = null
 let ctx2d: CanvasRenderingContext2D | null = null

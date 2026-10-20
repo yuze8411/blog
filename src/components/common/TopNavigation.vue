@@ -3,30 +3,31 @@
     class="fixed top-0 left-0 w-full h-16 z-[100] backdrop-blur-[6px] transition-all duration-300"
     :class="
       scrolled
-        ? 'bg-[rgba(47,74,119,0.94)] shadow-[0_6px_24px_rgba(15,35,65,0.28)] dark:bg-gray-900/95 dark:shadow-[0_6px_24px_rgba(0,0,0,0.5)]'
+        ? 'bg-[#ffffff80] shadow-[0_6px_24px_rgba(255,255,255,0.6)] dark:bg-gray-900/95 dark:shadow-[0_6px_24px_rgba(0,0,0,0.5)]'
         : 'bg-[rgba(47,74,119,0.45)] shadow-none dark:bg-gray-900/50'
     "
     @mouseleave="openMenu = ''"
   >
     <div class="relative h-full flex items-center justify-center">
-      <div class="absolute top-1/2 -translate-y-1/2 left-[450px] hidden 2x5l:block">
+      <!-- <div class="absolute top-1/2 -translate-y-1/2 left-[450px] hidden 2x5l:block">
         <span
-          class="inline-block text-[24px] leading-none font-[xuanzong] tracking-[6px] bg-gradient-to-r from-white via-[#d6ecff] to-[#8ecbff] bg-clip-text text-transparent drop-shadow-[0_1px_5px_rgba(120,200,255,0.35)]"
+          class="inline-block text-[24px] leading-none font-[xuanzong] tracking-[6px] bg-clip-text text-transparent transition-all duration-300"
+          :class="brandClass"
           >雨落千山</span
         >
-      </div>
+      </div> -->
       <ul class="flex items-center gap-5 h-full">
         <!-- 一级：首页（无下拉） -->
         <li class="group relative h-full" @mouseenter="openMenu = ''">
           <RouterLink
             to="/"
-            class="h-full flex items-center gap-2 px-5 text-[17px] font-medium text-gray-700 hover:text-sky-500 dark:text-gray-300 dark:hover:text-sky-400 transition-colors"
+            class="h-full flex items-center gap-2 px-5 text-[17px] font-medium transition-colors"
             :class="isActive({ name: 'home', path: '/' })"
           >
             <span class="text-[20px] leading-none">
               <IconFont name="shouye" />
             </span>
-            <span class="text-white hover:text-sky-200 font-[huoxie] text-[21px]">首页</span>
+            <span class="font-[huoxie] text-[21px]" :class="labelClass">首页</span>
           </RouterLink>
         </li>
 
@@ -34,13 +35,13 @@
         <li class="group relative h-full" @mouseenter="openMenu = 'category'">
           <RouterLink
             to="/category"
-            class="h-full flex items-center gap-2 px-5 text-[17px] font-medium text-gray-700 hover:text-sky-500 dark:text-gray-300 dark:hover:text-sky-400 transition-colors"
+            class="h-full flex items-center gap-2 px-5 text-[17px] font-medium transition-colors"
             :class="isActive({ name: 'category', path: '/category' })"
           >
             <span class="text-[20px] leading-none">
               <IconFont name="fenlei1" class="text-[25px]" />
             </span>
-            <span class="text-white hover:text-sky-200 font-[huoxie] text-[21px]">分类</span>
+            <span class="font-[huoxie] text-[21px]" :class="labelClass">分类</span>
           </RouterLink>
 
           <!-- 二级导航：分类 -->
@@ -101,13 +102,13 @@
         <li class="group relative h-full" @mouseenter="openMenu = ''">
           <RouterLink
             to="/time"
-            class="h-full flex items-center gap-2 px-5 text-[17px] font-medium text-gray-700 hover:text-sky-500 dark:text-gray-300 dark:hover:text-sky-400 transition-colors"
+            class="h-full flex items-center gap-2 px-5 text-[17px] font-medium transition-colors"
             :class="isActive({ name: 'time', path: '/time' })"
           >
             <span class="text-[20px] leading-none">
               <IconFont name="-shijian" />
             </span>
-            <span class="text-white hover:text-sky-200 font-[huoxie] text-[21px]">时光</span>
+            <span class="font-[huoxie] text-[21px]" :class="labelClass">时光</span>
           </RouterLink>
         </li>
 
@@ -115,13 +116,13 @@
         <li class="group relative h-full hidden ssm:block" @mouseenter="openMenu = ''">
           <RouterLink
             to="/travel"
-            class="h-full flex items-center gap-2 px-5 text-[17px] font-medium text-gray-700 hover:text-sky-500 dark:text-gray-300 dark:hover:text-sky-400 transition-colors"
+            class="h-full flex items-center gap-2 px-5 text-[17px] font-medium transition-colors"
             :class="isActive({ name: 'travel', path: '/travel' })"
           >
             <span class="text-[20px] leading-none">
               <IconFont name="diqiu" class="text-[23px]" />
             </span>
-            <span class="text-white hover:text-sky-200 font-[huoxie] text-[21px]">游记</span>
+            <span class="font-[huoxie] text-[21px]" :class="labelClass">游记</span>
           </RouterLink>
         </li>
 
@@ -129,13 +130,13 @@
         <li class="group relative h-full hidden sm:block" @mouseenter="openMenu = 'explore'">
           <RouterLink
             to="/explore"
-            class="h-full flex items-center gap-2 px-5 text-[17px] font-medium text-gray-700 hover:text-sky-500 dark:text-gray-300 dark:hover:text-sky-400 transition-colors"
+            class="h-full flex items-center gap-2 px-5 text-[17px] font-medium transition-colors"
             :class="isActive({ name: 'explore', path: '/explore' })"
           >
             <span class="text-[20px] leading-none">
               <IconFont name="a-232_linggan" class="text-[25px]" />
             </span>
-            <span class="text-white hover:text-sky-200 font-[huoxie] text-[21px]">探索</span>
+            <span class="font-[huoxie] text-[21px]" :class="labelClass">探索</span>
           </RouterLink>
 
           <!-- 二级导航：探索 -->
@@ -275,12 +276,16 @@ const activePath = computed(() => route.fullPath)
 
 function isActive(item: { name: string; path: string }) {
   // 精确匹配一级路径；子项路径带上自身 name 高亮
-  return {
-    'text-sky-500 dark:text-sky-400':
-      item.name === 'home'
-        ? activePath.value === item.path
-        : activePath.value.startsWith(item.path),
+  const active =
+    item.name === 'home' ? activePath.value === item.path : activePath.value.startsWith(item.path)
+
+  // 滚动后导航变浅：普通项转黑字，激活项用更深的蓝色保证对比度
+  if (active) {
+    return scrolled.value ? 'text-sky-600 dark:text-sky-400' : 'text-sky-200'
   }
+  return scrolled.value
+    ? 'text-gray-900 hover:text-sky-600 dark:text-gray-300 dark:hover:text-sky-400'
+    : 'text-white/90 hover:text-sky-200 dark:text-gray-300 dark:hover:text-sky-400'
 }
 
 // 路由变化时收起二级导航
@@ -290,6 +295,19 @@ watch(activePath, () => {
 
 // ---------- 滚动后加深导航栏背景并加阴影 ----------
 const scrolled = ref(false)
+
+// 滚动后文字/品牌字转深色，未滚动时保持白色
+const labelClass = computed(() =>
+  scrolled.value
+    ? 'text-gray-900 hover:text-sky-600 dark:text-gray-100 dark:hover:text-sky-400'
+    : 'text-white hover:text-sky-200 dark:text-gray-300 dark:hover:text-sky-400',
+)
+
+const brandClass = computed(() =>
+  scrolled.value
+    ? 'bg-gradient-to-r from-[#2f4a77] via-[#3f74ad] to-[#5fa6dd] dark:from-white dark:via-sky-200 dark:to-sky-400'
+    : 'bg-gradient-to-r from-white via-[#d6ecff] to-[#8ecbff] drop-shadow-[0_1px_5px_rgba(120,200,255,0.35)]',
+)
 
 function handleScroll() {
   scrolled.value = window.scrollY > 20

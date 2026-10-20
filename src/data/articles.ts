@@ -1,15 +1,6 @@
-/** 首页演示文章数据，后续接入真实接口时只需替换这里的 articles */
-export interface Article {
-  textId: string
-  coverSrc: string
-  title: string
-  content: string
-  time: string
-  comment: number
-  eyes: number
-  tags: string[]
-}
+import type { Article } from '@/types'
 
+/** 首页演示文章数据，后续接入真实接口时只需替换这里的 articles */
 export const articles: Article[] = [
   {
     textId: '1',
