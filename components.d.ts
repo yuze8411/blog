@@ -15,6 +15,7 @@ declare module 'vue' {
     ArticleContentLeft: typeof import('./src/components/business/articleDetail/ArticleContentLeft.vue')['default']
     ArticleContentRight: typeof import('./src/components/business/articleDetail/ArticleContentRight.vue')['default']
     ArticleContentRightCatalog: typeof import('./src/components/business/articleDetail/ArticleContentRightCatalog.vue')['default']
+    ArticleContentRightImg: typeof import('./src/components/business/articleDetail/ArticleContentRightImg.vue')['default']
     ArticleData: typeof import('./src/components/business/articleDetail/ArticleData.vue')['default']
     ArticleDataText: typeof import('./src/components/business/articleDetail/ArticleDataText.vue')['default']
     ElPagination: typeof import('element-plus/es')['ElPagination']

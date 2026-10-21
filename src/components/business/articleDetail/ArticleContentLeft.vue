@@ -63,6 +63,7 @@ async function copyContent() {
 
 onMounted(() => {
   htmlContent.value = md.render(props.virtureData.content)
+  console.log(htmlContent.value)
 })
 </script>
 

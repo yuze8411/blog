@@ -3,7 +3,7 @@
     class="w-full rounded-xl border border-gray-200/80 bg-white/85 p-4 backdrop-blur-md dark:border-gray-700/60 dark:bg-gray-900/85"
   >
     <div class="flex items-center">
-      <h2 class="text-[22px] tracking-[2px] text-gray-800 dark:text-gray-100 font-[huoxie]">
+      <h2 class="text-[22px] tracking-[2px] text-gray-900 dark:text-gray-100 font-[huoxie]">
         目录
       </h2>
 
@@ -63,7 +63,7 @@
         v-for="(item, index) in toc"
         :key="item.id + '-' + index"
         :href="'#' + item.id"
-        class="block rounded py-[5px] font-[huoxie] text-[14px] leading-5 text-gray-500 transition-colors duration-200 hover:text-sky-600 dark:text-gray-400 dark:hover:text-sky-400"
+        class="block rounded py-[5px] font-[huoxie] text-[14px] leading-5 text-gray-600 transition-colors duration-200 hover:text-sky-600 dark:text-gray-400 dark:hover:text-sky-400"
         :style="{ paddingLeft: 4 + (item.level - minLevel) * 14 + 'px' }"
         @click.prevent="scrollTo(item.id)"
       >
@@ -71,7 +71,7 @@
       </a>
     </nav>
 
-    <p v-else class="mt-3 font-[huoxie] text-[13px] text-gray-400 dark:text-gray-500">
+    <p v-else class="mt-3 font-[huoxie] text-[15px] text-gray-700 dark:text-gray-500">
       这篇文章还没有目录，慢慢读吧。
     </p>
   </aside>
