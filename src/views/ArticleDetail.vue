@@ -24,7 +24,7 @@ let virtureData = {
 修改标签循环那一块，准备一套颜色数组，通过 \`index\` 取色，不会随机闪烁。
 > 
 > 我准备了 5 组浅色背景 + 深色文字、深色模式自动适配的配色，你可以自行增删。
-\`\`\`
+\`\`\`vue
 <template>
   <div class="w-full md:w-[90%] lg:w-[77%] xl:w-[82%] mx-auto transition-width">
     <div class="w-full">
@@ -81,7 +81,7 @@ const tagColorList = [
 4. 给 \`v-for\` 补上了 \`:key="index"\`，规范写法。
 ---
 ### 如果你想要【内联 style 版本】（不想用 tailwind class）
-\`\`\`
+\`\`\`vue
 <script setup>
 const tagStyleList = [
   { bg: '#dbeafe', color: '#1d4ed8', darkBg: '#1e3a8a80', darkColor: '#93c5fd' },

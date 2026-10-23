@@ -48,3 +48,64 @@
   padding: 0;
   box-sizing: border-box;
 }
+
+/* ========== 入场动画 ========== */
+/* 滚动进入视口：由 v-reveal 指令切换 reveal-init -> reveal-in */
+.reveal-init {
+  opacity: 0;
+  transform: translateY(24px);
+  will-change: opacity, transform;
+}
+
+.reveal-in {
+  opacity: 1;
+  transform: translateY(0);
+  transition:
+    opacity 0.65s cubic-bezier(0.22, 0.61, 0.36, 1),
+    transform 0.65s cubic-bezier(0.22, 0.61, 0.36, 1);
+  will-change: auto;
+}
+
+/* 只淡入、不位移：用于紧贴波浪等区块的元素 */
+.reveal-fade-init {
+  opacity: 0;
+}
+
+.reveal-fade-in {
+  opacity: 1;
+  transition: opacity 0.65s ease;
+}
+
+/* 已有 transform 定位的元素用纯淡入，避免覆盖定位 */
+.enter-fade-in {
+  animation: enter-fade-in 0.8s ease both;
+}
+
+@keyframes enter-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal-init {
+    opacity: 1;
+    transform: none;
+  }
+
+  .reveal-in,
+  .reveal-fade-in {
+    transition: none;
+  }
+
+  .reveal-fade-init {
+    opacity: 1;
+  }
+
+  .enter-fade-in {
+    animation: none;
+  }
+}

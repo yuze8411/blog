@@ -1,11 +1,11 @@
 <template>
   <div
     id="article-content"
-    class="w-full md:w-[90%] lg:w-[74%] xl:w-[79%] mx-auto transition-width group px-2"
+    class="w-full md:w-[90%] lg:w-[72%] xl:w-[77%] mx-auto transition-width group px-2"
   >
     <div class="w-full overflow-auto">
       <div
-        class="text-gray-900 dark:text-gray-200 font-[huoxie] text-[26px] max-w-full line-clamp-2 mt-2"
+        class="text-gray-900 dark:text-[#e8eff8] font-[huoxie] text-[26px] max-w-full line-clamp-2 mt-2"
       >
         {{ virtureData.title }}
       </div>
@@ -28,16 +28,17 @@
           <IconFont name="fuzhi"></IconFont>
         </div>
       </div>
-      <div class="w-full h-[1px] bg-gray-200 dark:bg-gray-700 mt-[6px]"></div>
+      <div class="w-full h-[1px] bg-gray-200 dark:bg-[#243247] mt-[6px]"></div>
       <div class="article-prose w-full mt-6 pt-5" v-html="htmlContent"></div>
     </div>
+    <Comment></Comment>
   </div>
 </template>
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import type { ArticleDetailProps } from '@/types'
-import { md } from '@/utils/markdown'
+import { md, renderMarkdown } from '@/utils/markdown'
 
 const props = defineProps<ArticleDetailProps>()
 
@@ -61,9 +62,15 @@ async function copyContent() {
   }
 }
 
-onMounted(() => {
+onMounted(async () => {
+  // 先用普通 markdown 渲染，避免等待 Shiki 初始化时正文一片空白
   htmlContent.value = md.render(props.virtureData.content)
-  console.log(htmlContent.value)
+  try {
+    // Shiki 就绪后替换为带高亮的版本
+    htmlContent.value = await renderMarkdown(props.virtureData.content)
+  } catch (error) {
+    console.error('代码高亮失败，保留普通渲染结果', error)
+  }
 })
 </script>
 
@@ -93,18 +100,19 @@ onMounted(() => {
   text-rendering: optimizeLegibility;
 }
 
-:global(.dark) .article-prose {
-  --prose-text: #cbd5e1;
-  --prose-heading: #f1f5f9;
-  --prose-muted: #94a3b8;
-  --prose-accent: #7dd3fc;
-  --prose-accent-2: #38bdf8;
-  --prose-accent-soft: rgba(56, 189, 248, 0.07);
-  --prose-zebra: rgba(148, 163, 184, 0.04);
-  --prose-border: #334155;
-  --prose-inline-bg: rgba(51, 65, 85, 0.65);
-  --prose-mark: rgba(56, 189, 248, 0.22);
-  --prose-selection: rgba(56, 189, 248, 0.25);
+.dark .article-prose {
+  /* 正文整体压成偏蓝的深色，和站点水墨蓝主题统一 */
+  --prose-text: #c3cedd;
+  --prose-heading: #e8eff8;
+  --prose-muted: #8d9db2;
+  --prose-accent: #8ecbff;
+  --prose-accent-2: #5fa6dd;
+  --prose-accent-soft: rgba(95, 166, 221, 0.1);
+  --prose-zebra: rgba(148, 163, 184, 0.035);
+  --prose-border: #243247;
+  --prose-inline-bg: rgba(95, 166, 221, 0.1);
+  --prose-mark: rgba(142, 203, 255, 0.2);
+  --prose-selection: rgba(95, 166, 221, 0.3);
 }
 
 :global(.article-prose ::selection) {
@@ -375,5 +383,73 @@ onMounted(() => {
 
 .article-prose :deep(pre) {
   margin: 1rem 0;
+}
+
+/* 代码块基础外观，语法配色由 Shiki 输出的行内样式负责 */
+.article-prose :deep(pre.shiki) {
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--prose-border);
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13.5px;
+  line-height: 1.75;
+}
+
+.article-prose :deep(pre.shiki code) {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: inherit;
+  background: transparent;
+}
+
+/* 暗色模式：把 Shiki 的 light 主题切换到 dark 主题变量 */
+.dark .article-prose :deep(.shiki),
+.dark .article-prose :deep(.shiki span) {
+  color: var(--shiki-dark) !important;
+  background-color: var(--shiki-dark-bg) !important;
+  font-style: var(--shiki-dark-font-style) !important;
+  font-weight: var(--shiki-dark-font-weight) !important;
+  text-decoration: var(--shiki-dark-text-decoration) !important;
+}
+
+/* ---------- 暗色模式下的局部细节 ---------- */
+.dark .article-prose :deep(:not(pre) > code) {
+  box-shadow: inset 0 0 0 1px rgba(142, 203, 255, 0.16);
+}
+
+.dark .article-prose :deep(blockquote) {
+  border-left-color: #5fa6dd;
+}
+
+.dark .article-prose :deep(li::marker) {
+  color: var(--prose-accent-2);
+}
+
+.dark .article-prose :deep(table) {
+  background: rgba(7, 12, 21, 0.45);
+}
+
+.dark .article-prose :deep(img) {
+  box-shadow:
+    0 18px 42px -26px rgba(0, 0, 0, 0.95),
+    0 0 0 1px rgba(148, 163, 184, 0.12);
+}
+
+/* 代码块换成偏蓝的深色底，避免和页面纯黑脱节 */
+.dark .article-prose :deep(pre.shiki) {
+  --shiki-dark-bg: #0d1524 !important;
+
+  border-color: #243247;
+  scrollbar-width: thin;
+  scrollbar-color: #2b3a4f transparent;
+  box-shadow: inset 0 1px 0 rgba(142, 203, 255, 0.05);
+}
+
+.dark .article-prose :deep(pre.shiki::-webkit-scrollbar) {
+  height: 6px;
+}
+
+.dark .article-prose :deep(pre.shiki::-webkit-scrollbar-thumb) {
+  border-radius: 999px;
+  background: #2b3a4f;
 }
 </style>

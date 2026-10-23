@@ -2,7 +2,7 @@
   <footer class="border-t border-gray-200/80 dark:border-gray-700/60">
     <div class="max-w-[1250px] mx-auto px-6 py-8 text-center">
       <p class="text-[14px] font-[huoxie] text-gray-600 dark:text-gray-300">
-        © {{ year }} 雨落千山 · 保持热爱，奔赴山海
+        © {{ year }} 愿世间美好更多，愿你我前程顺风
       </p>
       <p class="mt-2 text-[12px] text-gray-400 dark:text-gray-500">
         Built with
