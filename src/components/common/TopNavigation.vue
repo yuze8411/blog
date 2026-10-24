@@ -1,11 +1,7 @@
 <template>
   <nav
     class="fixed top-0 left-0 w-full h-16 z-[100] backdrop-blur-[6px] transition-all duration-300"
-    :class="
-      scrolled
-        ? 'bg-[#ffffff80] shadow-[0_6px_24px_rgba(255,255,255,0.6)] dark:bg-gray-900/95 dark:shadow-[0_6px_24px_rgba(0,0,0,0.5)]'
-        : 'bg-[rgba(47,74,119,0.45)] shadow-none dark:bg-gray-900/50'
-    "
+    :class="navClass"
     @mouseleave="openMenu = ''"
   >
     <div class="relative h-full flex items-center justify-center">
@@ -34,7 +30,7 @@
         <!-- 一级：分类（有下拉） -->
         <li class="group relative h-full" @mouseenter="openMenu = 'category'">
           <RouterLink
-            to="/category"
+            to="/category?classify=0"
             class="h-full flex items-center gap-2 px-5 text-[17px] font-medium transition-colors"
             :class="isActive({ name: 'category', path: '/category' })"
           >
@@ -55,7 +51,7 @@
               >
                 <div class="flex gap-1">
                   <RouterLink
-                    to="/category/dev"
+                    to="/category?classify=0"
                     class="mr-1 flex items-center gap-2 px-3 py-2 pr-5 rounded-lg text-[16px] text-gray-600 hover:text-sky-500 hover:bg-sky-50 dark:text-gray-400 dark:hover:text-sky-400 dark:hover:bg-gray-800 transition-colors"
                   >
                     <span class="text-[18px] leading-none">
@@ -64,7 +60,7 @@
                     <span class="text-nowrap">开发笔记</span>
                   </RouterLink>
                   <RouterLink
-                    to="/category/life"
+                    to="/category?classify=1"
                     class="flex items-center gap-2 px-3 py-2 pr-5 rounded-lg text-[16px] text-gray-600 hover:text-sky-500 hover:bg-sky-50 dark:text-gray-400 dark:hover:text-sky-400 dark:hover:bg-gray-800 transition-colors"
                   >
                     <span class="text-[18px] leading-none">
@@ -75,7 +71,7 @@
                 </div>
                 <div class="flex gap-1 mt-[6px]">
                   <RouterLink
-                    to="/category/rant"
+                    to="/category?classify=2"
                     class="mr-1 flex items-center gap-2 px-3 py-2 pr-5 rounded-lg text-[16px] text-gray-600 hover:text-sky-500 hover:bg-sky-50 dark:text-gray-400 dark:hover:text-sky-400 dark:hover:bg-gray-800 transition-colors"
                   >
                     <span class="text-[18px] leading-none">
@@ -84,7 +80,7 @@
                     <span class="text-nowrap">我的吐槽</span>
                   </RouterLink>
                   <RouterLink
-                    to="/category/tech"
+                    to="/category?classify=3"
                     class="flex items-center gap-2 px-3 py-2 pr-5 rounded-lg text-[16px] text-gray-600 hover:text-sky-500 hover:bg-sky-50 dark:text-gray-400 dark:hover:text-sky-400 dark:hover:bg-gray-800 transition-colors"
                   >
                     <span class="text-[18px] leading-none">
@@ -162,7 +158,7 @@
                   class="flex items-center gap-2 px-3 py-2 rounded-lg text-[16px] text-gray-600 hover:text-sky-500 hover:bg-sky-50 dark:text-gray-400 dark:hover:text-sky-400 dark:hover:bg-gray-800 transition-colors"
                 >
                   <span class="text-[18px] leading-none">
-                    <IconFont name="biaoqian" />
+                    <IconFont name="biaoqian1" />
                   </span>
                   <span class="text-nowrap">标签墙</span>
                 </RouterLink>
@@ -269,6 +265,16 @@ import { useRoute } from 'vue-router'
 import { onMounted, onUnmounted } from 'vue'
 // IconFont 由 unplugin-vue-components 自动注册为全局组件，无需手动导入
 
+const props = withDefaults(
+  defineProps<{
+    /** light：浅色页面（如标签墙）使用浅色底 + 深色字，保证可读性 */
+    variant?: 'default' | 'light'
+  }>(),
+  { variant: 'default' },
+)
+
+const isLight = computed(() => props.variant === 'light')
+
 const openMenu = ref('')
 const route = useRoute()
 
@@ -281,7 +287,11 @@ function isActive(item: { name: string; path: string }) {
 
   // 滚动后导航变浅：普通项转黑字，激活项用更深的蓝色保证对比度
   if (active) {
+    if (isLight.value) return 'text-sky-700 dark:text-sky-400'
     return scrolled.value ? 'text-sky-600 dark:text-sky-400' : 'text-sky-200'
+  }
+  if (isLight.value) {
+    return 'text-slate-700 hover:text-sky-600 dark:text-gray-300 dark:hover:text-sky-400'
   }
   return scrolled.value
     ? 'text-gray-900 hover:text-sky-600 dark:text-gray-300 dark:hover:text-sky-400'
@@ -296,12 +306,27 @@ watch(activePath, () => {
 // ---------- 滚动后加深导航栏背景并加阴影 ----------
 const scrolled = ref(false)
 
-// 滚动后文字/品牌字转深色，未滚动时保持白色
-const labelClass = computed(() =>
-  scrolled.value
+// 滚动后文字/品牌字转深色，未滚动时保持白色；浅色主题下始终使用深色字
+const labelClass = computed(() => {
+  if (isLight.value) {
+    return 'text-slate-800 hover:text-sky-600 dark:text-gray-100 dark:hover:text-sky-400'
+  }
+  return scrolled.value
     ? 'text-gray-900 hover:text-sky-600 dark:text-gray-100 dark:hover:text-sky-400'
-    : 'text-white hover:text-sky-200 dark:text-gray-300 dark:hover:text-sky-400',
-)
+    : 'text-white hover:text-sky-200 dark:text-gray-300 dark:hover:text-sky-400'
+})
+
+// 导航栏底色：浅色页面用与标签页一致的淡靛蓝，深色页面沿用原样式
+const navClass = computed(() => {
+  if (isLight.value) {
+    return scrolled.value
+      ? 'bg-[#eef2ff]/95 shadow-[0_6px_24px_rgba(148,163,184,0.18)] dark:bg-gray-900/95 dark:shadow-[0_6px_24px_rgba(0,0,0,0.5)]'
+      : 'bg-[#eef2ff]/80 shadow-none dark:bg-gray-900/50'
+  }
+  return scrolled.value
+    ? 'bg-[#ffffff80] shadow-[0_6px_24px_rgba(255,255,255,0.6)] dark:bg-gray-900/95 dark:shadow-[0_6px_24px_rgba(0,0,0,0.5)]'
+    : 'bg-[rgba(47,74,119,0.45)] shadow-none dark:bg-gray-900/50'
+})
 
 const brandClass = computed(() =>
   scrolled.value

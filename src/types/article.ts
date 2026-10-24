@@ -8,6 +8,7 @@ export interface Article {
   comment: number
   eyes: number
   tags: string[]
+  category?: string
 }
 
 /** 文章详情页数据 */

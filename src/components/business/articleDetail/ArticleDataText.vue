@@ -36,13 +36,9 @@
   </div>
 </template>
 <script setup lang="ts">
-import MarkdownIt from 'markdown-it'
 import { onMounted } from 'vue'
 import type { ArticleDetailProps } from '@/types'
-let mdit = new MarkdownIt()
 const props = defineProps<ArticleDetailProps>()
-onMounted(() => {
-  console.log(mdit.render(props.virtureData.content))
-})
+onMounted(() => {})
 </script>
 <style scoped></style>

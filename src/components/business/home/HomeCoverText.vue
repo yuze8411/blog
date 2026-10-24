@@ -14,9 +14,9 @@ import { ref, onMounted, onUnmounted } from 'vue'
 const text = ref('')
 const textData = [
   '浮生若梦人间寄，得失循环莫悲喜。',
-  '赞美帝皇！人类帝国万岁！',
+  '花有重开日，人物在少年。',
   '遇事不决可问春风，春风不语，即随本心。',
-  '咕咕嘎嘎，比比拉布，八格牙楼！',
+  'while(true)console.log("努力的一天！")',
 ]
 
 let i = 0 // 当前句子下标

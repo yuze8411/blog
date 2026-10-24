@@ -4,13 +4,18 @@
   </svg>
 </template>
 <script setup>
+import { computed } from 'vue'
+
 const props = defineProps({
   name: {
     type: String,
     required: true,
   },
 })
-const iconName = `#icon-${props.name}`
+
+// 必须用 computed：普通 const 只在 setup 执行时算一次，
+// 父组件切换分类后 name 变了，href 也不会跟着更新
+const iconName = computed(() => `#icon-${props.name}`)
 </script>
 <style scoped>
 .icon {
