@@ -18,6 +18,7 @@ declare module 'vue' {
     ArticleContentRightImg: typeof import('./src/components/business/articleDetail/ArticleContentRightImg.vue')['default']
     ArticleData: typeof import('./src/components/business/articleDetail/ArticleData.vue')['default']
     ArticleDataText: typeof import('./src/components/business/articleDetail/ArticleDataText.vue')['default']
+    ClassifyArticleCard: typeof import('./src/components/business/classify/ClassifyArticleCard.vue')['default']
     ClassifyContent: typeof import('./src/components/business/classify/ClassifyContent.vue')['default']
     ClassifyCover: typeof import('./src/components/business/classify/ClassifyCover.vue')['default']
     ClassifyCoverText: typeof import('./src/components/business/classify/ClassifyCoverText.vue')['default']
@@ -43,9 +44,13 @@ declare module 'vue' {
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SiteFooter: typeof import('./src/components/common/SiteFooter.vue')['default']
+    TagsArticleContent: typeof import('./src/components/business/tags/TagsArticleContent.vue')['default']
+    TagsArticleCover: typeof import('./src/components/business/tags/TagsArticleCover.vue')['default']
+    TagsArticleRow: typeof import('./src/components/business/tags/TagsArticleRow.vue')['default']
     TagsContent: typeof import('./src/components/business/tags/TagsContent.vue')['default']
     TagsFloating: typeof import('./src/components/business/tags/TagsFloating.vue')['default']
-    TagsWheat: typeof import('./src/components/business/tags/TagsWheat.vue')['default']
     TopNavigation: typeof import('./src/components/common/TopNavigation.vue')['default']
+    TravelNoteContent: typeof import('./src/components/business/travelNote/TravelNoteContent.vue')['default']
+    TravelNoteLightbox: typeof import('./src/components/business/travelNote/TravelNoteLightbox.vue')['default']
   }
 }

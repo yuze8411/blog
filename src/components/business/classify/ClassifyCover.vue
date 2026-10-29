@@ -1,7 +1,7 @@
 <template>
   <div class="w-full h-[600px] relative">
     <img
-      src="@/assets/images/demoTextImages/demo3.jpg"
+      src="https://gmnabqqeadmyngvidnqf.supabase.co/storage/v1/object/public/blog-image/demo3.jpg"
       alt="Home Cover"
       class="w-full h-full object-cover object-center"
     />

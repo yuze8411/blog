@@ -63,13 +63,16 @@
             ></span>
           </header>
 
-          <div
-            v-for="(article, i) in group.articles"
-            :key="article.textId"
-            :data-text-id="article.textId"
-            v-reveal="Math.min(i, 6) * 70"
-          >
-            <HomeContentLeftBox :article="article" :index="group.startIndex + i" />
+          <div class="mt-4 grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6">
+            <div
+              v-for="(article, i) in group.articles"
+              :key="article.textId"
+              :data-text-id="article.textId"
+              v-reveal="Math.min(i, 6) * 80"
+              class="min-w-0"
+            >
+              <ClassifyArticleCard :article="article" />
+            </div>
           </div>
         </section>
 
@@ -145,8 +148,6 @@ interface MonthGroup {
   key: string
   year: string
   month: string
-  /** 该组第一篇在可见列表中的下标，用来延续卡片左右交替 */
-  startIndex: number
   articles: Article[]
 }
 
@@ -163,7 +164,7 @@ const visibleArticles = computed(() => sortedArticles.value.slice(0, visibleCoun
 const groups = computed<MonthGroup[]>(() => {
   const result: MonthGroup[] = []
 
-  visibleArticles.value.forEach((article, index) => {
+  visibleArticles.value.forEach((article) => {
     const date = article.time.split(' ')[0] ?? ''
     const [year = '', month = ''] = date.split('-')
     const key = `${year}-${month}`
@@ -172,7 +173,7 @@ const groups = computed<MonthGroup[]>(() => {
     if (last?.key === key) {
       last.articles.push(article)
     } else {
-      result.push({ key, year, month, startIndex: index, articles: [article] })
+      result.push({ key, year, month, articles: [article] })
     }
   })
 

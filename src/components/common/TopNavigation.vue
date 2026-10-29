@@ -328,12 +328,6 @@ const navClass = computed(() => {
     : 'bg-[rgba(47,74,119,0.45)] shadow-none dark:bg-gray-900/50'
 })
 
-const brandClass = computed(() =>
-  scrolled.value
-    ? 'bg-gradient-to-r from-[#2f4a77] via-[#3f74ad] to-[#5fa6dd] dark:from-white dark:via-sky-200 dark:to-sky-400'
-    : 'bg-gradient-to-r from-white via-[#d6ecff] to-[#8ecbff] drop-shadow-[0_1px_5px_rgba(120,200,255,0.35)]',
-)
-
 function handleScroll() {
   scrolled.value = window.scrollY > 20
 }

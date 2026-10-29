@@ -1,14 +1,8 @@
 <template>
   <div class="relative mx-auto w-full max-w-[1500px] px-4 sm:px-6 lg:px-10">
     <!-- 页头标题 -->
-    <header class="tags-hero pb-10 pt-28 text-center sm:pt-32">
+    <header class="tags-hero pb-5 pt-28 text-center sm:pt-32">
       <h1 class="tags-title font-[huoxie]">标签墙</h1>
-      <p class="text-center mt-1 text-[#cf7cff] font-[huoxie] text-[17px]">看看你感兴趣的内容吧~</p>
-      <div class="hero-divider" aria-hidden="true">
-        <span class="line"></span>
-        <i class="dot"></i>
-        <span class="line"></span>
-      </div>
     </header>
 
     <!-- 标签墙 -->
@@ -29,9 +23,10 @@
           v-for="(tag, index) in tagWall"
           :key="tag.name"
           :aria-label="`${tag.name}，${tag.count} 篇文章`"
-          class="tag-chip"
+          class="tag-chip cursor-pointer"
           :class="[`tone-${index % 12}`, sizeClass(tag.count)]"
           :style="{ animationDelay: `${index * 40}ms` }"
+          @click="toTagArticles(tag.name)"
         >
           <span class="tag-hash" aria-hidden="true">#</span>
           <span class="tag-name">{{ tag.name }}</span>
@@ -44,12 +39,16 @@
 
 <script setup lang="ts">
 import { tagWall } from '@/data/tags'
-
+import { useRouter } from 'vue-router'
+const router = useRouter()
 // 按热度给标签分三档字号，让墙面有轻重层次
 function sizeClass(count: number) {
   if (count >= 15) return 'tag-lg'
   if (count >= 8) return 'tag-md'
   return 'tag-sm'
+}
+function toTagArticles(tagName: string): void {
+  router.push(`/tags/${tagName}`)
 }
 </script>
 
