@@ -97,7 +97,8 @@
         <!-- 一级：时光（无下拉） -->
         <li class="group relative h-full" @mouseenter="openMenu = ''">
           <RouterLink
-            to="/time"
+            to="/milestone"
+            target="_blank"
             class="h-full flex items-center gap-2 px-5 text-[17px] font-medium transition-colors"
             :class="isActive({ name: 'time', path: '/time' })"
           >
@@ -149,7 +150,7 @@
                   class="flex items-center gap-2 px-3 py-2 rounded-lg text-[16px] text-gray-600 hover:text-sky-500 hover:bg-sky-50 dark:text-gray-400 dark:hover:text-sky-400 dark:hover:bg-gray-800 transition-colors"
                 >
                   <span class="text-[18px] leading-none">
-                    <IconFont name="tongji" />
+                    <IconFont name="tongjiguanli" />
                   </span>
                   <span class="text-nowrap">统计</span>
                 </RouterLink>

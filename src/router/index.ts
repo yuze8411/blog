@@ -6,6 +6,8 @@ import Classify from '@/views/Classify.vue'
 import Tags from '@/views/Tags.vue'
 import TagsArticle from '@/views/TagsArticle.vue'
 import TravelNote from '@/views/TravelNote.vue'
+import Milestone from '@/views/Milestone.vue'
+import Stats from '@/views/Stats.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -39,6 +41,16 @@ const router = createRouter({
       path: '/travel',
       name: 'travel',
       component: TravelNote,
+    },
+    {
+      path: '/milestone',
+      name: 'milestone',
+      component: Milestone,
+    },
+    {
+      path: '/stats',
+      name: 'Stats',
+      component: Stats,
     },
     {
       // 兜底路由：未匹配的地址统一走 404 页面

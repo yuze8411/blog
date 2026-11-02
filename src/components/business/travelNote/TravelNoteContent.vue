@@ -17,7 +17,7 @@
           旅游图片集
         </h1>
         <p class="mt-3 max-w-[560px] text-[14px] leading-7 text-slate-500 dark:text-slate-400">
-          从25年的嵩山开始，更多的高山在未来逐渐被征服，登山旅游不仅是放松，更多的是寻找人生存在的意义。
+          从25年的嵩山开始，更多的高山在未来逐渐被征服，于我而言旅游不仅是放松，更多的是寻找人生存在的意义。
         </p>
       </div>
 
@@ -28,7 +28,7 @@
         <span class="h-6 w-px bg-slate-200 dark:bg-slate-700"></span>
         <p class="font-[huoxie] text-[13px] text-slate-500 dark:text-slate-400">
           共
-          <span class="text-[26px] leading-none text-sky-800 dark:text-sky-400">{{
+          <span class="text-[26px] leading-none text-sky-600 dark:text-sky-400">{{
             totalCount
           }}</span>
           张
@@ -43,7 +43,7 @@
       <span
         class="hidden items-center gap-1.5 px-2 text-[10px] tracking-[0.22em] text-slate-400 sm:flex dark:text-slate-500"
       >
-        <IconFont name="biaoqian1" class="text-[12px]" />
+        <IconFont name="biaoqian1" class="text-[14px]" />
         FILTER
       </span>
       <span class="mx-1 hidden h-5 w-px bg-slate-200 sm:block dark:bg-slate-700"></span>
@@ -55,14 +55,14 @@
         class="group inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 font-[huoxie] text-[13px] transition-all duration-300"
         :class="
           tag.name === activeTag
-            ? 'bg-gradient-to-r from-[#3f74ad] to-[#6c7fc4] text-white shadow-[0_10px_20px_-14px_rgba(63,116,173,0.95)]'
+            ? 'bg-gradient-to-r from-[#7fbcfd] to-[#5378ff] text-white shadow-[0_10px_20px_-14px_rgba(63,116,173,0.95)]'
             : 'text-slate-500 hover:bg-white hover:text-sky-700 hover:shadow-[0_8px_18px_-16px_rgba(63,116,173,0.8)] dark:text-slate-400 dark:hover:bg-slate-800/80 dark:hover:text-sky-300 dark:hover:shadow-none'
         "
         @click="selectTag(tag.name)"
       >
         <span>{{ tag.name }}</span>
         <span
-          class="rounded-full px-1.5 py-0.5 text-[10px] leading-none tabular-nums transition-colors"
+          class="rounded-full px-1.5 py-0.5 text-[11px] leading-none tabular-nums transition-colors"
           :class="
             tag.name === activeTag
               ? 'bg-white/20 text-white/90'
