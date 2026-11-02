@@ -1,13 +1,4 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Home from '@/views/Home.vue'
-import ArticleDetail from '@/views/ArticleDetail.vue'
-import NotFound from '@/views/NotFound.vue'
-import Classify from '@/views/Classify.vue'
-import Tags from '@/views/Tags.vue'
-import TagsArticle from '@/views/TagsArticle.vue'
-import TravelNote from '@/views/TravelNote.vue'
-import Milestone from '@/views/Milestone.vue'
-import Stats from '@/views/Stats.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -15,48 +6,53 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: Home,
+      component: () => import('@/views/Home.vue'),
     },
     {
       path: '/detail',
       name: 'articleDetail',
-      component: ArticleDetail,
+      component: () => import('@/views/ArticleDetail.vue'),
     },
     {
       path: '/category',
       name: 'category',
-      component: Classify,
+      component: () => import('@/views/Classify.vue'),
     },
     {
       path: '/tags',
       name: 'tags',
-      component: Tags,
+      component: () => import('@/views/Tags.vue'),
     },
     {
       path: '/tags/:tag',
       name: 'tagArticle',
-      component: TagsArticle,
+      component: () => import('@/views/TagsArticle.vue'),
     },
     {
       path: '/travel',
       name: 'travel',
-      component: TravelNote,
+      component: () => import('@/views/TravelNote.vue'),
     },
     {
       path: '/milestone',
       name: 'milestone',
-      component: Milestone,
+      component: () => import('@/views/Milestone.vue'),
     },
     {
       path: '/stats',
       name: 'Stats',
-      component: Stats,
+      component: () => import('@/views/Stats.vue'),
+    },
+    {
+      path: '/about',
+      name: 'about',
+      component: () => import('@/views/About.vue'),
     },
     {
       // 兜底路由：未匹配的地址统一走 404 页面
       path: '/:pathMatch(.*)*',
       name: 'notFound',
-      component: NotFound,
+      component: () => import('@/views/NotFound.vue'),
     },
   ],
 })

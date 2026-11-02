@@ -168,7 +168,7 @@
                   class="flex items-center gap-2 px-3 py-2 rounded-lg text-[16px] text-gray-600 hover:text-sky-500 hover:bg-sky-50 dark:text-gray-400 dark:hover:text-sky-400 dark:hover:bg-gray-800 transition-colors"
                 >
                   <span class="text-[18px] leading-none">
-                    <IconFont name="guanyu" />
+                    <IconFont name="jumao" />
                   </span>
                   <span class="text-nowrap">关于我</span>
                 </RouterLink>
@@ -270,6 +270,7 @@ const props = withDefaults(
   defineProps<{
     /** light：浅色页面（如标签墙）使用浅色底 + 深色字，保证可读性 */
     variant?: 'default' | 'light'
+    ishidden?: boolean
   }>(),
   { variant: 'default' },
 )
