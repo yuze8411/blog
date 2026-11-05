@@ -1,17 +1,5 @@
 <template>
-  <div class="relative min-h-screen w-full overflow-hidden bg-slate-950">
-    <div class="absolute inset-0 overflow-hidden">
-      <video autoplay muted loop playsinline class="h-full w-full object-cover">
-        <source src="@/assets/images/星空_3.mp4" type="video/mp4" />
-      </video>
-      <div
-        class="absolute inset-0 bg-gradient-to-br from-slate-950/80 via-slate-950/35 to-slate-950/80"
-      />
-      <div
-        class="absolute inset-0 bg-[radial-gradient(circle_at_50%_45%,transparent_0%,rgba(2,6,23,0.42)_100%)]"
-      />
-    </div>
-
+  <div class="relative min-h-screen w-full overflow-hidden">
     <div
       class="relative z-10 mx-auto flex min-h-screen max-w-[1440px] flex-col justify-center gap-12 px-5 py-24 pr-16 sm:px-8 sm:pr-20 md:flex-row md:gap-14 lg:gap-20 lg:pl-12 lg:pr-24"
     >
@@ -65,13 +53,13 @@
             <p
               class="text-[17px] font-medium leading-8 text-slate-200 dark:text-slate-300 sm:text-[18px]"
             >
-              前端开发 · 长期写作者 · 偶尔折腾一些没用但好玩的东西
+              前端学习者 · 旅游爱好者 · 沙盒热爱玩家
             </p>
 
             <p
               class="mt-4 max-w-[700px] text-[16px] leading-8 text-slate-200/90 dark:text-slate-300 sm:text-[17px] sm:leading-9"
             >
-              24年开始接触编程，从最初的懵懵懂懂，到现在的清楚的知道学习什么，该用学到的东西做什么，一路走来，平凡又精彩，未来可期
+              我是一个热爱前端开发的程序员，同时也是一个喜欢旅行和探索的人。我喜欢在代码中创造美丽的界面，也喜欢在旅途中发现世界的美好。我的兴趣爱好包括前端开发、旅游、摄影和沙盒游戏。我相信，生活就像一段代码，需要不断地调试和优化，才能实现最好的效果。
             </p>
           </div>
 
@@ -170,8 +158,8 @@
                 </svg>
               </span>
               <span>
-                <span class="block text-[14px] font-semibold text-amber-50">摄影</span>
-                <span class="mt-1 block text-[11.5px] text-amber-100/65">光影与瞬间</span>
+                <span class="block text-[14px] font-semibold text-amber-50">沙盒</span>
+                <span class="mt-1 block text-[11.5px] text-amber-100/65">探索与创造</span>
               </span>
             </div>
           </div>

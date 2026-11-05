@@ -16,6 +16,7 @@ declare module 'vue' {
     AboutContentMydata: typeof import('./src/components/business/about/AboutContentMydata.vue')['default']
     AboutContentWebdata: typeof import('./src/components/business/about/AboutContentWebdata.vue')['default']
     AboutDot: typeof import('./src/components/business/about/AboutDot.vue')['default']
+    AboutGithubHeatmap: typeof import('./src/components/business/about/AboutGithubHeatmap.vue')['default']
     ArticleContent: typeof import('./src/components/business/articleDetail/ArticleContent.vue')['default']
     ArticleContentLeft: typeof import('./src/components/business/articleDetail/ArticleContentLeft.vue')['default']
     ArticleContentRight: typeof import('./src/components/business/articleDetail/ArticleContentRight.vue')['default']

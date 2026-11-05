@@ -1,30 +1,33 @@
 <template>
   <div class="fixed right-5 top-1/2 z-40 -translate-y-1/2 sm:right-[30px]">
-    <div class="about-dot-capsule relative flex flex-col items-center gap-5 rounded-full px-3 py-4">
-      <span
-        aria-hidden="true"
-        class="pointer-events-none absolute bottom-5 left-1/2 top-5 w-px -translate-x-1/2 bg-gradient-to-b from-transparent via-white/25 to-transparent"
+    <nav class="about-switcher flex flex-col items-center gap-4" aria-label="关于页切换">
+      <button
+        type="button"
+        class="about-switch"
+        :class="{ 'is-active': index === 0 }"
+        aria-label="切换到第一屏"
+        :aria-current="index === 0 ? 'true' : undefined"
+        @click="emit('myscroll', 0)"
       />
 
-      <div
-        aria-hidden="true"
-        class="about-dot dot_1"
-        @click="emit('myscroll', 0)"
-        :class="index == 0 ? 'dot_active' : ''"
-      />
-      <div
-        aria-hidden="true"
-        class="about-dot dot_2"
+      <button
+        type="button"
+        class="about-switch"
+        :class="{ 'is-active': index === 1 }"
+        aria-label="切换到第二屏"
+        :aria-current="index === 1 ? 'true' : undefined"
         @click="emit('myscroll', 1)"
-        :class="index == 1 ? 'dot_active' : ''"
       />
-      <div
-        aria-hidden="true"
-        class="about-dot dot_3"
+
+      <button
+        type="button"
+        class="about-switch"
+        :class="{ 'is-active': index === 2 }"
+        aria-label="切换到第三屏"
+        :aria-current="index === 2 ? 'true' : undefined"
         @click="emit('myscroll', 2)"
-        :class="index == 2 ? 'dot_active' : ''"
       />
-    </div>
+    </nav>
   </div>
 </template>
 <script setup lang="ts">
@@ -37,143 +40,96 @@ let props = defineProps<{
 </script>
 
 <style scoped>
-.about-dot-capsule {
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.17), rgba(255, 255, 255, 0.06));
+.about-switcher {
+  padding: 12px 7px;
+  border: 1px solid rgba(186, 230, 253, 0.14);
+  border-radius: 999px;
+  background: rgba(8, 15, 33, 0.34);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.26),
-    0 10px 34px rgba(3, 7, 18, 0.22);
-  backdrop-filter: blur(14px) saturate(140%);
-  -webkit-backdrop-filter: blur(14px) saturate(140%);
-  animation: capsule-in 0.65s cubic-bezier(0.22, 0.8, 0.3, 1) both;
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 10px 28px rgba(2, 6, 23, 0.28);
+  backdrop-filter: blur(10px) saturate(120%);
+  -webkit-backdrop-filter: blur(10px) saturate(120%);
+  animation: switcher-in 0.55s cubic-bezier(0.22, 0.85, 0.3, 1) both;
 }
 
-.about-dot {
+/* 半透明圆形按钮：只保留一个圆、细边框和柔和阴影 */
+.about-switch {
   position: relative;
-  width: 14px;
-  height: 14px;
+  width: 12px;
+  height: 12px;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.28);
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.88);
+  background: rgba(255, 255, 255, 0.16);
   box-shadow:
-    0 0 0 3px rgba(255, 255, 255, 0.08),
-    0 0 12px rgba(255, 255, 255, 0.48);
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    0 2px 8px rgba(2, 6, 23, 0.35);
   cursor: pointer;
   transition:
-    transform 0.35s ease,
+    transform 0.3s ease,
     background-color 0.3s ease,
-    box-shadow 0.35s ease;
-  /* backwards：入场结束后把 transform 交还给 hover，放大效果不会被锁住 */
-  animation: dot-in 0.7s cubic-bezier(0.22, 1.25, 0.36, 1) backwards;
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
-/* 渐变背景单独放在伪元素上：background-image 本身不能过渡，用 opacity 做淡入淡出 */
-.about-dot::after {
+/* 扩大点击热区，视觉上仍然只有一个小圆 */
+.about-switch::after {
   content: '';
   position: absolute;
-  inset: 0;
+  inset: -6px;
   border-radius: inherit;
-  background: linear-gradient(135deg, #f5d0fe 0%, #d858ff 62%, #a855f7 100%);
-  opacity: 0;
-  transition: opacity 0.4s ease;
 }
 
-.about-dot:hover {
+.about-switch:hover {
+  transform: scale(1.16);
+  border-color: rgba(255, 255, 255, 0.45);
+  background: rgba(255, 255, 255, 0.28);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    0 4px 14px rgba(2, 6, 23, 0.4),
+    0 0 12px rgba(125, 211, 252, 0.18);
+}
+
+.about-switch.is-active {
+  transform: scale(1.16);
+  border-color: rgba(224, 242, 254, 0.65);
+  background: rgba(186, 230, 253, 0.78);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.6),
+    0 0 0 3px rgba(125, 211, 252, 0.12),
+    0 0 16px rgba(56, 189, 248, 0.4),
+    0 4px 14px rgba(2, 6, 23, 0.35);
+}
+
+.about-switch.is-active:hover {
   transform: scale(1.22);
-  background: #fff;
-  box-shadow:
-    0 0 0 4px rgba(255, 255, 255, 0.1),
-    0 0 18px rgba(255, 255, 255, 0.75);
+  background: rgba(224, 242, 254, 0.9);
 }
 
-/* 三个点错峰进场：每个都从右侧轻轻弹进来 */
-.dot_1 {
-  animation-delay: 0.16s;
+.about-switch:focus-visible {
+  outline: 1px solid rgba(186, 230, 253, 0.9);
+  outline-offset: 4px;
 }
 
-.dot_2 {
-  animation-delay: 0.3s;
-}
-
-.dot_3 {
-  animation-delay: 0.44s;
-}
-
-/* 当前所在的点：淡紫色渐变 + 一圈缓慢扩散的光环 */
-.dot_active {
-  transform: scale(1.08);
-  box-shadow:
-    0 0 0 3px rgba(216, 88, 255, 0.16),
-    0 0 18px rgba(216, 88, 255, 0.78);
-}
-
-.dot_active::after {
-  opacity: 1;
-}
-
-.dot_active::before {
-  content: '';
-  position: absolute;
-  inset: -5px;
-  border: 1px solid rgba(216, 88, 255, 0.45);
-  border-radius: inherit;
-  animation: dot-pulse 2.4s ease-out 1s infinite;
-}
-
-.dot_active:hover::after {
-  background: linear-gradient(135deg, #fae8ff 0%, #e879f9 58%, #c084fc 100%);
-}
-
-.dot_active:hover {
-  box-shadow:
-    0 0 0 4px rgba(216, 88, 255, 0.2),
-    0 0 22px rgba(216, 88, 255, 0.95);
-}
-
-@keyframes capsule-in {
+@keyframes switcher-in {
   from {
     opacity: 0;
-    transform: translateX(22px) scale(0.94);
+    transform: translateX(10px);
   }
   to {
     opacity: 1;
-    transform: translateX(0) scale(1);
-  }
-}
-
-@keyframes dot-in {
-  from {
-    opacity: 0;
-    transform: translateX(16px) scale(0.35);
-    filter: blur(2px);
-  }
-  65% {
-    opacity: 1;
-    filter: blur(0);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0) scale(1);
-    filter: blur(0);
-  }
-}
-
-@keyframes dot-pulse {
-  0% {
-    opacity: 0.8;
-    transform: scale(0.8);
-  }
-  70%,
-  100% {
-    opacity: 0;
-    transform: scale(1.65);
+    transform: translateX(0);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .about-dot-capsule,
-  .about-dot,
-  .dot_active::before {
+  .about-switcher {
     animation: none;
+  }
+
+  .about-switch {
+    transition: none;
   }
 }
 </style>

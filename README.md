@@ -63,6 +63,23 @@
 
 > `.env` 已被 `.gitignore` 忽略，不要提交真实密钥。
 
+## GitHub 热力图配置
+
+关于页第二屏的贡献热力图通过 GitHub GraphQL 的 `contributionCalendar` 获取近一年数据：
+
+- 前端请求站内 `/api/githubcontributions?username=yuze8411`
+- 线上：Vercel Edge Function `api/githubcontributions.ts` 携带 PAT 请求 GitHub GraphQL
+- 本地：`vite.config.ts` 内置同名中间件，复用 `api/githubcontributions.ts` 的逻辑
+- GitHub REST API 没有贡献日历接口，所以这里使用 GraphQL，PAT 只保存在服务端
+
+需要配置一个环境变量：
+
+| 变量名 | 说明 |
+| --- | --- |
+| `GITHUB_PAT` | GitHub Classic PAT，勾选 `read:user` 即可；留空时热力图会提示加载失败 |
+
+本地开发填在 `.env`，线上填在 Vercel 的 **Settings → Environment Variables**。浏览器端只使用站内代理，不会接触 PAT。
+
 ## 项目简要说明
 
 该项目为 Vue3 个人博客系统，依托 Vercel 实现一键部署。通过 Vercel 提供的 Serverless 代理能力，中转第三方接口（和风天气等）；使用 Pinia 维护全局状态，Element Plus 快速搭建页面，搭配 ECharts 实现博客数据可视化、particles.js 实现首页粒子背景特效。

@@ -6,7 +6,8 @@ import vueDevTools from 'vite-plugin-vue-devtools'
 import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
-import { handleWeather, type WeatherEnv } from './api/weather.ts'
+import { handleWeather } from './api/weather.ts'
+import { handleGithubContributions } from './api/githubcontributions.ts'
 
 /** 这些响应头由 Node 的 http 模块自己管理，转发时要去掉 */
 const HOP_BY_HOP_HEADERS = new Set([
@@ -18,15 +19,19 @@ const HOP_BY_HOP_HEADERS = new Set([
 
 /**
  * 本地开发时模拟 Vercel 的 /api 函数。
- * 与线上 api/weather.ts 复用同一个 handleWeather，保证本地和线上行为一致；
- * 密钥从 .env 读取，不会打进前端产物。
+ * 每个接口都复用线上 api/ 目录里的 handle 函数，保证本地和线上行为一致；
+ * 环境变量从 .env 读取，不会打进前端产物。
  */
-function weatherApiPlugin(env: WeatherEnv): Plugin {
+function createLocalApiPlugin(
+  name: string,
+  path: string,
+  handler: (request: Request) => Promise<Response>,
+): Plugin {
   function attach(server: { middlewares: Connect.Server }) {
     server.middlewares.use(async (req, res, next) => {
-      // 只拦截精确的 /api/weather，其余请求交给 Vite
+      // 只拦截指定路径，其余请求交给 Vite
       const requestUrl = new URL(req.url ?? '/', `http://${req.headers.host ?? 'localhost'}`)
-      if (requestUrl.pathname !== '/api/weather') {
+      if (requestUrl.pathname !== path) {
         next()
         return
       }
@@ -39,7 +44,7 @@ function weatherApiPlugin(env: WeatherEnv): Plugin {
         }
 
         const request = new Request(requestUrl, { method: req.method, headers })
-        const response = await handleWeather(request, env)
+        const response = await handler(request)
 
         res.statusCode = response.status
         response.headers.forEach((value, key) => {
@@ -47,16 +52,16 @@ function weatherApiPlugin(env: WeatherEnv): Plugin {
         })
         res.end(await response.text())
       } catch (err) {
-        console.error('[weather-api] 本地天气代理异常：', err)
+        console.error(`[${name}] 本地 API 代理异常：`, err)
         res.statusCode = 500
         res.setHeader('Content-Type', 'application/json; charset=utf-8')
-        res.end(JSON.stringify({ msg: '本地天气代理异常' }))
+        res.end(JSON.stringify({ msg: '本地 API 代理异常' }))
       }
     })
   }
 
   return {
-    name: 'local-weather-api',
+    name,
     configureServer: attach,
     configurePreviewServer: attach,
   }
@@ -81,7 +86,17 @@ export default defineConfig(({ mode }) => {
         resolvers: [ElementPlusResolver()],
         dts: true, // 生成 components.d.ts，自定义组件+ElementPlus组件提示
       }),
-      weatherApiPlugin(env),
+      createLocalApiPlugin('local-weather-api', '/api/weather', (request) =>
+        handleWeather(request, {
+          QWEATHER_KEY: env.QWEATHER_KEY,
+          QWEATHER_API_HOST: env.QWEATHER_API_HOST,
+        }),
+      ),
+      createLocalApiPlugin('local-github-api', '/api/githubcontributions', (request) =>
+        handleGithubContributions(request, {
+          GITHUB_PAT: env.GITHUB_PAT,
+        }),
+      ),
     ],
     resolve: {
       alias: {
