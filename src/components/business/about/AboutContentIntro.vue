@@ -1,5 +1,5 @@
 <template>
-  <section class="relative flex h-[100vh] w-full items-center overflow-hidden bg-pink-100/5">
+  <section class="relative flex h-[100vh] w-full items-center overflow-hidden">
     <!-- 整体改成上下结构：上面讲故事，下面放整年热力图 -->
     <div
       class="relative z-10 mx-auto flex w-full max-w-[1520px] flex-col gap-10 px-5 py-10 sm:px-8 sm:pr-20 lg:gap-16 lg:py-5 lg:px-20"
