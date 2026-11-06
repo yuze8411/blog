@@ -25,7 +25,9 @@
     <div ref="pageTwo" class="about-page-slot">
       <AboutContentIntro></AboutContentIntro>
     </div>
-    <AboutContentWebdata></AboutContentWebdata>
+    <div ref="pageThree" class="about-page-slot">
+      <AboutContentPlan></AboutContentPlan>
+    </div>
   </div>
 </template>
 <script setup lang="ts">
@@ -34,6 +36,7 @@ import { onBeforeUnmount, onMounted, ref } from 'vue'
 const container = ref<HTMLDivElement | null>(null)
 const pageOne = ref<HTMLDivElement | null>(null)
 const pageTwo = ref<HTMLDivElement | null>(null)
+const pageThree = ref<HTMLDivElement | null>(null)
 const index = ref(0)
 
 // 一屏滚动用时 0.75s，比浏览器自带的 smooth 更慢、更从容
@@ -47,10 +50,12 @@ let motionFrame = 0
 let reducedMotion = false
 
 function easeInOutCubic(t: number) {
+  // 控制滚动速度
   return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2
 }
 
 function scrollToY(targetTop: number) {
+  // 实现滚动时间控制
   const el = container.value
   if (!el) return
 
@@ -77,6 +82,7 @@ function scrollToY(targetTop: number) {
 }
 
 function handleWheel(event: WheelEvent) {
+  //实现滚动滚轮时的滑动，结合上面的函数
   if (event.deltaY === 0) return
 
   const now = performance.now()
@@ -91,6 +97,7 @@ function handleWheel(event: WheelEvent) {
 }
 
 function myScorll(targetIndex: number) {
+  // 点击跳转时的回调
   const nextIndex = Math.max(0, Math.min(2, targetIndex))
   index.value = nextIndex
   // 点击圆点后也进入冷却，防止动画途中滚轮又插一脚
@@ -110,16 +117,13 @@ function updatePageMotion() {
 
   const viewport = el.clientHeight || window.innerHeight
   const scrollTop = el.scrollTop
-  const slots = [pageOne.value, pageTwo.value]
+  const slots = [pageOne.value, pageTwo.value, pageThree.value]
 
   slots.forEach((slot, pageIndex) => {
     if (!slot) return
 
     // 0 = 正好停在这一页；1 = 已经滚出一整屏；-1 = 还在下方一整屏
-    const offset = Math.max(
-      -1,
-      Math.min(1, (scrollTop - pageIndex * viewport) / viewport),
-    )
+    const offset = Math.max(-1, Math.min(1, (scrollTop - pageIndex * viewport) / viewport))
     const distance = Math.abs(offset)
 
     slot.style.opacity = String(1 - distance * 0.55)

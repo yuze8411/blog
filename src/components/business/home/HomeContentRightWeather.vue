@@ -1,21 +1,30 @@
 <template>
   <div
-    class="relative min-h-[300px] border border-gray-200/80 rounded-[10px] mt-3 p-5 pb-8 overflow-hidden shadow-[0_2px_10px_rgba(0,0,0,0.04)] dark:border-gray-700/60 dark:shadow-[0_2px_12px_rgba(0,0,0,0.3)]"
+    class="relative mt-3 min-h-[300px] overflow-hidden rounded-[10px] border border-gray-200/80 bg-white bg-gradient-to-br p-5 pb-6 shadow-[0_2px_10px_rgba(0,0,0,0.04)] dark:border-gray-700/60 dark:bg-gray-900 dark:shadow-[0_2px_12px_rgba(0,0,0,0.3)]"
+    :class="weatherTheme"
   >
-    <div class="absolute inset-0 z-0 pointer-events-none" aria-hidden="true">
-      <img
-        src="@/assets/images/demoTextImages/demo.jpg"
-        alt=""
-        class="w-full h-full object-cover scale-105 blur-[1.5px] opacity-50 dark:opacity-30"
-      />
-      <div
-        class="absolute inset-0 bg-gradient-to-b from-white/45 via-white/65 to-white/85 dark:from-gray-950/55 dark:via-gray-950/75 dark:to-gray-950/90"
-      ></div>
-    </div>
+    <div class="relative z-10 flex items-start justify-between gap-3">
+      <div class="min-w-0">
+        <span class="text-[16px] font-[huoxie] text-gray-700 dark:text-gray-300">实时天气</span>
 
-    <div class="relative z-10 flex items-center justify-between">
-      <span class="text-[16px] font-[huoxie] text-gray-700 dark:text-gray-300">实时天气</span>
-      <span v-if="updateTimeText" class="text-[12px] text-gray-400">
+        <!-- 经纬度直接用浏览器定位结果，不做逆地理编码，简单且不额外请求 -->
+        <p
+          v-if="coordsText"
+          class="mt-1.5 flex items-center gap-1.5 text-[11px] text-gray-500 dark:text-gray-400"
+        >
+          <IconFont
+            name="diqiu"
+            class="shrink-0 text-[12px] text-sky-500/80 dark:text-sky-300/70"
+          ></IconFont>
+          <span class="truncate">当前位置 {{ coordsText }}</span>
+        </p>
+      </div>
+
+      <span
+        v-if="updateTimeText"
+        class="flex shrink-0 items-center gap-1 text-[11px] text-gray-400 dark:text-gray-500"
+      >
+        <IconFont name="shijian" class="text-[11px]"></IconFont>
         {{ updateTimeText }} 更新
       </span>
     </div>
@@ -23,11 +32,11 @@
     <!-- 加载中 / 出错 -->
     <div
       v-if="status !== 'success'"
-      class="relative z-10 h-[220px] flex flex-col items-center justify-center gap-3"
+      class="relative z-10 flex h-[220px] flex-col items-center justify-center gap-3"
     >
       <template v-if="status === 'loading'">
         <span
-          class="w-6 h-6 rounded-full border-2 border-sky-300 border-t-transparent animate-spin"
+          class="h-6 w-6 animate-spin rounded-full border-2 border-sky-300 border-t-transparent"
         ></span>
         <span class="text-[14px] font-[huoxie] text-gray-500 dark:text-gray-400">
           正在定位并获取天气…
@@ -39,7 +48,7 @@
         </span>
         <button
           type="button"
-          class="text-[13px] text-sky-500 hover:text-sky-600 dark:text-sky-400 dark:hover:text-sky-300 duration-300"
+          class="text-[13px] text-sky-500 duration-300 hover:text-sky-600 dark:text-sky-400 dark:hover:text-sky-300"
           @click="getPositionAndWeather"
         >
           重新获取
@@ -49,60 +58,74 @@
 
     <!-- 天气内容 -->
     <template v-else>
-      <div class="relative z-10 mt-4 flex items-center justify-between">
-        <div class="flex items-end gap-2">
-          <span class="text-[52px] leading-none font-[huoxie] text-gray-800 dark:text-gray-100">
+      <div class="relative z-10 mt-4 flex items-center justify-between gap-3">
+        <div class="flex min-w-0 items-start gap-2">
+          <span class="text-[50px] leading-none font-[huoxie] text-gray-800 dark:text-gray-100">
             {{ temperatureText }}
           </span>
-          <div class="mb-1 flex flex-col">
-            <span class="text-[18px] leading-tight font-[huoxie] text-gray-700 dark:text-gray-200">
+
+          <div class="pt-1">
+            <p class="text-[18px] leading-tight font-[huoxie] text-gray-700 dark:text-gray-200">
               {{ conditionText }}
-            </span>
-            <span class="mt-[2px] text-[12px] text-gray-400">体感 {{ feelsLikeText }}</span>
+            </p>
+            <p class="mt-1 text-[11px] text-gray-500 dark:text-gray-400">
+              体感 {{ feelsLikeText }}
+            </p>
           </div>
         </div>
-        <span class="text-[42px] leading-none select-none" aria-hidden="true">
+
+        <span
+          class="grid h-14 w-14 shrink-0 place-items-center rounded-2xl border border-white/70 bg-white/50 text-[28px] shadow-[inset_0_1px_0_rgba(255,255,255,0.55)] dark:border-white/10 dark:bg-white/[0.06]"
+          aria-hidden="true"
+        >
           {{ weatherEmoji }}
         </span>
       </div>
 
-      <div class="relative z-10 mt-4 h-[1px] bg-gray-200 dark:bg-gray-700"></div>
+      <div class="relative z-10 mt-4 border-t border-white/70 dark:border-white/10"></div>
 
-      <!-- 基本天气信息 -->
-      <div class="relative z-10 mt-3 grid grid-cols-2 gap-x-5 gap-y-2 text-[13px] font-[huoxie]">
-        <div class="flex items-center justify-between">
-          <span class="text-gray-400">湿度</span>
-          <span class="text-gray-600 dark:text-gray-300">{{ humidityText }}</span>
-        </div>
-        <div class="flex items-center justify-between">
-          <span class="text-gray-400">风力</span>
-          <span class="text-gray-600 dark:text-gray-300">{{ windText }}</span>
-        </div>
-        <div class="flex items-center justify-between">
-          <span class="text-gray-400">降水</span>
-          <span class="text-gray-600 dark:text-gray-300">{{ precipitationText }}</span>
-        </div>
-        <div class="flex items-center justify-between">
-          <span class="text-gray-400">能见度</span>
-          <span class="text-gray-600 dark:text-gray-300">{{ visibilityText }}</span>
-        </div>
-        <div class="flex items-center justify-between">
-          <span class="text-gray-400">气压</span>
-          <span class="text-gray-600 dark:text-gray-300">{{ pressureText }}</span>
-        </div>
-        <div class="flex items-center justify-between">
-          <span class="text-gray-400">紫外线</span>
-          <span class="text-gray-600 dark:text-gray-300">{{ uvText }}</span>
+      <!-- 天气指标：两列小卡片，比原来纯文字两栏更清楚 -->
+      <div class="relative z-10 mt-3 grid grid-cols-2 gap-2">
+        <div
+          v-for="metric in weatherMetrics"
+          :key="metric.label"
+          class="min-w-0 rounded-xl border border-white/70 bg-white/50 px-3 py-2 dark:border-white/10 dark:bg-white/[0.04]"
+        >
+          <p class="text-[10.5px] text-gray-400 dark:text-gray-500">{{ metric.label }}</p>
+          <p
+            class="mt-0.5 truncate text-[13px] font-[huoxie] text-gray-700 dark:text-gray-200"
+            :title="metric.value"
+          >
+            {{ metric.value }}
+          </p>
         </div>
       </div>
 
       <!-- 外出建议 -->
-      <div class="relative z-10 mt-4 rounded-[8px] bg-sky-50/70 px-3 py-2.5 dark:bg-sky-900/20">
-        <p class="text-[12px] text-sky-500 dark:text-sky-400">外出建议</p>
-        <p class="mt-1 text-[13px] leading-relaxed font-[huoxie] text-gray-600 dark:text-gray-300">
+      <div
+        class="relative z-10 mt-3 rounded-xl border border-white/70 bg-white/50 px-3.5 py-3 dark:border-white/10 dark:bg-white/[0.04]"
+      >
+        <p
+          class="flex items-center gap-1.5 text-[10.5px] tracking-[0.12em] text-sky-600/80 dark:text-sky-300/80"
+        >
+          <IconFont name="a-232_linggan" class="text-[12px]"></IconFont>
+          外出建议
+        </p>
+        <p
+          class="mt-1.5 text-[12.5px] leading-relaxed font-[huoxie] text-gray-600 dark:text-gray-300"
+        >
           {{ outingAdvice }}
         </p>
       </div>
+
+      <a
+        :href="attributionUrl"
+        target="_blank"
+        rel="noreferrer"
+        class="relative z-10 mt-2 block text-right text-[10px] text-gray-400/80 transition-colors duration-300 hover:text-sky-500 dark:text-gray-500 dark:hover:text-sky-300"
+      >
+        数据来自和风天气
+      </a>
     </template>
   </div>
 </template>
@@ -115,6 +138,8 @@ import type { CurrentWeather, WeatherStatus, WeatherValue } from '@/types'
 const status = ref<WeatherStatus>('loading')
 const weather = ref<CurrentWeather>()
 const errorMessage = ref('')
+/** 浏览器定位得到的经纬度，只做展示，不额外请求逆地理编码 */
+const coordsText = ref('')
 
 const COMPASS_TEXT = ['北风', '东北风', '东风', '东南风', '南风', '西南风', '西风', '西北风']
 const PRECIPITATION_TEXT: Record<string, string> = {
@@ -123,6 +148,42 @@ const PRECIPITATION_TEXT: Record<string, string> = {
   ice: '冰',
   mixed: '雨夹雪',
 }
+
+/**
+ * 天气背景色：全部使用很淡的渐变色，
+ * 晴、云、雨、雪、雾、雷暴和夜间各有一套轻微不同的色调。
+ */
+const WEATHER_THEMES = {
+  sunny:
+    'from-amber-50 via-orange-50/80 to-white dark:from-amber-950/20 dark:via-gray-900 dark:to-gray-900',
+  cloudy:
+    'from-slate-50 via-sky-50/80 to-white dark:from-slate-800/30 dark:via-gray-900 dark:to-gray-900',
+  rain: 'from-sky-50 via-cyan-50/80 to-white dark:from-sky-950/30 dark:via-gray-900 dark:to-gray-900',
+  snow: 'from-sky-50 via-indigo-50/80 to-white dark:from-indigo-950/25 dark:via-gray-900 dark:to-gray-900',
+  fog: 'from-slate-50 via-gray-50/80 to-white dark:from-slate-800/25 dark:via-gray-900 dark:to-gray-900',
+  storm:
+    'from-violet-50 via-indigo-50/80 to-white dark:from-violet-950/25 dark:via-gray-900 dark:to-gray-900',
+  night:
+    'from-indigo-50 via-slate-50/80 to-white dark:from-indigo-950/30 dark:via-gray-900 dark:to-gray-900',
+  default: 'from-sky-50 via-white to-white dark:from-gray-900 dark:via-gray-900 dark:to-gray-900',
+} as const
+
+type WeatherTone = keyof typeof WEATHER_THEMES
+
+const weatherTone = computed<WeatherTone>(() => {
+  const code = Number(weather.value?.condition?.code)
+  if (!Number.isFinite(code)) return 'default'
+  if (code >= 200 && code < 300) return 'storm'
+  if (code >= 300 && code < 400) return 'rain'
+  if (code >= 400 && code < 500) return 'snow'
+  if (code >= 500 && code < 600) return 'fog'
+  if (code >= 150 && code <= 153) return 'night'
+  if (code === 100) return 'sunny'
+  if (code >= 101 && code <= 104) return 'cloudy'
+  return 'default'
+})
+
+const weatherTheme = computed(() => WEATHER_THEMES[weatherTone.value])
 
 const conditionText = computed(() => weather.value?.condition?.text ?? '--')
 
@@ -181,6 +242,15 @@ const uvText = computed(() => {
   const level = uv <= 2 ? '弱' : uv <= 5 ? '中等' : uv <= 7 ? '强' : uv <= 10 ? '很强' : '极强'
   return `${Math.round(uv)} ${level}`
 })
+
+const weatherMetrics = computed(() => [
+  { label: '湿度', value: humidityText.value },
+  { label: '风力', value: windText.value },
+  { label: '降水', value: precipitationText.value },
+  { label: '能见度', value: visibilityText.value },
+  { label: '气压', value: pressureText.value },
+  { label: '紫外线', value: uvText.value },
+])
 
 const updateTimeText = computed(() => {
   const raw = weather.value?.updateTime
@@ -254,9 +324,17 @@ const outingAdvice = computed(() => {
   return `${tips.slice(0, 3).join('；')}。`
 })
 
+/** 把浏览器返回的十进制度数变成更好读的经纬度文本 */
+function formatCoords(lat: number, lon: number): string {
+  const latDirection = lat >= 0 ? 'N' : 'S'
+  const lonDirection = lon >= 0 ? 'E' : 'W'
+  return `${Math.abs(lat).toFixed(2)}°${latDirection} · ${Math.abs(lon).toFixed(2)}°${lonDirection}`
+}
+
 function getPositionAndWeather() {
   status.value = 'loading'
   errorMessage.value = ''
+  coordsText.value = ''
 
   if (!navigator.geolocation) {
     status.value = 'error'
@@ -266,8 +344,11 @@ function getPositionAndWeather() {
 
   navigator.geolocation.getCurrentPosition(
     async (pos) => {
+      const { latitude, longitude } = pos.coords
+      coordsText.value = formatCoords(latitude, longitude)
+
       try {
-        weather.value = await getCurrentWeather(pos.coords.latitude, pos.coords.longitude)
+        weather.value = await getCurrentWeather(latitude, longitude)
         status.value = 'success'
       } catch (err) {
         console.error('天气获取失败：', err)

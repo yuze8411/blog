@@ -1,260 +1,268 @@
 <template>
   <nav
-    class="fixed top-0 left-0 w-full h-16 z-[100] backdrop-blur-[6px] transition-all duration-300"
-    :class="navClass"
+    class="nav-root fixed top-0 left-0 w-full z-[100]"
+    :class="isAutoHidden ? 'nav-root--auto h-4' : 'h-16'"
     @mouseleave="openMenu = ''"
   >
-    <div class="relative h-full flex items-center justify-center">
-      <!-- <div class="absolute top-1/2 -translate-y-1/2 left-[450px] hidden 2x5l:block">
+    <!-- 默认收起时，顶部留一小条触发区，鼠标移上来导航就会滑出 -->
+    <span v-if="isAutoHidden" class="nav-reveal-hint" aria-hidden="true"></span>
+
+    <div
+      class="nav-bar absolute inset-x-0 top-0 h-16 backdrop-blur-[6px] transition-all duration-300"
+      :class="navClass"
+    >
+      <div class="relative h-full flex items-center justify-center">
+        <!-- <div class="absolute top-1/2 -translate-y-1/2 left-[450px] hidden 2x5l:block">
         <span
           class="inline-block text-[24px] leading-none font-[xuanzong] tracking-[6px] bg-clip-text text-transparent transition-all duration-300"
           :class="brandClass"
           >雨落千山</span
         >
       </div> -->
-      <ul class="flex items-center gap-5 h-full">
-        <!-- 一级：首页（无下拉） -->
-        <li class="group relative h-full" @mouseenter="openMenu = ''">
-          <RouterLink
-            to="/"
-            class="h-full flex items-center gap-2 px-5 text-[17px] font-medium transition-colors"
-            :class="isActive({ name: 'home', path: '/' })"
-          >
-            <span class="text-[20px] leading-none">
-              <IconFont name="shouye" />
-            </span>
-            <span class="font-[huoxie] text-[21px]" :class="labelClass">首页</span>
-          </RouterLink>
-        </li>
-
-        <!-- 一级：分类（有下拉） -->
-        <li class="group relative h-full" @mouseenter="openMenu = 'category'">
-          <RouterLink
-            to="/category?classify=0"
-            class="h-full flex items-center gap-2 px-5 text-[17px] font-medium transition-colors"
-            :class="isActive({ name: 'category', path: '/category' })"
-          >
-            <span class="text-[20px] leading-none">
-              <IconFont name="fenlei1" class="text-[25px]" />
-            </span>
-            <span class="font-[huoxie] text-[21px]" :class="labelClass">分类</span>
-          </RouterLink>
-
-          <!-- 二级导航：分类 -->
-          <transition name="sub-fade">
-            <div
-              v-show="openMenu === 'category'"
-              class="absolute left-1/2 top-full -translate-x-1/2 pt-2"
+        <ul class="flex items-center gap-5 h-full">
+          <!-- 一级：首页（无下拉） -->
+          <li class="group relative h-full" @mouseenter="openMenu = ''">
+            <RouterLink
+              to="/"
+              class="h-full flex items-center gap-2 px-5 text-[17px] font-medium transition-colors"
+              :class="isActive({ name: 'home', path: '/' })"
             >
+              <span class="text-[20px] leading-none">
+                <IconFont name="shouye" />
+              </span>
+              <span class="font-[huoxie] text-[21px]" :class="labelClass">首页</span>
+            </RouterLink>
+          </li>
+
+          <!-- 一级：分类（有下拉） -->
+          <li class="group relative h-full" @mouseenter="openMenu = 'category'">
+            <RouterLink
+              to="/category?classify=0"
+              class="h-full flex items-center gap-2 px-5 text-[17px] font-medium transition-colors"
+              :class="isActive({ name: 'category', path: '/category' })"
+            >
+              <span class="text-[20px] leading-none">
+                <IconFont name="fenlei1" class="text-[25px]" />
+              </span>
+              <span class="font-[huoxie] text-[21px]" :class="labelClass">分类</span>
+            </RouterLink>
+
+            <!-- 二级导航：分类 -->
+            <transition name="sub-fade">
               <div
-                class="p-2 rounded-xl bg-white/80 dark:bg-gray-900/95 backdrop-blur-md border border-gray-100 dark:border-gray-700 px-3 py-2 shadow-lg shadow-gray-200/60 dark:shadow-gray-950"
+                v-show="openMenu === 'category'"
+                class="absolute left-1/2 top-full -translate-x-1/2 pt-2"
               >
-                <div class="flex gap-1">
-                  <RouterLink
-                    to="/category?classify=0"
-                    class="mr-1 flex items-center gap-2 px-3 py-2 pr-5 rounded-lg text-[16px] text-gray-600 hover:text-sky-500 hover:bg-sky-50 dark:text-gray-400 dark:hover:text-sky-400 dark:hover:bg-gray-800 transition-colors"
-                  >
-                    <span class="text-[18px] leading-none">
-                      <IconFont name="kaifazhe" />
-                    </span>
-                    <span class="text-nowrap">开发笔记</span>
-                  </RouterLink>
-                  <RouterLink
-                    to="/category?classify=1"
-                    class="flex items-center gap-2 px-3 py-2 pr-5 rounded-lg text-[16px] text-gray-600 hover:text-sky-500 hover:bg-sky-50 dark:text-gray-400 dark:hover:text-sky-400 dark:hover:bg-gray-800 transition-colors"
-                  >
-                    <span class="text-[18px] leading-none">
-                      <IconFont name="shenghuo" />
-                    </span>
-                    <span class="text-nowrap">生活记录</span>
-                  </RouterLink>
+                <div
+                  class="p-2 rounded-xl bg-white/80 dark:bg-gray-900/95 backdrop-blur-md border border-gray-100 dark:border-gray-700 px-3 py-2 shadow-lg shadow-gray-200/60 dark:shadow-gray-950"
+                >
+                  <div class="flex gap-1">
+                    <RouterLink
+                      to="/category?classify=0"
+                      class="mr-1 flex items-center gap-2 px-3 py-2 pr-5 rounded-lg text-[16px] text-gray-600 hover:text-sky-500 hover:bg-sky-50 dark:text-gray-400 dark:hover:text-sky-400 dark:hover:bg-gray-800 transition-colors"
+                    >
+                      <span class="text-[18px] leading-none">
+                        <IconFont name="kaifazhe" />
+                      </span>
+                      <span class="text-nowrap">开发笔记</span>
+                    </RouterLink>
+                    <RouterLink
+                      to="/category?classify=1"
+                      class="flex items-center gap-2 px-3 py-2 pr-5 rounded-lg text-[16px] text-gray-600 hover:text-sky-500 hover:bg-sky-50 dark:text-gray-400 dark:hover:text-sky-400 dark:hover:bg-gray-800 transition-colors"
+                    >
+                      <span class="text-[18px] leading-none">
+                        <IconFont name="shenghuo" />
+                      </span>
+                      <span class="text-nowrap">生活记录</span>
+                    </RouterLink>
+                  </div>
+                  <div class="flex gap-1 mt-[6px]">
+                    <RouterLink
+                      to="/category?classify=2"
+                      class="mr-1 flex items-center gap-2 px-3 py-2 pr-5 rounded-lg text-[16px] text-gray-600 hover:text-sky-500 hover:bg-sky-50 dark:text-gray-400 dark:hover:text-sky-400 dark:hover:bg-gray-800 transition-colors"
+                    >
+                      <span class="text-[18px] leading-none">
+                        <IconFont name="tucao" />
+                      </span>
+                      <span class="text-nowrap">我的吐槽</span>
+                    </RouterLink>
+                    <RouterLink
+                      to="/category?classify=3"
+                      class="flex items-center gap-2 px-3 py-2 pr-5 rounded-lg text-[16px] text-gray-600 hover:text-sky-500 hover:bg-sky-50 dark:text-gray-400 dark:hover:text-sky-400 dark:hover:bg-gray-800 transition-colors"
+                    >
+                      <span class="text-[18px] leading-none">
+                        <IconFont name="keji1" />
+                      </span>
+                      <span class="text-nowrap">科技产品</span>
+                    </RouterLink>
+                  </div>
                 </div>
-                <div class="flex gap-1 mt-[6px]">
+              </div>
+            </transition>
+          </li>
+
+          <!-- 一级：时光（无下拉） -->
+          <li class="group relative h-full" @mouseenter="openMenu = ''">
+            <RouterLink
+              to="/milestone"
+              target="_blank"
+              class="h-full flex items-center gap-2 px-5 text-[17px] font-medium transition-colors"
+              :class="isActive({ name: 'time', path: '/time' })"
+            >
+              <span class="text-[20px] leading-none">
+                <IconFont name="-shijian" />
+              </span>
+              <span class="font-[huoxie] text-[21px]" :class="labelClass">时光</span>
+            </RouterLink>
+          </li>
+
+          <!-- 一级：游记（无下拉） -->
+          <li class="group relative h-full hidden ssm:block" @mouseenter="openMenu = ''">
+            <RouterLink
+              to="/travel"
+              class="h-full flex items-center gap-2 px-5 text-[17px] font-medium transition-colors"
+              :class="isActive({ name: 'travel', path: '/travel' })"
+            >
+              <span class="text-[20px] leading-none">
+                <IconFont name="diqiu" class="text-[23px]" />
+              </span>
+              <span class="font-[huoxie] text-[21px]" :class="labelClass">游记</span>
+            </RouterLink>
+          </li>
+
+          <!-- 一级：探索（有下拉） -->
+          <li class="group relative h-full hidden sm:block" @mouseenter="openMenu = 'explore'">
+            <RouterLink
+              to="/explore"
+              class="h-full flex items-center gap-2 px-5 text-[17px] font-medium transition-colors"
+              :class="isActive({ name: 'explore', path: '/explore' })"
+            >
+              <span class="text-[20px] leading-none">
+                <IconFont name="a-232_linggan" class="text-[25px]" />
+              </span>
+              <span class="font-[huoxie] text-[21px]" :class="labelClass">探索</span>
+            </RouterLink>
+
+            <!-- 二级导航：探索 -->
+            <transition name="sub-fade">
+              <div
+                v-show="openMenu === 'explore'"
+                class="absolute left-1/2 top-full -translate-x-1/2 pt-2"
+              >
+                <div
+                  class="flex gap-1 rounded-xl bg-white/80 dark:bg-gray-900/95 backdrop-blur-md border border-gray-100 dark:border-gray-700 px-3 py-2 shadow-lg shadow-gray-200/60 dark:shadow-gray-950"
+                >
                   <RouterLink
-                    to="/category?classify=2"
-                    class="mr-1 flex items-center gap-2 px-3 py-2 pr-5 rounded-lg text-[16px] text-gray-600 hover:text-sky-500 hover:bg-sky-50 dark:text-gray-400 dark:hover:text-sky-400 dark:hover:bg-gray-800 transition-colors"
+                    to="/stats"
+                    class="flex items-center gap-2 px-3 py-2 rounded-lg text-[16px] text-gray-600 hover:text-sky-500 hover:bg-sky-50 dark:text-gray-400 dark:hover:text-sky-400 dark:hover:bg-gray-800 transition-colors"
                   >
                     <span class="text-[18px] leading-none">
-                      <IconFont name="tucao" />
+                      <IconFont name="tongjiguanli" />
                     </span>
-                    <span class="text-nowrap">我的吐槽</span>
+                    <span class="text-nowrap">统计</span>
                   </RouterLink>
                   <RouterLink
-                    to="/category?classify=3"
-                    class="flex items-center gap-2 px-3 py-2 pr-5 rounded-lg text-[16px] text-gray-600 hover:text-sky-500 hover:bg-sky-50 dark:text-gray-400 dark:hover:text-sky-400 dark:hover:bg-gray-800 transition-colors"
+                    to="/tags"
+                    class="flex items-center gap-2 px-3 py-2 rounded-lg text-[16px] text-gray-600 hover:text-sky-500 hover:bg-sky-50 dark:text-gray-400 dark:hover:text-sky-400 dark:hover:bg-gray-800 transition-colors"
                   >
                     <span class="text-[18px] leading-none">
-                      <IconFont name="keji1" />
+                      <IconFont name="biaoqian1" />
                     </span>
-                    <span class="text-nowrap">科技产品</span>
+                    <span class="text-nowrap">标签墙</span>
+                  </RouterLink>
+                  <RouterLink
+                    to="/about"
+                    class="flex items-center gap-2 px-3 py-2 rounded-lg text-[16px] text-gray-600 hover:text-sky-500 hover:bg-sky-50 dark:text-gray-400 dark:hover:text-sky-400 dark:hover:bg-gray-800 transition-colors"
+                  >
+                    <span class="text-[18px] leading-none">
+                      <IconFont name="jumao" />
+                    </span>
+                    <span class="text-nowrap">关于我</span>
+                  </RouterLink>
+                  <RouterLink
+                    to="/message"
+                    class="flex items-center gap-2 px-3 py-2 rounded-lg text-[16px] text-gray-600 hover:text-sky-500 hover:bg-sky-50 dark:text-gray-400 dark:hover:text-sky-400 dark:hover:bg-gray-800 transition-colors"
+                  >
+                    <span class="text-[18px] leading-none">
+                      <IconFont name="liuyan" />
+                    </span>
+                    <span class="text-nowrap">留言墙</span>
                   </RouterLink>
                 </div>
               </div>
-            </div>
-          </transition>
-        </li>
+            </transition>
+          </li>
+        </ul>
 
-        <!-- 一级：时光（无下拉） -->
-        <li class="group relative h-full" @mouseenter="openMenu = ''">
-          <RouterLink
-            to="/milestone"
-            target="_blank"
-            class="h-full flex items-center gap-2 px-5 text-[17px] font-medium transition-colors"
-            :class="isActive({ name: 'time', path: '/time' })"
-          >
-            <span class="text-[20px] leading-none">
-              <IconFont name="-shijian" />
-            </span>
-            <span class="font-[huoxie] text-[21px]" :class="labelClass">时光</span>
-          </RouterLink>
-        </li>
+        <!-- 右侧：浅黑主题切换 -->
+        <div class="absolute right-[300px] top-1/2 -translate-y-1/2 hidden xl:block">
+          <label class="switch">
+            <input id="input" type="checkbox" :checked="isDark" @change="toggleTheme" />
+            <div class="slider round">
+              <div class="sun-moon">
+                <svg id="moon-dot-1" class="moon-dot" viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="50"></circle>
+                </svg>
+                <svg id="moon-dot-2" class="moon-dot" viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="50"></circle>
+                </svg>
+                <svg id="moon-dot-3" class="moon-dot" viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="50"></circle>
+                </svg>
+                <svg id="light-ray-1" class="light-ray" viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="50"></circle>
+                </svg>
+                <svg id="light-ray-2" class="light-ray" viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="50"></circle>
+                </svg>
+                <svg id="light-ray-3" class="light-ray" viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="50"></circle>
+                </svg>
 
-        <!-- 一级：游记（无下拉） -->
-        <li class="group relative h-full hidden ssm:block" @mouseenter="openMenu = ''">
-          <RouterLink
-            to="/travel"
-            class="h-full flex items-center gap-2 px-5 text-[17px] font-medium transition-colors"
-            :class="isActive({ name: 'travel', path: '/travel' })"
-          >
-            <span class="text-[20px] leading-none">
-              <IconFont name="diqiu" class="text-[23px]" />
-            </span>
-            <span class="font-[huoxie] text-[21px]" :class="labelClass">游记</span>
-          </RouterLink>
-        </li>
-
-        <!-- 一级：探索（有下拉） -->
-        <li class="group relative h-full hidden sm:block" @mouseenter="openMenu = 'explore'">
-          <RouterLink
-            to="/explore"
-            class="h-full flex items-center gap-2 px-5 text-[17px] font-medium transition-colors"
-            :class="isActive({ name: 'explore', path: '/explore' })"
-          >
-            <span class="text-[20px] leading-none">
-              <IconFont name="a-232_linggan" class="text-[25px]" />
-            </span>
-            <span class="font-[huoxie] text-[21px]" :class="labelClass">探索</span>
-          </RouterLink>
-
-          <!-- 二级导航：探索 -->
-          <transition name="sub-fade">
-            <div
-              v-show="openMenu === 'explore'"
-              class="absolute left-1/2 top-full -translate-x-1/2 pt-2"
-            >
-              <div
-                class="flex gap-1 rounded-xl bg-white/80 dark:bg-gray-900/95 backdrop-blur-md border border-gray-100 dark:border-gray-700 px-3 py-2 shadow-lg shadow-gray-200/60 dark:shadow-gray-950"
-              >
-                <RouterLink
-                  to="/stats"
-                  class="flex items-center gap-2 px-3 py-2 rounded-lg text-[16px] text-gray-600 hover:text-sky-500 hover:bg-sky-50 dark:text-gray-400 dark:hover:text-sky-400 dark:hover:bg-gray-800 transition-colors"
-                >
-                  <span class="text-[18px] leading-none">
-                    <IconFont name="tongjiguanli" />
-                  </span>
-                  <span class="text-nowrap">统计</span>
-                </RouterLink>
-                <RouterLink
-                  to="/tags"
-                  class="flex items-center gap-2 px-3 py-2 rounded-lg text-[16px] text-gray-600 hover:text-sky-500 hover:bg-sky-50 dark:text-gray-400 dark:hover:text-sky-400 dark:hover:bg-gray-800 transition-colors"
-                >
-                  <span class="text-[18px] leading-none">
-                    <IconFont name="biaoqian1" />
-                  </span>
-                  <span class="text-nowrap">标签墙</span>
-                </RouterLink>
-                <RouterLink
-                  to="/about"
-                  class="flex items-center gap-2 px-3 py-2 rounded-lg text-[16px] text-gray-600 hover:text-sky-500 hover:bg-sky-50 dark:text-gray-400 dark:hover:text-sky-400 dark:hover:bg-gray-800 transition-colors"
-                >
-                  <span class="text-[18px] leading-none">
-                    <IconFont name="jumao" />
-                  </span>
-                  <span class="text-nowrap">关于我</span>
-                </RouterLink>
-                <RouterLink
-                  to="/message"
-                  class="flex items-center gap-2 px-3 py-2 rounded-lg text-[16px] text-gray-600 hover:text-sky-500 hover:bg-sky-50 dark:text-gray-400 dark:hover:text-sky-400 dark:hover:bg-gray-800 transition-colors"
-                >
-                  <span class="text-[18px] leading-none">
-                    <IconFont name="liuyan" />
-                  </span>
-                  <span class="text-nowrap">留言墙</span>
-                </RouterLink>
+                <svg id="cloud-1" class="cloud-dark" viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="50"></circle>
+                </svg>
+                <svg id="cloud-2" class="cloud-dark" viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="50"></circle>
+                </svg>
+                <svg id="cloud-3" class="cloud-dark" viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="50"></circle>
+                </svg>
+                <svg id="cloud-4" class="cloud-light" viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="50"></circle>
+                </svg>
+                <svg id="cloud-5" class="cloud-light" viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="50"></circle>
+                </svg>
+                <svg id="cloud-6" class="cloud-light" viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="50"></circle>
+                </svg>
+              </div>
+              <div class="stars">
+                <svg id="star-1" class="star" viewBox="0 0 20 20">
+                  <path
+                    d="M 0 10 C 10 10,10 10 ,0 10 C 10 10 , 10 10 , 10 20 C 10 10 , 10 10 , 20 10 C 10 10 , 10 10 , 10 0 C 10 10,10 10 ,0 10 Z"
+                  ></path>
+                </svg>
+                <svg id="star-2" class="star" viewBox="0 0 20 20">
+                  <path
+                    d="M 0 10 C 10 10,10 10 ,0 10 C 10 10 , 10 10 , 10 20 C 10 10 , 10 10 , 20 10 C 10 10 , 10 10 , 10 0 C 10 10,10 10 ,0 10 Z"
+                  ></path>
+                </svg>
+                <svg id="star-3" class="star" viewBox="0 0 20 20">
+                  <path
+                    d="M 0 10 C 10 10,10 10 ,0 10 C 10 10 , 10 10 , 10 20 C 10 10 , 10 10 , 20 10 C 10 10 , 10 10 , 10 0 C 10 10,10 10 ,0 10 Z"
+                  ></path>
+                </svg>
+                <svg id="star-4" class="star" viewBox="0 0 20 20">
+                  <path
+                    d="M 0 10 C 10 10,10 10 ,0 10 C 10 10 , 10 10 , 10 20 C 10 10 , 10 10 , 20 10 C 10 10 , 10 10 , 10 0 C 10 10,10 10 ,0 10 Z"
+                  ></path>
+                </svg>
               </div>
             </div>
-          </transition>
-        </li>
-      </ul>
-
-      <!-- 右侧：浅黑主题切换 -->
-      <div class="absolute right-[300px] top-1/2 -translate-y-1/2 hidden xl:block">
-        <label class="switch">
-          <input id="input" type="checkbox" :checked="isDark" @change="toggleTheme" />
-          <div class="slider round">
-            <div class="sun-moon">
-              <svg id="moon-dot-1" class="moon-dot" viewBox="0 0 100 100">
-                <circle cx="50" cy="50" r="50"></circle>
-              </svg>
-              <svg id="moon-dot-2" class="moon-dot" viewBox="0 0 100 100">
-                <circle cx="50" cy="50" r="50"></circle>
-              </svg>
-              <svg id="moon-dot-3" class="moon-dot" viewBox="0 0 100 100">
-                <circle cx="50" cy="50" r="50"></circle>
-              </svg>
-              <svg id="light-ray-1" class="light-ray" viewBox="0 0 100 100">
-                <circle cx="50" cy="50" r="50"></circle>
-              </svg>
-              <svg id="light-ray-2" class="light-ray" viewBox="0 0 100 100">
-                <circle cx="50" cy="50" r="50"></circle>
-              </svg>
-              <svg id="light-ray-3" class="light-ray" viewBox="0 0 100 100">
-                <circle cx="50" cy="50" r="50"></circle>
-              </svg>
-
-              <svg id="cloud-1" class="cloud-dark" viewBox="0 0 100 100">
-                <circle cx="50" cy="50" r="50"></circle>
-              </svg>
-              <svg id="cloud-2" class="cloud-dark" viewBox="0 0 100 100">
-                <circle cx="50" cy="50" r="50"></circle>
-              </svg>
-              <svg id="cloud-3" class="cloud-dark" viewBox="0 0 100 100">
-                <circle cx="50" cy="50" r="50"></circle>
-              </svg>
-              <svg id="cloud-4" class="cloud-light" viewBox="0 0 100 100">
-                <circle cx="50" cy="50" r="50"></circle>
-              </svg>
-              <svg id="cloud-5" class="cloud-light" viewBox="0 0 100 100">
-                <circle cx="50" cy="50" r="50"></circle>
-              </svg>
-              <svg id="cloud-6" class="cloud-light" viewBox="0 0 100 100">
-                <circle cx="50" cy="50" r="50"></circle>
-              </svg>
-            </div>
-            <div class="stars">
-              <svg id="star-1" class="star" viewBox="0 0 20 20">
-                <path
-                  d="M 0 10 C 10 10,10 10 ,0 10 C 10 10 , 10 10 , 10 20 C 10 10 , 10 10 , 20 10 C 10 10 , 10 10 , 10 0 C 10 10,10 10 ,0 10 Z"
-                ></path>
-              </svg>
-              <svg id="star-2" class="star" viewBox="0 0 20 20">
-                <path
-                  d="M 0 10 C 10 10,10 10 ,0 10 C 10 10 , 10 10 , 10 20 C 10 10 , 10 10 , 20 10 C 10 10 , 10 10 , 10 0 C 10 10,10 10 ,0 10 Z"
-                ></path>
-              </svg>
-              <svg id="star-3" class="star" viewBox="0 0 20 20">
-                <path
-                  d="M 0 10 C 10 10,10 10 ,0 10 C 10 10 , 10 10 , 10 20 C 10 10 , 10 10 , 20 10 C 10 10 , 10 10 , 10 0 C 10 10,10 10 ,0 10 Z"
-                ></path>
-              </svg>
-              <svg id="star-4" class="star" viewBox="0 0 20 20">
-                <path
-                  d="M 0 10 C 10 10,10 10 ,0 10 C 10 10 , 10 10 , 10 20 C 10 10 , 10 10 , 20 10 C 10 10 , 10 10 , 10 0 C 10 10,10 10 ,0 10 Z"
-                ></path>
-              </svg>
-            </div>
-          </div>
-        </label>
+          </label>
+        </div>
       </div>
     </div>
   </nav>
@@ -270,12 +278,14 @@ const props = withDefaults(
   defineProps<{
     /** light：浅色页面（如标签墙）使用浅色底 + 深色字，保证可读性 */
     variant?: 'default' | 'light'
-    ishidden?: boolean
+    /** visible：正常展示；hidden：默认收起，鼠标移到页面顶部或键盘聚焦时滑出 */
+    visibility?: 'visible' | 'hidden'
   }>(),
-  { variant: 'default' },
+  { variant: 'default', visibility: 'visible' },
 )
 
 const isLight = computed(() => props.variant === 'light')
+const isAutoHidden = computed(() => props.visibility === 'hidden')
 
 const openMenu = ref('')
 const route = useRoute()
@@ -368,6 +378,50 @@ onMounted(() => {
 </script>
 
 <style scoped>
+/* ---------- About 页：默认收起的导航 ---------- */
+/* 收起状态：整条导航向上滑出画面，只留下顶部一条很窄的触发区 */
+.nav-root--auto .nav-bar {
+  opacity: 0;
+  transform: translateY(-100%);
+}
+
+/* 鼠标移到页面顶部，或者键盘 Tab 进导航时，导航重新滑下来 */
+.nav-root--auto:hover .nav-bar,
+.nav-root--auto:focus-within .nav-bar {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* 顶部中央的一小段微光，提示这里可以唤出导航 */
+.nav-reveal-hint {
+  position: absolute;
+  top: 5px;
+  left: 50%;
+  width: 36px;
+  height: 3px;
+  border-radius: 999px;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgba(186, 230, 253, 0.55), transparent);
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.25);
+  transform: translateX(-50%);
+  transition:
+    opacity 0.25s ease,
+    transform 0.25s ease;
+}
+
+.nav-root--auto:hover .nav-reveal-hint,
+.nav-root--auto:focus-within .nav-reveal-hint {
+  opacity: 0;
+  transform: translate(-50%, -4px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-root--auto .nav-bar,
+  .nav-reveal-hint {
+    transition: none;
+  }
+}
+
 /* 二级导航淡入淡出 */
 .sub-fade-enter-active,
 .sub-fade-leave-active {

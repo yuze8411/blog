@@ -184,13 +184,13 @@ export async function handleGithubContributions(
     if (!user) {
       return jsonResponse({ msg: '没有找到这个 GitHub 用户' }, 404, origin)
     }
-
     // 把 GitHub 的周数据整理成组件需要的结构：每列固定七天，缺失的位置补 null
     const weeks: { days: ({ date: string; count: number; level: 0 | 1 | 2 | 3 | 4 } | null)[] }[] =
       []
 
     for (const week of user.contributionsCollection.contributionCalendar.weeks) {
       const days = Array.from({ length: 7 }, () => null) as ({
+        // 这是需要的days数据
         date: string
         count: number
         level: 0 | 1 | 2 | 3 | 4

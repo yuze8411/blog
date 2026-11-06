@@ -10,13 +10,16 @@
           class="inline-flex items-center gap-3 text-[12.5px] font-semibold uppercase tracking-[0.32em] text-sky-200"
         >
           <span class="h-px w-7 bg-gradient-to-r from-sky-300 to-transparent" />
-          关于网站
+          关于该网站
         </p>
 
         <h2
-          class="mt-5 text-[38px] font-bold leading-[1.16] tracking-tight text-white sm:text-[46px] xl:text-[54px]"
+          class="mt-5 text-[38px] font-bold leading-[1.16] tracking-tight text-white sm:text-[46px] xl:text-[54px] flex"
         >
-          建站历史，
+          <div class="flex">
+            <IconFont name="16global" class="mr-5 relative top-[6px]"></IconFont>建站历史，
+          </div>
+
           <span
             class="bg-gradient-to-r from-sky-300 via-violet-300 to-fuchsia-300 bg-clip-text text-transparent"
           >

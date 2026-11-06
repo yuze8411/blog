@@ -1,6 +1,7 @@
 <template>
   <div class="relative min-h-screen w-full overflow-hidden">
     <div
+      v-reveal
       class="relative z-10 mx-auto flex min-h-screen max-w-[1440px] flex-col justify-center gap-12 px-5 py-24 pr-16 sm:px-8 sm:pr-20 md:flex-row md:gap-14 lg:gap-20 lg:pl-12 lg:pr-24"
     >
       <div class="about-avatar group relative shrink-0 items-start mt-[10%]">
@@ -169,7 +170,10 @@
   </div>
 </template>
 <script setup lang="ts">
-// 第一页数据
+import { vReveal } from '@/directives/reveal'
+
+// 入场动画交给全局 v-reveal 指令：它会在组件挂载后再观察元素，
+// 自动处理减少动态效果，并在第一次进入视口后断开观察，避免空 ref 和重复触发。
 </script>
 
 <style scoped>
