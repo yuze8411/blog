@@ -13,9 +13,11 @@
       ></div>
     </div>
 
-    <TopNavigation variant="light" />
+    <!-- 封面图会盖住页面顶部，默认导航在图片上使用白色文字，和首页一致 -->
+    <TopNavigation />
 
     <main class="relative z-10">
+      <TravelNoteCover :total="travelImages.length" />
       <TravelNoteContent :travel-images="travelImages" />
     </main>
 
@@ -28,6 +30,7 @@
 <script setup lang="ts">
 import { reactive } from 'vue'
 import type { TravelImage } from '@/types/travel'
+import TravelNoteCover from '@/components/business/travelNote/TravelNoteCover.vue'
 
 const travelImages = reactive<TravelImage[]>([
   {

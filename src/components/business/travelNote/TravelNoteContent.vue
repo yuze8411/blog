@@ -1,77 +1,52 @@
 <template>
-  <div class="mx-auto w-[90%] max-w-[1200px] pb-16 pt-[92px] sm:w-[80%]">
-    <!-- 页头 -->
-    <header class="flex flex-wrap items-end justify-between gap-6">
-      <div class="min-w-0">
-        <p class="font-[huoxie] text-[12px] tracking-[0.35em] text-sky-500/90 dark:text-sky-400/90">
-          TRAVEL NOTES
-        </p>
-        <h1
-          class="mt-2 flex items-center gap-3 font-[huoxie] text-[26px] leading-tight text-slate-800 dark:text-slate-100 sm:text-[30px]"
-        >
-          <span
-            class="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-sky-500 to-indigo-500 text-white shadow-[0_10px_24px_-12px_rgba(56,110,170,0.8)]"
-          >
-            <IconFont name="tupian" class="text-[21px]" />
-          </span>
-          旅游图片集
-        </h1>
-        <p class="mt-3 max-w-[560px] text-[14px] leading-7 text-slate-500 dark:text-slate-400">
-          从25年的嵩山开始，更多的高山在未来逐渐被征服，于我而言旅游不仅是放松，更多的是寻找人生存在的意义。
-        </p>
-      </div>
-
-      <div
-        class="flex items-center gap-3 rounded-2xl border border-slate-200/80 bg-white/60 px-5 py-3 backdrop-blur-sm dark:border-slate-800 dark:bg-slate-900/40"
-      >
-        <span class="text-[10px] tracking-[0.25em] text-slate-400 dark:text-slate-500">PHOTOS</span>
-        <span class="h-6 w-px bg-slate-200 dark:bg-slate-700"></span>
-        <p class="font-[huoxie] text-[13px] text-slate-500 dark:text-slate-400">
-          共
-          <span class="text-[26px] leading-none text-sky-600 dark:text-sky-400">{{
-            totalCount
-          }}</span>
-          张
-        </p>
-      </div>
-    </header>
-
-    <nav
-      class="mt-8 flex flex-wrap items-center gap-1.5 rounded-2xl border border-slate-200/70 bg-white/55 p-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)] backdrop-blur-sm dark:border-slate-800/80 dark:bg-slate-900/35 dark:shadow-none"
-      aria-label="照片标签筛选"
-    >
-      <span
-        class="hidden items-center gap-1.5 px-2 text-[10px] tracking-[0.22em] text-slate-400 sm:flex dark:text-slate-500"
-      >
-        <IconFont name="biaoqian1" class="text-[14px]" />
-        FILTER
-      </span>
-      <span class="mx-1 hidden h-5 w-px bg-slate-200 sm:block dark:bg-slate-700"></span>
-
-      <button
-        v-for="tag of filterTags"
-        :key="tag.name"
-        type="button"
-        class="group inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 font-[huoxie] text-[13px] transition-all duration-300"
-        :class="
-          tag.name === activeTag
-            ? 'bg-gradient-to-r from-[#7fbcfd] to-[#5378ff] text-white shadow-[0_10px_20px_-14px_rgba(63,116,173,0.95)]'
-            : 'text-slate-500 hover:bg-white hover:text-sky-700 hover:shadow-[0_8px_18px_-16px_rgba(63,116,173,0.8)] dark:text-slate-400 dark:hover:bg-slate-800/80 dark:hover:text-sky-300 dark:hover:shadow-none'
-        "
-        @click="selectTag(tag.name)"
-      >
-        <span>{{ tag.name }}</span>
+  <div class="mx-auto w-[92%] max-w-[1360px] pb-16 pt-8 sm:w-[88%] sm:pt-10">
+    <!-- 标题和介绍已经放进上方的封面，这里直接从标签筛选开始 -->
+    <nav class="border-b border-slate-200/70 dark:border-slate-800/80" aria-label="照片标签筛选">
+      <div class="flex flex-wrap items-center gap-x-2 gap-y-2 sm:gap-x-3">
         <span
-          class="rounded-full px-1.5 py-0.5 text-[11px] leading-none tabular-nums transition-colors"
+          class="inline-flex items-center gap-1.5 pb-4 pt-2 text-[12px] tracking-[0.18em] text-slate-400 dark:text-slate-500"
+        >
+          <IconFont name="biaoqian1" class="text-[14px]" />
+          筛选
+        </span>
+        <span class="mb-4 h-4 w-px bg-slate-200 dark:bg-slate-700"></span>
+
+        <button
+          v-for="tag of filterTags"
+          :key="tag.name"
+          type="button"
+          :aria-pressed="tag.name === activeTag"
+          class="group relative inline-flex items-baseline gap-2 rounded-md px-2 pb-4 pt-2 font-[huoxie] text-[15px] transition-colors duration-300 sm:text-[16px]"
           :class="
             tag.name === activeTag
-              ? 'bg-white/20 text-white/90'
-              : 'bg-slate-100/90 text-slate-400 group-hover:bg-sky-50 group-hover:text-sky-600 dark:bg-slate-800 dark:text-slate-500 dark:group-hover:bg-slate-700 dark:group-hover:text-sky-300'
+              ? 'text-gray-900 dark:text-slate-100'
+              : 'text-slate-500 hover:bg-slate-100/70 hover:text-sky-600 dark:text-slate-400 dark:hover:bg-slate-800/60 dark:hover:text-sky-300'
           "
+          @click="selectTag(tag.name)"
         >
-          {{ tag.count }}
+          <span>{{ tag.name }}</span>
+          <span
+            class="text-[11px] tabular-nums transition-colors duration-300 sm:text-[12px]"
+            :class="
+              tag.name === activeTag
+                ? 'text-sky-600 dark:text-sky-400'
+                : 'text-slate-400/80 group-hover:text-sky-500/80 dark:text-slate-500 dark:group-hover:text-sky-400/80'
+            "
+          >
+            {{ tag.count }}
+          </span>
+          <span
+            class="absolute inset-x-0 -bottom-px h-[2px] rounded-full bg-sky-500 transition-opacity duration-300 dark:bg-sky-400"
+            :class="tag.name === activeTag ? 'opacity-100' : 'opacity-0 group-hover:opacity-40'"
+          ></span>
+        </button>
+
+        <span
+          class="ml-auto hidden pb-4 pt-2 text-[11px] tracking-[0.14em] text-slate-400 dark:text-slate-500 sm:inline"
+        >
+          共 {{ totalCount }} 张
         </span>
-      </button>
+      </div>
     </nav>
 
     <section
