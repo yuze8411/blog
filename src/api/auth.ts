@@ -66,6 +66,7 @@ const AUTH_ERROR_MESSAGES: Record<string, string> = {
 }
 
 function translateAuthError(error: AuthError): string {
+  // 把error统一转为合适的格式
   // 优先用错误码，稳定且不受 Supabase 文案变化影响
   const byCode = error.code ? AUTH_ERROR_MESSAGES[error.code] : undefined
   if (byCode) return byCode

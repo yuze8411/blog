@@ -1,14 +1,16 @@
 <template>
-  <div class="flex h-screen w-full overflow-hidden bg-[#f6f8fb] text-slate-800">
+  <div
+    class="flex h-screen w-full overflow-hidden bg-[#f6f8fb] text-slate-800 transition-colors duration-300 dark:bg-[#0b1220] dark:text-slate-200"
+  >
     <!-- ==================== 左侧导航栏 ==================== -->
     <aside
-      class="flex h-full shrink-0 flex-col border-r border-slate-200/70 bg-white transition-[width] duration-300 ease-out"
+      class="flex h-full shrink-0 flex-col border-r border-slate-200/70 bg-white transition-[width,background-color,border-color] duration-300 ease-out dark:border-slate-800 dark:bg-[#0f172a]"
       :class="isCollapse ? 'w-16' : 'w-[232px]'"
     >
       <!-- 品牌区：点击回到后台首页 -->
       <RouterLink
         to="/admin/dashboard"
-        class="flex h-16 shrink-0 items-center gap-3 border-b border-slate-100 px-4 transition-colors hover:bg-slate-50/70"
+        class="flex h-16 shrink-0 items-center gap-3 border-b border-slate-100 px-4 transition-colors hover:bg-slate-50/70 dark:border-slate-800 dark:hover:bg-slate-800/50"
         :class="isCollapse ? 'justify-center px-0' : ''"
       >
         <span
@@ -17,12 +19,18 @@
           <el-icon :size="18"><Reading /></el-icon>
         </span>
         <span v-show="!isCollapse" class="min-w-0 leading-tight">
-          <span class="block truncate text-[15px] font-medium text-slate-800">雨落千山</span>
-          <span class="block truncate text-[11px] tracking-[0.12em] text-slate-400">管理后台</span>
+          <span class="block truncate text-[15px] font-medium text-slate-800 dark:text-slate-100">
+            雨落千山
+          </span>
+          <span
+            class="block truncate text-[11px] tracking-[0.12em] text-slate-400 dark:text-slate-500"
+          >
+            管理后台
+          </span>
         </span>
         <span
           v-show="!isCollapse"
-          class="ml-auto shrink-0 rounded-full border border-sky-100 bg-sky-50 px-1.5 py-0.5 text-[10px] font-medium tracking-wide text-sky-500"
+          class="ml-auto shrink-0 rounded-full border border-sky-100 bg-sky-50 px-1.5 py-0.5 text-[10px] font-medium tracking-wide text-sky-500 dark:border-sky-900/70 dark:bg-sky-950/40 dark:text-sky-400"
         >
           ADMIN
         </span>
@@ -32,7 +40,7 @@
       <el-scrollbar class="min-h-0 flex-1">
         <p
           v-show="!isCollapse"
-          class="px-5 pb-1 pt-4 text-[10px] font-medium tracking-[0.22em] text-slate-400"
+          class="px-5 pb-1 pt-4 text-[10px] font-medium tracking-[0.22em] text-slate-400 dark:text-slate-500"
         >
           导航菜单
         </p>
@@ -85,7 +93,7 @@
       <div class="shrink-0 px-3 pb-3">
         <div
           v-show="!isCollapse"
-          class="mb-3 rounded-xl border border-slate-100 bg-slate-50/80 px-3 py-2.5"
+          class="mb-3 rounded-xl border border-slate-100 bg-slate-50/80 px-3 py-2.5 dark:border-slate-800 dark:bg-slate-800/40"
         >
           <div class="flex items-center gap-2">
             <span class="relative flex h-2 w-2">
@@ -94,15 +102,17 @@
               ></span>
               <span class="relative inline-flex h-2 w-2 rounded-full bg-emerald-500"></span>
             </span>
-            <p class="text-[12px] font-medium text-slate-600">站点运行中</p>
+            <p class="text-[12px] font-medium text-slate-600 dark:text-slate-300">站点运行中</p>
           </div>
-          <p class="mt-1 text-[11px] leading-5 text-slate-400">文章、相册与评论的管理入口</p>
+          <p class="mt-1 text-[11px] leading-5 text-slate-400 dark:text-slate-500">
+            文章、相册与评论的管理入口
+          </p>
         </div>
 
-        <div class="border-t border-slate-100 pt-3">
+        <div class="border-t border-slate-100 pt-3 dark:border-slate-800">
           <button
             type="button"
-            class="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-[14px] text-slate-500 transition-colors hover:bg-rose-50 hover:text-rose-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-300"
+            class="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-[14px] text-slate-500 transition-colors hover:bg-rose-50 hover:text-rose-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-300 dark:text-slate-400 dark:hover:bg-rose-950/40 dark:hover:text-rose-400 dark:focus-visible:ring-rose-800"
             :class="isCollapse ? 'justify-center px-0' : ''"
             title="退出登录"
             @click="handleLogout"
@@ -117,13 +127,13 @@
     <!-- ==================== 右侧：顶部栏 + 内容区 ==================== -->
     <div class="flex min-w-0 flex-1 flex-col">
       <header
-        class="flex h-16 shrink-0 items-center justify-between gap-3 border-b border-slate-200/70 bg-white/90 px-4 shadow-[0_1px_2px_rgba(15,23,42,0.03)] backdrop-blur sm:px-6"
+        class="flex h-16 shrink-0 items-center justify-between gap-3 border-b border-slate-200/70 bg-white/90 px-4 shadow-[0_1px_2px_rgba(15,23,42,0.03)] backdrop-blur transition-colors duration-300 dark:border-slate-800 dark:bg-slate-900/90 dark:shadow-[0_1px_2px_rgba(0,0,0,0.3)] sm:px-6"
       >
         <div class="flex min-w-0 items-center gap-2.5">
           <!-- 侧栏收起 / 展开 -->
           <button
             type="button"
-            class="grid h-9 w-9 shrink-0 place-items-center rounded-lg text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300"
+            class="grid h-9 w-9 shrink-0 place-items-center rounded-lg text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100 dark:focus-visible:ring-sky-800"
             :aria-label="isCollapse ? '展开侧边栏' : '收起侧边栏'"
             @click="isCollapse = !isCollapse"
           >
@@ -133,7 +143,7 @@
             </el-icon>
           </button>
 
-          <span class="hidden h-4 w-px shrink-0 bg-slate-200 sm:block"></span>
+          <span class="hidden h-4 w-px shrink-0 bg-slate-200 dark:bg-slate-700 sm:block"></span>
 
           <!-- 面包屑：后台管理 / 分组 / 当前页 -->
           <el-breadcrumb separator="/" class="admin-breadcrumb hidden min-w-0 sm:block">
@@ -148,14 +158,16 @@
           </el-breadcrumb>
 
           <!-- 小屏时面包屑太长，只显示当前页标题 -->
-          <p class="truncate text-[15px] font-medium text-slate-800 sm:hidden">{{ pageTitle }}</p>
+          <p class="truncate text-[15px] font-medium text-slate-800 dark:text-slate-100 sm:hidden">
+            {{ pageTitle }}
+          </p>
         </div>
 
         <div class="flex shrink-0 items-center gap-2 sm:gap-3">
           <!-- 回到前台博客 -->
           <RouterLink
             to="/"
-            class="group inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-[13px] text-slate-600 shadow-sm transition-colors hover:border-sky-200 hover:bg-sky-50/60 hover:text-sky-600"
+            class="group inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-[13px] text-slate-600 shadow-sm transition-colors hover:border-sky-200 hover:bg-sky-50/60 hover:text-sky-600 dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-300 dark:hover:border-sky-700 dark:hover:bg-sky-950/40 dark:hover:text-sky-300"
           >
             <el-icon :size="14" class="transition-transform group-hover:-translate-x-0.5">
               <Back />
@@ -163,7 +175,21 @@
             <span class="hidden sm:inline">返回博客</span>
           </RouterLink>
 
-          <span class="hidden h-4 w-px bg-slate-200 sm:block"></span>
+          <!-- 黑夜 / 白天切换：和前台博客共用 localStorage 里的 theme -->
+          <button
+            type="button"
+            class="grid h-8 w-8 shrink-0 place-items-center rounded-lg border border-slate-200 bg-white text-slate-500 shadow-sm transition-colors hover:border-sky-200 hover:bg-sky-50/60 hover:text-sky-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300 dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-400 dark:hover:border-sky-700 dark:hover:bg-sky-950/40 dark:hover:text-sky-300 dark:focus-visible:ring-sky-800"
+            :aria-label="isDark ? '切换到白天模式' : '切换到黑夜模式'"
+            :title="isDark ? '切换到白天模式' : '切换到黑夜模式'"
+            @click="toggleTheme"
+          >
+            <el-icon :size="15">
+              <Sunny v-if="isDark" />
+              <Moon v-else />
+            </el-icon>
+          </button>
+
+          <span class="hidden h-4 w-px bg-slate-200 dark:bg-slate-700 sm:block"></span>
 
           <!-- 博主信息：头像、昵称、邮箱都来自当前登录的 Supabase 账号 -->
           <div class="flex min-w-0 items-center gap-2.5 rounded-full py-1 pl-1 pr-1 sm:pr-2">
@@ -172,23 +198,25 @@
                 :size="34"
                 :src="displayAvatar"
                 :title="displayEmail"
-                class="shadow-sm ring-2 ring-white"
+                class="shadow-sm ring-2 ring-white dark:ring-slate-900"
               />
               <span
-                class="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border-2 border-white bg-emerald-400"
+                class="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border-2 border-white bg-emerald-400 dark:border-slate-900"
                 aria-hidden="true"
               ></span>
             </span>
             <div class="hidden min-w-0 leading-tight sm:block">
-              <p class="flex items-center gap-1.5 text-[13px] font-medium text-slate-800">
+              <p
+                class="flex items-center gap-1.5 text-[13px] font-medium text-slate-800 dark:text-slate-100"
+              >
                 <span class="max-w-[140px] truncate">{{ displayName }}</span>
                 <span
-                  class="shrink-0 rounded-full border border-sky-100 bg-sky-50 px-1.5 py-0.5 text-[10px] font-medium text-sky-500"
+                  class="shrink-0 rounded-full border border-sky-100 bg-sky-50 px-1.5 py-0.5 text-[10px] font-medium text-sky-500 dark:border-sky-900/70 dark:bg-sky-950/40 dark:text-sky-400"
                 >
                   博主
                 </span>
               </p>
-              <p class="max-w-[180px] truncate text-[11px] text-slate-400">
+              <p class="max-w-[180px] truncate text-[11px] text-slate-400 dark:text-slate-500">
                 {{ displayEmail || '已登录' }}
               </p>
             </div>
@@ -197,18 +225,21 @@
       </header>
 
       <!-- 内容区：二级路由的具体页面渲染在这里 -->
-      <main class="relative min-h-0 flex-1 overflow-y-auto bg-[#f6f8fb] p-4 sm:p-6">
+      <main
+        class="admin-main-scroll relative min-h-0 flex-1 overflow-y-auto bg-[#f6f8fb] p-2 transition-colors duration-300 dark:bg-[#0b1220] sm:p-4"
+      >
         <!-- 很淡的底色光晕，避免大片纯灰显得单调 -->
         <div class="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
           <div
-            class="absolute -right-24 -top-24 h-64 w-64 rounded-full bg-sky-100/60 blur-3xl"
+            class="absolute -right-24 -top-24 h-64 w-64 rounded-full bg-sky-100/60 blur-3xl dark:bg-sky-950/40"
           ></div>
           <div
-            class="absolute -left-24 bottom-0 h-72 w-72 rounded-full bg-indigo-100/40 blur-3xl"
+            class="absolute -left-24 bottom-0 h-72 w-72 rounded-full bg-indigo-100/40 blur-3xl dark:bg-indigo-950/30"
           ></div>
         </div>
 
         <div class="relative mx-auto h-full w-full">
+          <!-- 路由 -->
           <RouterView v-slot="{ Component }">
             <Transition name="admin-fade" mode="out-in">
               <component :is="Component" :key="route.path" />
@@ -243,8 +274,10 @@ import {
   Fold,
   House,
   Management,
+  Moon,
   Reading,
   Setting,
+  Sunny,
   SwitchButton,
 } from '@element-plus/icons-vue'
 import fallbackAvatar from '@/assets/images/mycover.jpg'
@@ -264,6 +297,23 @@ const logoutVisible = ref(false)
 
 /** 退出登录请求进行中，用于禁用确认按钮 */
 const logoutLoading = ref(false)
+
+/**
+ * 当前是否黑夜模式。
+ * index.html 在首屏渲染前已经根据 localStorage / 系统主题加好了 dark 类，
+ * 这里只需要同步一下按钮的显示状态，切换时改同一个 class 和 localStorage 即可。
+ */
+const isDark = ref(false)
+
+function applyTheme(dark: boolean) {
+  document.documentElement.classList.toggle('dark', dark)
+  localStorage.setItem('theme', dark ? 'dark' : 'light')
+  isDark.value = dark
+}
+
+function toggleTheme() {
+  applyTheme(!isDark.value)
+}
 
 /** 当前登录的博主信息，进入后台时拉取一次 */
 const currentUser = ref<AdminUser | null>(null)
@@ -336,12 +386,23 @@ async function confirmLogout() {
 }
 
 onMounted(() => {
+  isDark.value = document.documentElement.classList.contains('dark')
+
+  /*
+   * 后台是「整屏应用壳」：进入时把 html 的滚动锁住，
+   * 只有内容区（main）自己滚动。
+   * 否则 h-screen 在某些缩放下会多出 1px，切换主题、侧栏伸缩重新计算时，
+   * 浏览器右侧就会突然冒出一根页面滚动条。离开后台时再解锁。
+   */
+  document.documentElement.classList.add('admin-scroll-lock')
+
   syncCollapse()
   void loadCurrentUser()
   window.addEventListener('resize', syncCollapse, { passive: true })
 })
 
 onBeforeUnmount(() => {
+  document.documentElement.classList.remove('admin-scroll-lock')
   window.removeEventListener('resize', syncCollapse)
 })
 </script>
@@ -449,6 +510,138 @@ onBeforeUnmount(() => {
 
 .admin-breadcrumb :deep(.el-breadcrumb__separator) {
   color: #cbd5e1;
+}
+
+/* ==================== 黑夜模式 ==================== */
+/*
+ * 深色下不要用接近白色的文字：
+ * 常态用 slate-400，悬停只提亮到 slate-300，选中用蓝-400，
+ * 悬停/选中的底色也用很低透明度的蓝灰，避免整条导航发白、抢视线。
+ */
+:global(html.dark) .admin-menu {
+  --el-menu-text-color: #94a3b8;
+  --el-menu-hover-bg-color: rgba(148, 163, 184, 0.1);
+  --el-menu-active-color: #60a5fa;
+}
+
+:global(html.dark) .admin-menu :deep(.el-menu-item .el-icon),
+:global(html.dark) .admin-menu :deep(.el-sub-menu__title .el-icon) {
+  color: #64748b;
+}
+
+:global(html.dark) .admin-menu :deep(.el-menu-item:not(.is-active):hover),
+:global(html.dark) .admin-menu :deep(.el-sub-menu__title:hover) {
+  color: #cbd5e1;
+}
+
+:global(html.dark) .admin-menu :deep(.el-menu-item:hover .el-icon),
+:global(html.dark) .admin-menu :deep(.el-sub-menu__title:hover .el-icon) {
+  color: #60a5fa;
+}
+
+/* 选中项：低透明度蓝底 + 蓝-400 文字，比纯浅蓝更沉一点 */
+:global(html.dark) .admin-menu :deep(.el-menu-item.is-active) {
+  color: #60a5fa;
+  background: linear-gradient(90deg, rgba(37, 99, 235, 0.16) 0%, rgba(37, 99, 235, 0.03) 100%);
+  box-shadow: inset 0 0 0 1px rgba(96, 165, 250, 0.1);
+}
+
+:global(html.dark) .admin-menu :deep(.el-menu-item.is-active .el-icon) {
+  color: #60a5fa;
+}
+
+:global(html.dark) .admin-menu:not(.el-menu--collapse) :deep(.el-menu-item.is-active)::before {
+  background: linear-gradient(180deg, #3b82f6, #2563eb);
+}
+
+:global(html.dark) .admin-menu :deep(.el-sub-menu.is-active > .el-sub-menu__title) {
+  color: #60a5fa;
+}
+
+:global(html.dark) .admin-menu :deep(.el-sub-menu.is-active > .el-sub-menu__title .el-icon) {
+  color: #60a5fa;
+}
+
+/* 侧栏收起后，子菜单会以浮层形式挂到 body 上，单独补一层深色样式 */
+:global(html.dark) .el-menu--popup {
+  background-color: #0f172a;
+  border: 1px solid #1e293b;
+  box-shadow: 0 16px 36px -18px rgba(0, 0, 0, 0.8);
+}
+
+:global(html.dark) .el-menu--popup .el-menu-item {
+  color: #94a3b8;
+}
+
+:global(html.dark) .el-menu--popup .el-menu-item:hover {
+  background-color: rgba(148, 163, 184, 0.1);
+  color: #cbd5e1;
+}
+
+:global(html.dark) .el-menu--popup .el-menu-item.is-active {
+  color: #60a5fa;
+  background: rgba(37, 99, 235, 0.16);
+}
+
+/* 面包屑 */
+:global(html.dark) .admin-breadcrumb :deep(.el-breadcrumb__inner) {
+  color: #64748b;
+}
+
+:global(html.dark) .admin-breadcrumb :deep(.el-breadcrumb__inner.is-link:hover) {
+  color: #60a5fa;
+}
+
+:global(html.dark) .admin-breadcrumb :deep(.el-breadcrumb__item:last-child .el-breadcrumb__inner) {
+  color: #e2e8f0;
+}
+
+:global(html.dark) .admin-breadcrumb :deep(.el-breadcrumb__separator) {
+  color: #475569;
+}
+
+/* ==================== 整屏滚动控制 ==================== */
+/* 后台挂载期间锁住文档滚动，页面里只有内容区可以滚动，杜绝右侧多余的页面滚动条 */
+:global(html.admin-scroll-lock) {
+  overflow: hidden;
+}
+
+/* 内容区滚动条：做细一点、半透明，深浅主题下都不突兀 */
+.admin-main-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(148, 163, 184, 0.45) transparent;
+}
+
+.admin-main-scroll::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.admin-main-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.admin-main-scroll::-webkit-scrollbar-thumb {
+  border: 3px solid transparent;
+  border-radius: 999px;
+  background-color: rgba(148, 163, 184, 0.45);
+  background-clip: content-box;
+}
+
+.admin-main-scroll::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(100, 116, 139, 0.65);
+}
+
+:global(html.dark) .admin-main-scroll {
+  scrollbar-color: rgba(71, 85, 105, 0.7) transparent;
+}
+
+:global(html.dark) .admin-main-scroll::-webkit-scrollbar-thumb {
+  background-color: rgba(71, 85, 105, 0.7);
+}
+
+:global(html.dark) .admin-main-scroll::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(100, 116, 139, 0.85);
 }
 
 /* ==================== 内容区切换动画 ==================== */

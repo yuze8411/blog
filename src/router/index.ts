@@ -86,7 +86,7 @@ const router = createRouter({
         {
           path: 'manage/articles',
           name: 'adminManageArticles',
-          component: AdminPlaceholder,
+          component: () => import('@/views/admin/AdminArticleManage.vue'),
           meta: { title: '文章管理' },
         },
         {
@@ -141,6 +141,8 @@ const router = createRouter({
 router.beforeEach(async (to, _from, next) => {
   // 只有后台和登录页需要登录状态，前台页面直接放行，避免每次跳转都请求 Supabase
   if (!to.meta.isAdmin && to.name !== 'login') return next()
+  // 如果来之前就在后台了，那么大概率就是管理员了，进去即可，放置每次点击左侧导航栏都发请求，太慢了
+  if (_from.path.startsWith('/admin')) return next()
 
   // getCurrentUser 会向 Supabase 校验当前会话，未登录 / 会话失效时返回 null
   const user = await getCurrentUser()

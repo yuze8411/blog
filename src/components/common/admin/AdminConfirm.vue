@@ -31,7 +31,7 @@
       >
         <!-- 遮罩：点击等同于取消 -->
         <div
-          class="admin-confirm-mask absolute inset-0 bg-slate-900/30 backdrop-blur-[2px]"
+          class="admin-confirm-mask absolute inset-0 bg-slate-900/30 backdrop-blur-[2px] dark:bg-black/60"
           aria-hidden="true"
           @click="onMaskClick"
         ></div>
@@ -39,7 +39,7 @@
         <!-- 弹窗主体 -->
         <div
           ref="dialogRef"
-          class="admin-confirm-card relative w-full max-w-[420px] overflow-hidden rounded-2xl border border-slate-200/60 bg-white shadow-[0_24px_56px_-28px_rgba(15,23,42,0.28)] focus:outline-none"
+          class="admin-confirm-card relative w-full max-w-[420px] overflow-hidden rounded-2xl border border-slate-200/60 bg-white shadow-[0_24px_56px_-28px_rgba(15,23,42,0.28)] focus:outline-none dark:border-slate-700/70 dark:bg-slate-900 dark:shadow-[0_24px_56px_-28px_rgba(0,0,0,0.8)]"
           role="dialog"
           aria-modal="true"
           :aria-label="displayTitle"
@@ -60,10 +60,13 @@
               </span>
 
               <div class="min-w-0 flex-1">
-                <h3 class="text-[16px] font-medium leading-6 text-slate-800">
+                <h3 class="text-[16px] font-medium leading-6 text-slate-800 dark:text-slate-100">
                   {{ displayTitle }}
                 </h3>
-                <p v-if="message" class="mt-1.5 text-[13px] leading-6 text-slate-500">
+                <p
+                  v-if="message"
+                  class="mt-1.5 text-[13px] leading-6 text-slate-500 dark:text-slate-400"
+                >
                   {{ message }}
                 </p>
 
@@ -123,38 +126,41 @@ interface ConfirmTheme {
 /* 整体走淡色系：浅色底 + 深一点的文字，保证对比度但不刺眼 */
 const THEMES: Record<AdminConfirmType, ConfirmTheme> = {
   info: {
-    bar: 'bg-gradient-to-r from-sky-100 via-sky-300 to-sky-100',
-    iconBg: 'bg-sky-50 ring-1 ring-inset ring-sky-100',
+    bar: 'bg-gradient-to-r from-sky-100 via-sky-300 to-sky-100 dark:from-sky-900/60 dark:via-sky-500/70 dark:to-sky-900/60',
+    iconBg: 'bg-sky-50 ring-1 ring-inset ring-sky-100 dark:bg-sky-950/50 dark:ring-sky-900/60',
     iconColor: 'text-sky-400',
     confirmBtn:
-      'border border-sky-200 bg-sky-50 text-sky-600 hover:border-sky-300 hover:bg-sky-100 focus-visible:ring-sky-200',
+      'border border-sky-200 bg-sky-50 text-sky-600 hover:border-sky-300 hover:bg-sky-100 focus-visible:ring-sky-200 dark:border-sky-800 dark:bg-sky-950/40 dark:text-sky-300 dark:hover:border-sky-700 dark:hover:bg-sky-900/50 dark:focus-visible:ring-sky-800',
     icon: InfoFilled,
     title: '确认操作',
   },
   success: {
-    bar: 'bg-gradient-to-r from-emerald-100 via-emerald-300 to-emerald-100',
-    iconBg: 'bg-emerald-50 ring-1 ring-inset ring-emerald-100',
+    bar: 'bg-gradient-to-r from-emerald-100 via-emerald-300 to-emerald-100 dark:from-emerald-900/60 dark:via-emerald-500/70 dark:to-emerald-900/60',
+    iconBg:
+      'bg-emerald-50 ring-1 ring-inset ring-emerald-100 dark:bg-emerald-950/50 dark:ring-emerald-900/60',
     iconColor: 'text-emerald-400',
     confirmBtn:
-      'border border-emerald-200 bg-emerald-50 text-emerald-600 hover:border-emerald-300 hover:bg-emerald-100 focus-visible:ring-emerald-200',
+      'border border-emerald-200 bg-emerald-50 text-emerald-600 hover:border-emerald-300 hover:bg-emerald-100 focus-visible:ring-emerald-200 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300 dark:hover:border-emerald-700 dark:hover:bg-emerald-900/50 dark:focus-visible:ring-emerald-800',
     icon: CircleCheckFilled,
     title: '操作成功',
   },
   warning: {
-    bar: 'bg-gradient-to-r from-amber-100 via-amber-300 to-amber-100',
-    iconBg: 'bg-amber-50 ring-1 ring-inset ring-amber-100',
+    bar: 'bg-gradient-to-r from-amber-100 via-amber-300 to-amber-100 dark:from-amber-900/60 dark:via-amber-500/70 dark:to-amber-900/60',
+    iconBg:
+      'bg-amber-50 ring-1 ring-inset ring-amber-100 dark:bg-amber-950/50 dark:ring-amber-900/60',
     iconColor: 'text-amber-400',
     confirmBtn:
-      'border border-amber-200 bg-amber-50 text-amber-600 hover:border-amber-300 hover:bg-amber-100 focus-visible:ring-amber-200',
+      'border border-amber-200 bg-amber-50 text-amber-600 hover:border-amber-300 hover:bg-amber-100 focus-visible:ring-amber-200 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-300 dark:hover:border-amber-700 dark:hover:bg-amber-900/50 dark:focus-visible:ring-amber-800',
     icon: WarningFilled,
     title: '请注意',
   },
   danger: {
-    bar: 'bg-gradient-to-r from-rose-100 via-rose-300 to-rose-100',
-    iconBg: 'bg-rose-50 ring-1 ring-inset ring-rose-100',
+    bar: 'bg-gradient-to-r from-rose-100 via-rose-300 to-rose-100 dark:from-rose-900/60 dark:via-rose-500/70 dark:to-rose-900/60',
+    iconBg:
+      'bg-rose-50 ring-1 ring-inset ring-rose-100 dark:bg-rose-950/50 dark:ring-rose-900/60',
     iconColor: 'text-rose-400',
     confirmBtn:
-      'border border-rose-200 bg-rose-50 text-rose-600 hover:border-rose-300 hover:bg-rose-100 focus-visible:ring-rose-200',
+      'border border-rose-200 bg-rose-50 text-rose-600 hover:border-rose-300 hover:bg-rose-100 focus-visible:ring-rose-200 dark:border-rose-800 dark:bg-rose-950/40 dark:text-rose-300 dark:hover:border-rose-700 dark:hover:bg-rose-900/50 dark:focus-visible:ring-rose-800',
     icon: CircleCloseFilled,
     title: '危险操作',
   },
@@ -285,6 +291,25 @@ onBeforeUnmount(() => {
   box-shadow:
     0 0 0 2px #fff,
     0 0 0 4px #cbd5e1;
+}
+
+/* 黑夜模式：取消按钮也跟着变成深色 */
+:global(html.dark) .admin-confirm-cancel {
+  border-color: #334155;
+  background: #1e293b;
+  color: #cbd5e1;
+}
+
+:global(html.dark) .admin-confirm-cancel:hover {
+  border-color: #475569;
+  background: #334155;
+  color: #f1f5f9;
+}
+
+:global(html.dark) .admin-confirm-cancel:focus-visible {
+  box-shadow:
+    0 0 0 2px #0f172a,
+    0 0 0 4px #475569;
 }
 
 .admin-confirm-ok {

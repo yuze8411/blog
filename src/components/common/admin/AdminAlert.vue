@@ -19,7 +19,7 @@
         <div
           v-for="alert of alerts"
           :key="alert.id"
-          class="pointer-events-auto relative flex items-start gap-3 overflow-hidden rounded-xl border px-4 py-3 shadow-[0_14px_30px_-20px_rgba(15,23,42,0.3)]"
+          class="pointer-events-auto relative flex items-start gap-3 overflow-hidden rounded-xl border px-4 py-3 shadow-[0_14px_30px_-20px_rgba(15,23,42,0.3)] dark:shadow-[0_14px_30px_-20px_rgba(0,0,0,0.85)]"
           :class="[THEMES[alert.type].border, THEMES[alert.type].bg]"
           role="status"
         >
@@ -35,12 +35,15 @@
 
           <!-- 文字内容 -->
           <div class="min-w-0 flex-1">
-            <p v-if="alert.title" class="text-[13px] font-medium leading-5 text-slate-800">
+            <p
+              v-if="alert.title"
+              class="text-[13px] font-medium leading-5 text-slate-800 dark:text-slate-100"
+            >
               {{ alert.title }}
             </p>
             <p
-              class="text-[13px] leading-5 text-slate-600"
-              :class="alert.title ? 'mt-0.5 text-slate-500' : ''"
+              class="text-[13px] leading-5 text-slate-600 dark:text-slate-300"
+              :class="alert.title ? 'mt-0.5 text-slate-500 dark:text-slate-400' : ''"
             >
               {{ alert.message }}
             </p>
@@ -49,7 +52,7 @@
           <!-- 手动关闭 -->
           <button
             type="button"
-            class="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-md text-slate-300 transition-colors hover:bg-slate-100 hover:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-200"
+            class="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-md text-slate-300 transition-colors hover:bg-slate-100 hover:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-200 dark:text-slate-500 dark:hover:bg-slate-700/60 dark:hover:text-slate-300 dark:focus-visible:ring-slate-700"
             aria-label="关闭提示"
             @click="close(alert.id)"
           >
@@ -91,38 +94,41 @@ interface AlertTheme {
   icon: Component
 }
 
-/* 淡色提示条：整体是很浅的类型底色，图标用白色圆底托住，文字保持深灰保证清晰 */
+/*
+ * 淡色提示条：整体是很浅的类型底色，图标用白色圆底托住，文字保持深灰保证清晰。
+ * 黑夜模式下底色换成同色系的深色，图标圆底跟着变成深灰，避免一块白点扎眼。
+ */
 const THEMES: Record<AdminAlertType, AlertTheme> = {
   success: {
-    border: 'border-emerald-100',
-    bg: 'bg-emerald-50/50',
-    iconBg: 'bg-white',
+    border: 'border-emerald-100 dark:border-emerald-900/60',
+    bg: 'bg-emerald-50/50 dark:bg-emerald-950/40',
+    iconBg: 'bg-white dark:bg-slate-900',
     iconColor: 'text-emerald-400',
-    bar: 'bg-emerald-300',
+    bar: 'bg-emerald-300 dark:bg-emerald-500/80',
     icon: CircleCheckFilled,
   },
   error: {
-    border: 'border-rose-100',
-    bg: 'bg-rose-50/50',
-    iconBg: 'bg-white',
+    border: 'border-rose-100 dark:border-rose-900/60',
+    bg: 'bg-rose-50/50 dark:bg-rose-950/40',
+    iconBg: 'bg-white dark:bg-slate-900',
     iconColor: 'text-rose-400',
-    bar: 'bg-rose-300',
+    bar: 'bg-rose-300 dark:bg-rose-500/80',
     icon: CircleCloseFilled,
   },
   warning: {
-    border: 'border-amber-100',
-    bg: 'bg-amber-50/50',
-    iconBg: 'bg-white',
+    border: 'border-amber-100 dark:border-amber-900/60',
+    bg: 'bg-amber-50/50 dark:bg-amber-950/40',
+    iconBg: 'bg-white dark:bg-slate-900',
     iconColor: 'text-amber-400',
-    bar: 'bg-amber-300',
+    bar: 'bg-amber-300 dark:bg-amber-500/80',
     icon: WarningFilled,
   },
   info: {
-    border: 'border-sky-100',
-    bg: 'bg-sky-50/50',
-    iconBg: 'bg-white',
+    border: 'border-sky-100 dark:border-sky-900/60',
+    bg: 'bg-sky-50/50 dark:bg-sky-950/40',
+    iconBg: 'bg-white dark:bg-slate-900',
     iconColor: 'text-sky-400',
-    bar: 'bg-sky-300',
+    bar: 'bg-sky-300 dark:bg-sky-500/80',
     icon: InfoFilled,
   },
 }
