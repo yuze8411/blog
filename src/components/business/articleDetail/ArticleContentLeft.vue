@@ -36,13 +36,15 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import type { ArticleDetailProps } from '@/types'
 import { md, renderMarkdown } from '@/utils/markdown'
 
 const props = defineProps<ArticleDetailProps>()
 
 let htmlContent = ref('')
+// 用户可能在同一页面里切换到另一篇文章，用递增 id 只接收最后一次渲染结果
+let renderId = 0
 
 // 标签样式class列表，tailwind 类名
 const tagColorList = [
@@ -62,16 +64,26 @@ async function copyContent() {
   }
 }
 
-onMounted(async () => {
+async function renderArticle() {
+  const current = ++renderId
+  const content = props.virtureData.content || ''
+
   // 先用普通 markdown 渲染，避免等待 Shiki 初始化时正文一片空白
-  htmlContent.value = md.render(props.virtureData.content)
+  htmlContent.value = content ? md.render(content) : ''
+  if (!content) return
+
   try {
     // Shiki 就绪后替换为带高亮的版本
-    htmlContent.value = await renderMarkdown(props.virtureData.content)
+    const html = await renderMarkdown(content)
+    if (current === renderId) htmlContent.value = html
   } catch (error) {
     console.error('代码高亮失败，保留普通渲染结果', error)
   }
-})
+}
+
+// 从列表进入详情时数据是异步拿到的，正文变化后要重新渲染
+watch(() => props.virtureData.content, renderArticle)
+onMounted(renderArticle)
 </script>
 
 <style scoped>

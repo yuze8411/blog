@@ -1,9 +1,10 @@
 <template>
   <div class="w-full h-[600px] relative">
     <img
-      src="@/assets/images/demoTextImages/demo.jpg"
-      alt="Home Cover"
+      :src="virtureData.coverUrl || fallbackCover"
+      :alt="virtureData.title"
       class="w-full h-full object-cover object-center"
+      @error="handleCoverError"
     />
     <HomeLeafParticles />
     <!-- 文章基本信息 -->
@@ -19,8 +20,17 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import HomeLeafParticles from '../home/HomeLeafParticles.vue'
 import type { ArticleDetailProps } from '@/types'
+import fallbackCover from '@/assets/images/demoTextImages/demo.jpg'
 
 defineProps<ArticleDetailProps>()
+
+// 封面地址失效时换成本地默认图，避免详情页头图裂开
+function handleCoverError(event: Event) {
+  const img = event.target as HTMLImageElement
+  if (img.dataset.fallback) return
+  img.dataset.fallback = '1'
+  img.src = fallbackCover
+}
 
 const canobj = ref<HTMLCanvasElement | null>(null)
 

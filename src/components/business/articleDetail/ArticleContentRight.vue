@@ -3,7 +3,7 @@
     class="hidden lg:block self-start lg:sticky lg:top-20 lg:w-[26%] xl:w-[22%] transition-width relative space-y-4 dark:border-gray-700"
   >
     <!--封面-->
-    <ArticleContentRightImg v-reveal></ArticleContentRightImg>
+    <ArticleContentRightImg v-reveal :virtureData="virtureData"></ArticleContentRightImg>
     <ArticleContentRightCatalog
       v-reveal="100"
       :virtureData="virtureData"

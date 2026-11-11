@@ -90,6 +90,11 @@ const router = createRouter({
           meta: { title: '文章管理' },
         },
         {
+          path: 'articleedit',
+          component: () => import('@/views/admin/AdminArticleEdit.vue'),
+          meta: { title: '写博客' },
+        },
+        {
           path: 'manage/categories',
           name: 'adminManageCategories',
           component: AdminPlaceholder,

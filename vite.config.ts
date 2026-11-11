@@ -8,6 +8,7 @@ import Components from 'unplugin-vue-components/vite'
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 import { handleWeather } from './api/weather.ts'
 import { handleGithubContributions } from './api/githubcontributions.ts'
+import { handleDeepSeek } from './api/deepseek.ts'
 
 /** 这些响应头由 Node 的 http 模块自己管理，转发时要去掉 */
 const HOP_BY_HOP_HEADERS = new Set([
@@ -43,19 +44,47 @@ function createLocalApiPlugin(
           else if (Array.isArray(value)) headers.set(key, value.join(', '))
         }
 
-        const request = new Request(requestUrl, { method: req.method, headers })
+        // POST / PUT 等请求要把 body 原样转发，否则 handler 里的 request.json() 读不到内容
+        const init: RequestInit = { method: req.method, headers }
+        if (req.method && req.method !== 'GET' && req.method !== 'HEAD') {
+          const chunks: Buffer[] = []
+          for await (const chunk of req) {
+            chunks.push(typeof chunk === 'string' ? Buffer.from(chunk) : chunk)
+          }
+          if (chunks.length) init.body = new Uint8Array(Buffer.concat(chunks))
+        }
+
+        const request = new Request(requestUrl, init)
         const response = await handler(request)
 
         res.statusCode = response.status
         response.headers.forEach((value, key) => {
           if (!HOP_BY_HOP_HEADERS.has(key.toLowerCase())) res.setHeader(key, value)
         })
-        res.end(await response.text())
+
+        // 一边读一边写，SSE（AI 写作）才能实现流式输出；
+        // 普通 JSON 接口只读一次，效果和原来的 response.text() 一样
+        if (response.body) {
+          const reader = response.body.getReader()
+          while (true) {
+            const { done, value } = await reader.read()
+            if (done) break
+            res.write(value)
+          }
+          res.end()
+        } else {
+          res.end(await response.text())
+        }
       } catch (err) {
         console.error(`[${name}] 本地 API 代理异常：`, err)
-        res.statusCode = 500
-        res.setHeader('Content-Type', 'application/json; charset=utf-8')
-        res.end(JSON.stringify({ msg: '本地 API 代理异常' }))
+        // 流式响应已经开始时不能再改状态码和响应头
+        if (!res.headersSent) {
+          res.statusCode = 500
+          res.setHeader('Content-Type', 'application/json; charset=utf-8')
+          res.end(JSON.stringify({ msg: '本地 API 代理异常' }))
+        } else {
+          res.end()
+        }
       }
     })
   }
@@ -95,6 +124,15 @@ export default defineConfig(({ mode }) => {
       createLocalApiPlugin('local-github-api', '/api/githubcontributions', (request) =>
         handleGithubContributions(request, {
           GITHUB_PAT: env.GITHUB_PAT,
+        }),
+      ),
+      createLocalApiPlugin('local-deepseek-api', '/api/deepseek', (request) =>
+        handleDeepSeek(request, {
+          DEEPSEEK_API_KEY: env.DEEPSEEK_API_KEY,
+          DEEPSEEK_MODEL: env.DEEPSEEK_MODEL,
+          DEEPSEEK_BASE_URL: env.DEEPSEEK_BASE_URL,
+          SUPABASE_URL: env.VITE_SUPABASE_URL,
+          SUPABASE_ANON_KEY: env.VITE_SUPABASE_ANON_KEY,
         }),
       ),
     ],

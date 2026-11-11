@@ -10,6 +10,7 @@
         row-key="id"
         height="100%"
         class="admin-article-table"
+        @selection-change="onSelectionChange"
       >
         <!-- 勾选列：el-table 自带全选 / 单选逻辑 -->
         <el-table-column type="selection" width="48" />
@@ -70,7 +71,6 @@
         <el-table-column label="分类" width="140" align="left">
           <template #default="{ row }">
             <el-tag size="small" effect="plain" round class="admin-category-tag">
-              <IconFont name="fenlei1" class="admin-tag-icon" />
               <span class="admin-tag-text">{{ row.categories?.name || '未分类' }}</span>
             </el-tag>
           </template>
@@ -145,7 +145,12 @@
           <template #default="{ row }">
             <div class="flex items-center justify-end gap-0.5">
               <!-- 编辑 -->
-              <el-button link size="small" class="admin-row-action admin-row-action--edit">
+              <el-button
+                link
+                size="small"
+                class="admin-row-action admin-row-action--edit"
+                @click="emit('edit', row)"
+              >
                 <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                   <path
                     d="m5.433 13.917 1.262-3.155A4 4 0 0 1 7.58 9.42l6.92-6.918a2.121 2.121 0 0 1 3 3l-6.92 6.918c-.383.383-.84.685-1.343.886l-3.154 1.262a.5.5 0 0 1-.65-.65Z"
@@ -157,8 +162,14 @@
                 编辑
               </el-button>
 
-              <!-- 隐藏 / 展示：已展示时给「闭眼」，隐藏时给「睁眼」 -->
-              <el-button link size="small" class="admin-row-action admin-row-action--toggle">
+              <!-- 隐藏 / 展示：已展示时给「闭眼」，隐藏时给「睁眼」；草稿会在点击时给出提示 -->
+              <el-button
+                link
+                size="small"
+                class="admin-row-action admin-row-action--toggle"
+                :title="row.is_published ? '在前台隐藏或重新展示' : '草稿不会在前台展示，无需隐藏'"
+                @click="emit('toggle', row)"
+              >
                 <svg
                   v-if="row.is_visible"
                   viewBox="0 0 20 20"
@@ -184,7 +195,12 @@
               </el-button>
 
               <!-- 删除：淡一些的玫红，悬停才加深 -->
-              <el-button link size="small" class="admin-row-action admin-row-action--danger">
+              <el-button
+                link
+                size="small"
+                class="admin-row-action admin-row-action--danger"
+                @click="emit('delete', row)"
+              >
                 <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                   <path
                     fill-rule="evenodd"
@@ -216,10 +232,17 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, watch } from 'vue'
 import AdminBlank from '@/components/common/admin/AdminBlank.vue'
+import type { ArticleManageRow } from './types'
 
 // 获取文章列表数据
 const props = defineProps(['articleList', 'searchquery'])
-const emit = defineEmits(['pageJump'])
+const emit = defineEmits<{
+  pageJump: [page: number]
+  edit: [row: ArticleManageRow]
+  toggle: [row: ArticleManageRow]
+  delete: [row: ArticleManageRow]
+  selectionChange: [rows: ArticleManageRow[]]
+}>()
 
 const tableRef = ref()
 
@@ -228,17 +251,23 @@ function pageJump(page: number) {
   emit('pageJump', page)
 }
 
-// 换页或换筛选条件后，表格回到顶部，不要停在上一页的滚动位置
+// el-table 勾选变化时把当前选中的行抛给父级，批量删除要用
+function onSelectionChange(rows: ArticleManageRow[]) {
+  emit('selectionChange', rows)
+}
+
+// 换页或换筛选条件后，表格回到顶部并清空勾选，避免删到上一页的行
 watch(
   () => props.articleList?.list,
   async () => {
     await nextTick()
     tableRef.value?.setScrollTop(0)
+    tableRef.value?.clearSelection()
   },
 )
 
 let isTable = computed(() => {
-  if (!props.articleList) return false
+  if (!props.articleList) return true
   return props.articleList.list?.length > 0
 })
 
@@ -552,11 +581,7 @@ let title = computed(() => {
 :global(html.dark) .admin-article-table :deep(.admin-category-tag) {
   --el-tag-text-color: #cbd5e1;
   border-color: rgba(56, 189, 248, 0.18);
-  background-image: linear-gradient(
-    135deg,
-    rgba(30, 41, 59, 0.95) 0%,
-    rgba(12, 45, 72, 0.9) 100%
-  );
+  background-image: linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(12, 45, 72, 0.9) 100%);
   color: #cbd5e1;
 }
 

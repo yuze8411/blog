@@ -11,6 +11,7 @@
       :articleList="articleList"
       :searchquery="search_query"
       @pageJump="pageJump"
+      @refresh="refreshArticleList"
     ></ArticleManageContent>
     <AdminLoding overlay v-if="isLoding" :text="lodingtext"></AdminLoding>
   </div>
@@ -18,12 +19,14 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted, computed } from 'vue'
 import { supabase } from '@/api/supabase'
+import { useAdminAlert } from '@/components/common/admin/useAdminAlert'
+
+const adminAlert = useAdminAlert()
 
 let articleList = ref() // 文章列表
 let search_query = ref({
   search_keyword: '',
-  data_range: '',
-  status: '',
+  status: 'published',
   year: null,
   month: 0,
   page: 1,
@@ -45,6 +48,7 @@ async function keywordSearch(keyword: string) {
   if (keyword == search_query.value.search_keyword) return
   search_query.value.search_keyword = keyword
   // 搜索请求..
+  lodingtext.value = `搜索 ${search_query.value.search_keyword} 相关的文章中...`
   isLoding.value = true
   search_query.value.page = 1
   let res = await fetchArticleList(searchquery.value)
@@ -58,6 +62,7 @@ async function dataRangeSearch(time: { year: number | null; month: number | null
   ;(search_query.value.month as number | null) = time.month
 
   // 年月范围搜索
+  lodingtext.value = `搜索${search_query.value.year == null ? '全部时间段的' : search_query.value.year + '年' + search_query.value.month + '月的时间段发布的'}文章中...`
   isLoding.value = true
   search_query.value.page = 1
   let res = await fetchArticleList(searchquery.value)
@@ -69,16 +74,38 @@ async function statusSearch(statusS: string) {
   if (statusS == search_query.value.status) return
   search_query.value.status = statusS
   // 状态改变搜索
+  lodingtext.value = `搜索 ${search_query.value.status} 状态的文章中...`
   isLoding.value = true
   search_query.value.page = 1
   let res = await fetchArticleList(searchquery.value)
   articleList.value = res
   isLoding.value = false
 }
+// 删除 / 隐藏之后刷新当前页；如果这页被删空了，自动退回上一页
+async function refreshArticleList() {
+  lodingtext.value = '刷新文章列表中...'
+  isLoding.value = true
+
+  try {
+    let res = await fetchArticleList(searchquery.value)
+    if (!res.list.length && search_query.value.page > 1) {
+      search_query.value.page -= 1
+      res = await fetchArticleList(searchquery.value)
+    }
+    articleList.value = res
+  } catch (error) {
+    console.error('[articleManage] 刷新文章列表失败', error)
+    adminAlert.error('刷新文章列表失败，请稍后重试')
+  } finally {
+    isLoding.value = false
+  }
+}
+
 // 换页：分页条已经把页码算好了，这里只更新状态并重新取当前页数据
 async function pageJump(page: number) {
   if (page === search_query.value.page) return
   search_query.value.page = page
+  lodingtext.value = `加载第 ${page} 文章数据中...`
   isLoding.value = true
   let res = await fetchArticleList(searchquery.value)
   articleList.value = res
@@ -138,7 +165,7 @@ async function fetchArticleList(params: ArticleQuery) {
 async function initArticleList() {
   let res = await fetchArticleList({
     keyword: '',
-    status: 'unpublished',
+    status: 'published',
     year: null,
     month: 1,
     page: 1,

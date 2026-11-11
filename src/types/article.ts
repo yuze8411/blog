@@ -1,6 +1,8 @@
 /** 首页文章列表项 */
 export interface Article {
   textId: string
+  /** 文章 slug，跳详情页时优先用它 */
+  slug?: string
   coverSrc: string
   title: string
   content: string
@@ -14,6 +16,8 @@ export interface Article {
 /** 文章详情页数据 */
 export interface ArticleDetail {
   id: string
+  /** 详情页头图和右栏卡片的封面，没有时组件内部会用默认图兜底 */
+  coverUrl?: string
   author: string
   category: string
   wordsNumber: number

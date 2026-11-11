@@ -226,7 +226,7 @@
 
       <!-- 内容区：二级路由的具体页面渲染在这里 -->
       <main
-        class="admin-main-scroll relative min-h-0 flex-1 overflow-y-auto bg-[#f6f8fb] p-2 transition-colors duration-300 dark:bg-[#0b1220] sm:p-4"
+        class="admin-main-scroll relative min-h-0 flex-1 overflow-y-auto bg-[#f0f6ff] p-2 transition-colors duration-300 dark:bg-[#0b1220] sm:p-4"
       >
         <!-- 很淡的底色光晕，避免大片纯灰显得单调 -->
         <div class="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
