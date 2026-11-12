@@ -109,7 +109,7 @@ const router = createRouter({
         {
           path: 'manage/comments',
           name: 'adminManageComments',
-          component: AdminPlaceholder,
+          component: () => import('@/views/admin/AdminCommentManage.vue'),
           meta: { title: '评论管理' },
         },
         {

@@ -12,14 +12,17 @@
           月度归档
         </h2>
         <p class="mt-1 text-[12.5px] text-slate-400 dark:text-slate-500">
-          近 12 个月共 {{ totalArticles }} 篇，点开月份看标题
+          <template v-if="loading">正在整理最近 12 个月…</template>
+          <template v-else-if="error">月度归档暂时加载不出来</template>
+          <template v-else>近 12 个月共 {{ totalArticles }} 篇，点开月份看标题</template>
         </p>
       </div>
 
       <!-- 一键回到最新月份，不用在列表里往下找 -->
       <button
         type="button"
-        class="mt-1 shrink-0 rounded-full border border-violet-100 bg-violet-50/60 px-3.5 py-1.5 text-[11.5px] text-violet-600 transition-all duration-300 hover:-translate-y-0.5 hover:border-violet-200 hover:bg-violet-50 dark:border-white/10 dark:bg-white/5 dark:text-violet-300 dark:hover:border-violet-400/25 dark:hover:bg-white/[0.08]"
+        class="mt-1 shrink-0 rounded-full border border-violet-100 bg-violet-50/60 px-3.5 py-1.5 text-[11.5px] text-violet-600 transition-all duration-300 hover:-translate-y-0.5 hover:border-violet-200 hover:bg-violet-50 disabled:cursor-default disabled:opacity-50 disabled:hover:translate-y-0 dark:border-white/10 dark:bg-white/5 dark:text-violet-300 dark:hover:border-violet-400/25 dark:hover:bg-white/[0.08]"
+        :disabled="loading || !groups.length"
         @click="goLatest"
       >
         最新月份
@@ -27,7 +30,35 @@
     </div>
 
     <div ref="scrollerRef" class="stats-month-scroll relative mt-4 min-h-0 flex-1 overflow-y-auto pr-1.5">
-      <div class="space-y-2">
+      <!-- 加载中：用和月份行同样高度的骨架 -->
+      <div v-if="loading" class="space-y-2" aria-busy="true" aria-label="月度归档加载中">
+        <div v-for="n in 6" :key="n" class="month-skeleton">
+          <span class="month-skeleton-dot"></span>
+          <div class="min-w-0 flex-1">
+            <span class="month-skeleton-line w-1/3"></span>
+            <span class="month-skeleton-line is-bar mt-2.5 w-full"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 加载完成但一条记录都没有 -->
+      <div
+        v-else-if="!groups.length"
+        class="flex h-full min-h-[180px] flex-col items-center justify-center text-center"
+      >
+        <p class="font-[huoxie] text-[22px] text-slate-400 dark:text-slate-500">
+          {{ error ? '月度归档加载失败' : '还没有发布记录' }}
+        </p>
+        <p class="mt-2 text-[12.5px] text-slate-400 dark:text-slate-500">
+          {{
+            error
+              ? '可以点页面顶部的重新加载再试一次。'
+              : '等第一篇文章发布后，这里就会出现月份小卡片。'
+          }}
+        </p>
+      </div>
+
+      <div v-else class="space-y-2">
         <div
           v-for="group in groups"
           :key="group.month"
@@ -102,16 +133,28 @@
           >
             <div class="overflow-hidden">
               <ul class="space-y-0.5 pb-3 pr-4 pl-9">
-                <li
-                  v-for="(title, index) in group.articles"
-                  :key="title"
-                  class="group/item flex items-start gap-2 rounded-lg px-2 py-1 text-[13.5px] leading-[1.7] text-slate-500 transition-colors duration-200 hover:bg-white/80 hover:text-violet-700 dark:text-slate-400 dark:hover:bg-white/[0.04] dark:hover:text-violet-200"
-                >
-                  <span class="mt-[10px] h-1 w-1 shrink-0 rounded-full bg-violet-300/80 transition-transform duration-300 group-hover/item:scale-150 dark:bg-violet-400/60" />
-                  <span class="line-clamp-1">{{ title }}</span>
-                  <span class="ml-auto hidden shrink-0 font-[huoxie] text-[10px] text-slate-300 group-hover/item:inline dark:text-slate-600">
-                    {{ String(index + 1).padStart(2, '0') }}
-                  </span>
+                <li v-for="(article, index) in group.articles" :key="article.id">
+                  <RouterLink
+                    :to="articleLink(article)"
+                    :title="article.title"
+                    class="group/item flex items-start gap-2 rounded-lg px-2 py-1 text-[13.5px] leading-[1.7] text-slate-500 transition-colors duration-200 hover:bg-white/80 hover:text-violet-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-300/60 dark:text-slate-400 dark:hover:bg-white/[0.04] dark:hover:text-violet-200"
+                  >
+                    <span
+                      class="mt-[10px] h-1 w-1 shrink-0 rounded-full bg-violet-300/80 transition-transform duration-300 group-hover/item:scale-150 dark:bg-violet-400/60"
+                    />
+                    <span class="line-clamp-1">{{ article.title }}</span>
+                    <span
+                      class="ml-auto hidden shrink-0 font-[huoxie] text-[10px] text-slate-300 group-hover/item:inline dark:text-slate-600"
+                    >
+                      {{ String(index + 1).padStart(2, '0') }}
+                    </span>
+                    <span
+                      aria-hidden="true"
+                      class="hidden shrink-0 text-[11px] text-violet-400 group-hover/item:inline"
+                    >
+                      →
+                    </span>
+                  </RouterLink>
                 </li>
               </ul>
             </div>
@@ -120,16 +163,19 @@
       </div>
     </div>
 
-    <p class="mt-3 flex items-center gap-1.5 border-t border-slate-100 pt-3 text-[11.5px] text-slate-400 dark:border-white/[0.06] dark:text-slate-500">
+    <p
+      class="mt-3 flex items-center gap-1.5 border-t border-slate-100 pt-3 text-[11.5px] text-slate-400 dark:border-white/[0.06] dark:text-slate-500"
+    >
       <span class="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-violet-400" />
-      悬停折线图，对应月份会同步亮起
+      点文章标题直接阅读 · 悬停折线图同步月份
     </p>
   </section>
 </template>
 
 <script setup lang="ts">
 import { computed, nextTick, ref, watch } from 'vue'
-import type { MonthlyArticles } from '@/data/stats'
+import { RouterLink } from 'vue-router'
+import type { MonthlyArticleItem, MonthlyArticles } from '@/data/stats'
 
 const props = withDefaults(
   defineProps<{
@@ -138,8 +184,12 @@ const props = withDefaults(
     activeMonth: string
     /** 折线图上正悬停的月份，用来在列表里做同步高亮 */
     hoveredMonth?: string | null
+    /** 首次加载中 */
+    loading?: boolean
+    /** 首次加载失败或刷新失败时的提示 */
+    error?: string
   }>(),
-  { hoveredMonth: null },
+  { hoveredMonth: null, loading: false, error: '' },
 )
 
 const emit = defineEmits<{
@@ -186,6 +236,14 @@ function toggle(month: string) {
 function goLatest() {
   const latest = props.groups[0]?.month
   if (latest) emit('update:activeMonth', latest)
+}
+
+/** 归档里的标题也能直接打开详情页，优先使用 slug */
+function articleLink(article: MonthlyArticleItem) {
+  return {
+    name: 'articleDetail',
+    query: article.slug ? { slug: article.slug } : { id: article.id },
+  }
 }
 
 /**
@@ -237,5 +295,60 @@ watch(
 
 .stats-month-scroll::-webkit-scrollbar-thumb:hover {
   background: rgba(139, 92, 246, 0.42);
+}
+
+/* ---------- 加载骨架 ---------- */
+.month-skeleton {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid transparent;
+  border-radius: 15px;
+}
+
+.month-skeleton-dot {
+  width: 12px;
+  height: 12px;
+  margin-top: 2px;
+  flex-shrink: 0;
+  border-radius: 999px;
+  background: #edf1f6;
+  animation: month-pulse 1.5s ease-in-out infinite;
+}
+
+.month-skeleton-line {
+  display: block;
+  height: 13px;
+  border-radius: 999px;
+  background: #edf1f6;
+  animation: month-pulse 1.5s ease-in-out infinite;
+}
+
+.month-skeleton-line.is-bar {
+  height: 6px;
+}
+
+@keyframes month-pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+:global(html.dark .month-skeleton-dot),
+:global(html.dark .month-skeleton-line) {
+  background: rgba(148, 163, 184, 0.18);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .month-skeleton-dot,
+  .month-skeleton-line {
+    animation: none;
+  }
 }
 </style>

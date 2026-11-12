@@ -1,6 +1,12 @@
 <template>
   <article
-    class="article-row group relative flex flex-col gap-4 overflow-hidden rounded-2xl border border-slate-200/80 bg-white/85 p-3.5 shadow-[0_16px_36px_-30px_rgba(47,74,119,0.4)] transition-all duration-500 ease-out hover:-translate-y-1 hover:border-sky-200 hover:shadow-[0_24px_44px_-26px_rgba(37,99,235,0.32)] dark:border-gray-800 dark:bg-gray-900/80 dark:hover:border-sky-500/40 dark:hover:shadow-[0_26px_50px_-28px_rgba(0,0,0,0.85)] sm:flex-row sm:items-stretch sm:gap-5 sm:p-4"
+    role="link"
+    tabindex="0"
+    :aria-label="`阅读文章：${article.title}`"
+    class="article-row group relative flex cursor-pointer flex-col gap-4 overflow-hidden rounded-2xl border border-slate-200/80 bg-white/85 p-3.5 shadow-[0_16px_36px_-30px_rgba(47,74,119,0.4)] transition-all duration-500 ease-out hover:-translate-y-1 hover:border-sky-200 hover:shadow-[0_24px_44px_-26px_rgba(37,99,235,0.32)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:ring-offset-2 dark:border-gray-800 dark:bg-gray-900/80 dark:hover:border-sky-500/40 dark:hover:shadow-[0_26px_50px_-28px_rgba(0,0,0,0.85)] dark:focus-visible:ring-offset-gray-950 sm:flex-row sm:items-stretch sm:gap-5 sm:p-4"
+    @click="emit('open')"
+    @keydown.enter.prevent="emit('open')"
+    @keydown.space.prevent="emit('open')"
   >
     <!-- 封面 -->
     <div
@@ -11,6 +17,7 @@
         :alt="article.title"
         loading="lazy"
         class="h-full w-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-[1.06]"
+        @error="handleCoverError"
       />
       <span
         class="absolute left-2.5 top-2.5 rounded-full bg-white/85 px-2.5 py-1 font-[huoxie] text-[11px] leading-none text-sky-700 backdrop-blur dark:bg-gray-950/75 dark:text-sky-300"
@@ -65,13 +72,24 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import type { Article } from '@/types/article'
+import fallbackCover from '@/assets/images/demoTextImages/demo.jpg'
 
 const props = defineProps<{
   article: Article
   tag: string
 }>()
 
+const emit = defineEmits<{ open: [] }>()
+
 const date = computed(() => props.article.time.split(' ')[0] ?? props.article.time)
+
+/** 封面地址失效时退回本地默认图 */
+function handleCoverError(event: Event) {
+  const img = event.target as HTMLImageElement
+  if (img.dataset.fallback) return
+  img.dataset.fallback = '1'
+  img.src = fallbackCover
+}
 </script>
 
 <style scoped>

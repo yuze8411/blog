@@ -64,11 +64,10 @@
 // 首页左侧内容：轮播图 + 文章列表 + 分页
 import { onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { fetchPublicPosts, type PublicPost } from '@/api/posts'
+import { fetchPublicPosts } from '@/api/posts'
 import { vReveal } from '@/directives/reveal'
-import { formatDate } from '@/utils/date'
+import { publicPostToArticle } from '@/utils/article'
 import type { Article } from '@/types'
-import fallbackCover from '@/assets/images/demoTextImages/demo.jpg'
 
 const PAGE_SIZE = 10
 // 模板里也用它渲染分页条，单独起个可读的名字
@@ -94,22 +93,6 @@ function readPageFromQuery() {
   return Number.isInteger(value) && value > 0 ? value : 1
 }
 
-/** 把数据库里的文章行转换成首页卡片需要的数据 */
-function toArticle(row: PublicPost): Article {
-  return {
-    textId: row.id,
-    slug: row.slug,
-    coverSrc: row.cover_url || fallbackCover,
-    title: row.title,
-    content: row.excerpt?.trim() || '这篇文章暂时还没有摘要，点进来看看吧～',
-    time: formatDate(row.published_at ?? row.created_at),
-    comment: row.comment_count ?? 0,
-    eyes: row.view_count ?? 0,
-    tags: row.tags ?? [],
-    category: row.category_name ?? undefined,
-  }
-}
-
 async function loadPosts(targetPage = page.value) {
   const current = ++requestId
   loading.value = true
@@ -119,7 +102,7 @@ async function loadPosts(targetPage = page.value) {
     const res = await fetchPublicPosts(targetPage, PAGE_SIZE)
     if (current !== requestId) return
 
-    articleList.value = res.list.map(toArticle)
+    articleList.value = res.list.map(publicPostToArticle)
     total.value = res.total
 
     // 地址栏里的页码可能超出范围（比如文章被删了），自动退回最后一页

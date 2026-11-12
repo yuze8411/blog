@@ -16,15 +16,24 @@
           {{ label }}
         </p>
 
-        <p class="mt-3 flex items-baseline gap-1.5">
+        <p class="mt-3 flex items-baseline gap-1.5" :aria-busy="loading">
+          <span v-if="loading" class="metric-skeleton" aria-label="数据加载中"></span>
           <span
-            class="font-[huoxie] text-[36px] leading-none tracking-[0.02em] text-slate-800 transition-colors duration-300 group-hover:text-slate-900 dark:text-white dark:group-hover:text-white sm:text-[40px]"
+            v-else-if="unavailable"
+            class="font-[huoxie] text-[36px] leading-none tracking-[0.02em] text-slate-400 dark:text-slate-500 sm:text-[40px]"
           >
-            {{ formatted }}
+            --
           </span>
-          <span class="text-[12px] font-medium text-slate-400 dark:text-slate-500">
-            {{ unit }}
-          </span>
+          <template v-else>
+            <span
+              class="font-[huoxie] text-[36px] leading-none tracking-[0.02em] text-slate-800 transition-colors duration-300 group-hover:text-slate-900 dark:text-white dark:group-hover:text-white sm:text-[40px]"
+            >
+              {{ formatted }}
+            </span>
+            <span class="text-[12px] font-medium text-slate-400 dark:text-slate-500">
+              {{ unit }}
+            </span>
+          </template>
         </p>
       </div>
 
@@ -62,7 +71,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
 type MetricIcon = 'article' | 'tag' | 'comment' | 'clock'
 type MetricAccent = 'blue' | 'teal' | 'violet' | 'amber'
@@ -77,8 +86,12 @@ const props = withDefaults(
     accent?: MetricAccent
     /** 数字滚动开始的延迟，让四张卡片错峰 */
     delay?: number
+    /** 首次加载中：用占位条代替 0，避免看起来真的没有数据 */
+    loading?: boolean
+    /** 首次加载失败：显示 -- */
+    unavailable?: boolean
   }>(),
-  { accent: 'blue', delay: 0 },
+  { accent: 'blue', delay: 0, loading: false, unavailable: false },
 )
 
 /** 每张卡片的图标底色和悬停光晕，都是完整的类名，Tailwind 才能扫描到 */
@@ -104,7 +117,8 @@ const ACCENTS: Record<MetricAccent, { chip: string; glow: string }> = {
 const accent = computed(() => ACCENTS[props.accent])
 
 /* ---------------- 数字滚动 ----------------
- * 页面一进来四个数字从 0 滚到目标值，像计数器一样。
+ * 页面一进来四个数字从 0 滚到目标值，像计数器一样；
+ * 刷新后数字从当前值滚到新值，不会先跳回 0。
  * 尊重 prefers-reduced-motion：系统要求减少动画时直接显示最终值。
  */
 const displayed = ref(0)
@@ -114,26 +128,73 @@ let frame = 0
 const numberFormatter = new Intl.NumberFormat('zh-CN')
 const formatted = computed(() => numberFormatter.format(displayed.value))
 
-onMounted(() => {
+function animateTo(target: number, delay = 0) {
+  cancelAnimationFrame(frame)
+
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    displayed.value = props.value
+    displayed.value = target
     return
   }
 
-  const duration = 1100
+  const from = displayed.value
+  // 首次加载慢慢滚，刷新时短一点，避免用户等太久
+  const duration = from === 0 ? 1100 : 520
   let startAt = 0
 
   const tick = (now: number) => {
-    if (!startAt) startAt = now + props.delay
+    if (!startAt) startAt = now + delay
     const progress = Math.min(1, Math.max(0, (now - startAt) / duration))
     // cubic ease-out：起步快，收尾慢，最后几位数字看起来更稳
-    displayed.value = Math.round(props.value * (1 - Math.pow(1 - progress, 3)))
+    const eased = 1 - Math.pow(1 - progress, 3)
+    displayed.value = Math.round(from + (target - from) * eased)
 
     if (progress < 1) frame = requestAnimationFrame(tick)
   }
 
   frame = requestAnimationFrame(tick)
-})
+}
+
+onMounted(() => animateTo(props.value, props.delay))
+
+// 数据是异步回来的：props.value 变化后接着滚到新值
+// 首次拿到数据时保留错峰延迟，之后刷新就用更短的动画
+watch(
+  () => props.value,
+  (value) => animateTo(value, displayed.value === 0 ? props.delay : 0),
+)
 
 onBeforeUnmount(() => cancelAnimationFrame(frame))
 </script>
+
+<style scoped>
+/* 首次加载的占位条：和数字同高，卡片不会突然变高变矮 */
+.metric-skeleton {
+  display: inline-block;
+  width: 86px;
+  height: 36px;
+  border-radius: 9px;
+  background: #edf1f6;
+  animation: metric-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes metric-pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+:global(html.dark .metric-skeleton) {
+  background: rgba(148, 163, 184, 0.18);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .metric-skeleton {
+    animation: none;
+  }
+}
+</style>

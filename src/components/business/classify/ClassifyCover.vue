@@ -7,7 +7,7 @@
     />
     <HomeLeafParticles />
     <!-- 分类基本信息 -->
-    <ClassifyCoverText :classify="classify" :total="total"></ClassifyCoverText>
+    <ClassifyCoverText :name="categoryName" :icon="icon" :total="total"></ClassifyCoverText>
     <canvas
       ref="canobj"
       class="absolute bottom-0 left-0 w-full h-[200px] pointer-events-none"
@@ -19,9 +19,16 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import HomeLeafParticles from '../home/HomeLeafParticles.vue'
 
-let props = defineProps({
-  classify: {
+defineProps({
+  /** 当前分类名称，来自数据库 */
+  categoryName: {
     type: String,
+    default: '文章分类',
+  },
+  /** 当前分类对应的图标名 */
+  icon: {
+    type: String,
+    default: 'biaoqian1',
   },
   /** 当前分类下的文章总数 */
   total: {

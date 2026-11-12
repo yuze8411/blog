@@ -5,9 +5,9 @@
   >
     <h2
       class="text-[35px] font-[huoxie] text-white max-w-[70%] overflow-hidden text-ellipsis text-nowrap [text-shadow:0_5px_10px_rgba(0,0,0,1)] flex items-center gap-2"
-      :title="types[Number(classify)]"
+      :title="displayName"
     >
-      <IconFont :name="iconname" class="text-[26px]"></IconFont>{{ types[Number(classify)] }} |
+      <IconFont :name="icon" class="text-[26px]"></IconFont>{{ displayName }} |
       {{ total }}
     </h2>
   </div>
@@ -18,20 +18,18 @@ import { computed } from 'vue'
 
 const props = withDefaults(
   defineProps<{
-    classify?: string
+    name?: string
+    icon?: string
     total?: number
   }>(),
   {
-    classify: '0',
+    name: '文章分类',
+    icon: 'biaoqian1',
     total: 0,
   },
 )
 
-const types = ['开发笔记', '生活记录', '我的吐槽', '科技产品']
-const icons = ['kaifazhe', 'shenghuo', 'tucao', 'keji1']
-let iconname = computed(() => {
-  return icons[Number(props.classify)]
-})
+const displayName = computed(() => props.name.trim() || '文章分类')
 </script>
 
 <style scoped></style>

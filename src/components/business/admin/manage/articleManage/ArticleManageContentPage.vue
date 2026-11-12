@@ -10,7 +10,7 @@
       <span class="font-medium tabular-nums text-slate-600 dark:text-slate-300">
         {{ articleList?.total ?? 0 }}
       </span>
-      篇 · 每页 {{ articleList?.pageSize ?? 10 }} 篇
+      {{ unit }} · 每页 {{ articleList?.pageSize ?? 10 }} {{ unit }}
     </p>
 
     <el-pagination
@@ -27,8 +27,30 @@
 </template>
 
 <script setup lang="ts">
-const props = defineProps(['articleList', 'currentPage'])
-const emit = defineEmits(['pageJump'])
+interface PagerData {
+  total?: number
+  pageSize?: number
+}
+
+const props = withDefaults(
+  defineProps<{
+    /** 列表结果，只需要 total / pageSize */
+    articleList?: PagerData | null
+    /** 当前页，由父级传入，筛选变化时能跟着回到第 1 页 */
+    currentPage?: number
+    /** 计数单位：文章页用「篇」，评论页可以传「条」 */
+    unit?: string
+  }>(),
+  {
+    articleList: null,
+    currentPage: 1,
+    unit: '篇',
+  },
+)
+
+const emit = defineEmits<{
+  pageJump: [page: number]
+}>()
 
 // el-pagination 点页码 / 上一页 / 下一页时触发，把页码往上抛，由父级去请求数据
 function handleCurrentChange(page: number) {

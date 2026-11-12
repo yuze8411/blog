@@ -10,18 +10,27 @@
     :title="name"
     aria-hidden="true"
   >
-    <img v-if="src" :src="src" :alt="name" />
+    <img v-if="src && !imageFailed" :src="src" :alt="name" @error="imageFailed = true" />
     <template v-else>{{ initial }}</template>
   </span>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref, watch } from 'vue'
 import type { CommentAvatarProps } from '@/types'
 
 const props = withDefaults(defineProps<CommentAvatarProps>(), {
   size: 40,
 })
+
+// QQ 头像偶尔会加载失败（QQ 号停用、网络抖动），失败后退回昵称首字，别留一个破图
+const imageFailed = ref(false)
+watch(
+  () => props.src,
+  () => {
+    imageFailed.value = false
+  },
+)
 
 // 没有头像时用昵称首字 + 低饱和蓝紫渐变兜底，保证列表观感统一
 const AVATAR_BACKGROUNDS = [
@@ -38,7 +47,8 @@ const background = computed(() => {
   return AVATAR_BACKGROUNDS[hash % AVATAR_BACKGROUNDS.length] ?? '#5fa6dd'
 })
 
-const initial = computed(() => props.name.trim().slice(0, 1) || '咕')
+// 用 Array.from 而不是 slice(0, 1)：中文、emoji 都按完整字符取第一个
+const initial = computed(() => Array.from(props.name.trim())[0] ?? '咕')
 </script>
 
 <style scoped>

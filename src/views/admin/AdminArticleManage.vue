@@ -105,7 +105,7 @@ async function refreshArticleList() {
 async function pageJump(page: number) {
   if (page === search_query.value.page) return
   search_query.value.page = page
-  lodingtext.value = `加载第 ${page} 文章数据中...`
+  lodingtext.value = `加载第 ${page} 页文章数据中...`
   isLoding.value = true
   let res = await fetchArticleList(searchquery.value)
   articleList.value = res

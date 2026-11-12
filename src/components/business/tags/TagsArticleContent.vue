@@ -12,11 +12,33 @@
         </h2>
       </div>
       <p class="font-[huoxie] text-[14px] text-gray-400 dark:text-gray-500">
-        共 {{ sortedArticles.length }} 篇 · 按时间倒序
+        <template v-if="loading">正在加载文章…</template>
+        <template v-else-if="error">加载失败</template>
+        <template v-else>共 {{ sortedArticles.length }} 篇 · 按时间倒序</template>
       </p>
     </header>
 
-    <template v-if="groups.length">
+    <!-- 加载中：和真实行同样结构的骨架 -->
+    <div v-if="loading" class="space-y-4" aria-busy="true" aria-label="标签文章加载中">
+      <div v-for="n in 4" :key="n" class="row-skeleton">
+        <div class="row-skeleton-cover"></div>
+        <div class="row-skeleton-body">
+          <div class="skeleton-line w-1/4"></div>
+          <div class="skeleton-line is-title mt-4 w-3/5"></div>
+          <div class="skeleton-line mt-3 w-11/12"></div>
+          <div class="skeleton-line mt-6 w-1/3"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 加载失败 -->
+    <div v-else-if="error" class="content-state">
+      <p class="content-state-title">{{ error }}</p>
+      <p class="content-state-desc">网络恢复后可以再试一次，文章不会丢的。</p>
+      <button type="button" class="content-state-btn" @click="emit('retry')">重新加载</button>
+    </div>
+
+    <template v-else-if="groups.length">
       <section v-for="group in groups" :key="group.key" class="mb-10 last:mb-0">
         <header class="mb-4 flex items-center gap-3">
           <span
@@ -41,7 +63,7 @@
             :key="article.textId"
             v-reveal="Math.min(i, 8) * 70"
           >
-            <TagsArticleRow :article="article" :tag="tag" />
+            <TagsArticleRow :article="article" :tag="tag" @open="openArticle(article)" />
           </div>
         </div>
       </section>
@@ -64,6 +86,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useRouter } from 'vue-router'
 import type { Article } from '@/types/article'
 import { vReveal } from '@/directives/reveal'
 
@@ -74,10 +97,26 @@ interface MonthGroup {
   articles: Article[]
 }
 
-const props = defineProps<{
-  tag: string
-  articles: Article[]
+const props = withDefaults(
+  defineProps<{
+    tag: string
+    articles: Article[]
+    /** 是否正在加载 */
+    loading?: boolean
+    /** 加载失败文案，为空表示没有错误 */
+    error?: string
+  }>(),
+  {
+    loading: false,
+    error: '',
+  },
+)
+
+const emit = defineEmits<{
+  retry: []
 }>()
+
+const router = useRouter()
 
 // 时间从近到远
 const sortedArticles = computed(() =>
@@ -103,6 +142,170 @@ const groups = computed<MonthGroup[]>(() => {
 
   return result
 })
+
+/** 行点击 → 文章详情页，优先用 slug */
+function openArticle(article: Article) {
+  void router.push({
+    name: 'articleDetail',
+    query: article.slug ? { slug: article.slug } : { id: article.textId },
+  })
+}
 </script>
 
-<style scoped></style>
+<style scoped>
+/* ---------- 骨架屏 ---------- */
+.row-skeleton {
+  display: flex;
+  gap: 16px;
+  padding: 16px;
+  border: 1px solid #e9eef5;
+  border-radius: 1rem;
+  background: #fff;
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.03);
+}
+
+.row-skeleton-cover {
+  flex-shrink: 0;
+  width: 200px;
+  height: 132px;
+  border-radius: 12px;
+  background: linear-gradient(110deg, #eef2f7 8%, #fafcff 18%, #eef2f7 33%);
+  background-size: 220% 100%;
+  animation: tags-shimmer 1.6s linear infinite;
+}
+
+.row-skeleton-body {
+  flex: 1;
+  min-width: 0;
+  padding: 8px 4px;
+}
+
+.skeleton-line {
+  height: 13px;
+  border-radius: 999px;
+  background: #edf1f6;
+  animation: tags-pulse 1.5s ease-in-out infinite;
+}
+
+.skeleton-line.is-title {
+  height: 22px;
+}
+
+@keyframes tags-shimmer {
+  from {
+    background-position: 120% 0;
+  }
+
+  to {
+    background-position: -120% 0;
+  }
+}
+
+@keyframes tags-pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+@media (max-width: 639px) {
+  .row-skeleton-cover {
+    width: 104px;
+    height: 88px;
+  }
+}
+
+/* ---------- 加载失败 ---------- */
+.content-state {
+  padding: 72px 24px;
+  border: 1px solid #e9eef5;
+  border-radius: 1rem;
+  background: #fff;
+  text-align: center;
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.03);
+}
+
+.content-state-title {
+  font-family: 'huoxie', sans-serif;
+  font-size: 22px;
+  color: #334155;
+  letter-spacing: 1px;
+}
+
+.content-state-desc {
+  margin-top: 10px;
+  font-family: 'huoxie', sans-serif;
+  font-size: 15px;
+  color: #94a3b8;
+}
+
+.content-state-btn {
+  margin-top: 22px;
+  padding: 9px 26px;
+  border: 1px solid rgba(83, 157, 253, 0.45);
+  border-radius: 999px;
+  background: #f0f7ff;
+  color: #2f6fbf;
+  font-family: 'huoxie', sans-serif;
+  font-size: 16px;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.content-state-btn:hover {
+  border-color: rgba(83, 157, 253, 0.75);
+  background: #e3f1ff;
+}
+
+/* ---------- 暗色模式 ---------- */
+:global(html.dark .row-skeleton) {
+  border-color: rgba(148, 163, 184, 0.12);
+  background: rgba(15, 23, 42, 0.62);
+  box-shadow: none;
+}
+
+:global(html.dark .row-skeleton-cover) {
+  background: linear-gradient(
+    110deg,
+    rgba(148, 163, 184, 0.14) 8%,
+    rgba(148, 163, 184, 0.24) 18%,
+    rgba(148, 163, 184, 0.14) 33%
+  );
+  background-size: 220% 100%;
+}
+
+:global(html.dark .skeleton-line) {
+  background: rgba(148, 163, 184, 0.18);
+}
+
+:global(html.dark .content-state) {
+  border-color: rgba(148, 163, 184, 0.16);
+  background: rgba(15, 23, 42, 0.55);
+  box-shadow: none;
+}
+
+:global(html.dark .content-state-title) {
+  color: #e2e8f0;
+}
+
+:global(html.dark .content-state-desc) {
+  color: #94a3b8;
+}
+
+:global(html.dark .content-state-btn) {
+  border-color: rgba(83, 157, 253, 0.45);
+  background: rgba(83, 157, 253, 0.12);
+  color: #8ecbff;
+}
+
+:global(html.dark .content-state-btn:hover) {
+  border-color: rgba(83, 157, 253, 0.75);
+  background: rgba(83, 157, 253, 0.2);
+}
+</style>

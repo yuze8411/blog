@@ -19,24 +19,75 @@
         </h1>
 
         <div
-          class="stats-rise mt-4 inline-flex items-center gap-2 rounded-full border border-slate-200/80 bg-white/70 px-4 py-1.5 text-[11.5px] text-slate-400 shadow-[0_10px_28px_-26px_rgba(15,23,42,0.35)] backdrop-blur-sm dark:border-white/10 dark:bg-white/[0.04] dark:text-slate-500"
+          class="stats-rise mt-4 inline-flex items-center gap-2 rounded-full border border-slate-200/80 bg-white/70 py-1.5 pl-4 pr-2 text-[11.5px] text-slate-400 shadow-[0_10px_28px_-26px_rgba(15,23,42,0.35)] backdrop-blur-sm dark:border-white/10 dark:bg-white/[0.04] dark:text-slate-500"
           style="animation-delay: 230ms"
+          role="status"
         >
-          <span class="relative flex h-1.5 w-1.5">
+          <span class="relative flex h-1.5 w-1.5 shrink-0">
             <span
-              class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60"
+              class="absolute inline-flex h-full w-full rounded-full opacity-60"
+              :class="loadError ? 'bg-amber-400' : 'animate-ping bg-emerald-400'"
             />
-            <span class="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
+            <span
+              class="relative inline-flex h-1.5 w-1.5 rounded-full"
+              :class="loadError ? 'bg-amber-500' : 'bg-emerald-500'"
+            />
           </span>
-          数据更新于 {{ updatedLabel }}
+          <span>{{ statusLabel }}</span>
+          <!-- 手动刷新：重新拉一次统计页需要的全部数据 -->
+          <button
+            type="button"
+            class="grid h-6 w-6 shrink-0 place-items-center rounded-full text-slate-400 transition-colors duration-200 hover:bg-slate-100 hover:text-sky-600 disabled:cursor-default disabled:opacity-60 dark:hover:bg-white/10 dark:hover:text-sky-300"
+            :disabled="loading"
+            :title="loading ? '刷新中…' : '刷新统计数据'"
+            :aria-label="loading ? '正在刷新统计数据' : '刷新统计数据'"
+            :aria-busy="loading"
+            @click="loadStats"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.9"
+              class="h-3.5 w-3.5"
+              :class="{ 'animate-spin': loading }"
+              aria-hidden="true"
+            >
+              <path
+                d="M20 11a8 8 0 1 0-2.34 5.66M20 4v7h-7"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </button>
         </div>
       </div>
     </header>
 
+    <!-- 加载失败 / 刷新失败的提示，点击可以重试 -->
+    <div
+      v-if="loadError"
+      role="alert"
+      class="mb-5 flex flex-wrap items-center justify-center gap-3 rounded-2xl border border-amber-200/80 bg-amber-50/80 px-4 py-2.5 text-[12px] text-amber-700 dark:border-amber-400/20 dark:bg-amber-400/[0.08] dark:text-amber-300"
+    >
+      <span>{{ loadError }}</span>
+      <button
+        type="button"
+        class="font-[huoxie] underline underline-offset-2 transition-colors hover:text-amber-900 dark:hover:text-amber-200"
+        @click="loadStats"
+      >
+        重新加载
+      </button>
+    </div>
+
     <!-- ========== 四个核心数字 ========== -->
     <section aria-label="站点核心数据" class="grid grid-cols-2 gap-3.5 lg:grid-cols-4 lg:gap-4">
       <div v-for="(metric, index) in metrics" :key="metric.label" v-reveal="index * 80">
-        <StatsMetricCard v-bind="metric" />
+        <StatsMetricCard
+          v-bind="metric"
+          :loading="loading && !loaded"
+          :unavailable="!loaded && !!loadError"
+        />
       </div>
     </section>
 
@@ -67,21 +118,33 @@
           <span
             class="mt-1 shrink-0 rounded-full border border-slate-200/80 bg-slate-50/80 px-3.5 py-1.5 font-[huoxie] text-[11px] tracking-[0.06em] text-slate-600 dark:border-white/10 dark:bg-white/5 dark:text-slate-300"
           >
-            {{ categoryTotal }} 篇
+            {{ loaded ? `${categoryTotal} 篇` : '—' }}
           </span>
         </div>
 
         <div class="relative mt-2 h-[300px] sm:h-[320px]">
           <StatsChart
+            v-if="loaded && categoryTotal > 0"
             class="cursor-pointer"
             :option="categoryChartOption"
-            aria-label="四个分类的文章数量玫瑰图，扇区越大表示文章越多"
+            aria-label="分类文章数量玫瑰图，扇区越大表示文章越多"
             @hover="handleCategoryHover"
             @select="openCategory"
           />
+          <div
+            v-else-if="loading && !loaded"
+            class="chart-skeleton is-round"
+            aria-hidden="true"
+          ></div>
+          <div v-else class="chart-empty">
+            {{ !loaded && loadError ? '分类数据加载失败' : '还没有分类数据' }}
+          </div>
 
           <!-- 圆环中间的数字：默认显示总数，悬停扇区时切换成该分类的占比 -->
-          <div class="pointer-events-none absolute inset-0 flex items-center justify-center">
+          <div
+            v-if="loaded && categoryTotal > 0"
+            class="pointer-events-none absolute inset-0 flex items-center justify-center"
+          >
             <span class="absolute h-24 w-24 rounded-full bg-slate-200/20 blur-xl dark:bg-white/5" />
             <div class="relative text-center">
               <p
@@ -105,7 +168,22 @@
         </div>
 
         <!-- 自定义图例：颜色、名称、数量、占比都在这里，不必只靠扇区认颜色 -->
-        <div class="mt-2 grid grid-cols-1 gap-2 min-[400px]:grid-cols-2">
+        <div
+          v-if="loading && !loaded"
+          class="mt-2 grid grid-cols-1 gap-2 min-[400px]:grid-cols-2"
+          aria-busy="true"
+          aria-label="分类图例加载中"
+        >
+          <div v-for="n in 4" :key="n" class="legend-skeleton">
+            <span class="legend-skeleton-dot"></span>
+            <span class="legend-skeleton-line"></span>
+          </div>
+        </div>
+
+        <div
+          v-else-if="categoryPalette.length"
+          class="mt-2 grid grid-cols-1 gap-2 min-[400px]:grid-cols-2"
+        >
           <RouterLink
             v-for="item in categoryPalette"
             :key="item.name"
@@ -141,6 +219,13 @@
           </RouterLink>
         </div>
 
+        <div
+          v-else
+          class="mt-2 rounded-[12px] border border-dashed border-slate-200/80 py-6 text-center text-[12.5px] text-slate-400 dark:border-white/10 dark:text-slate-500"
+        >
+          还没有配置分类
+        </div>
+
         <p
           class="mt-auto flex items-center gap-1.5 pt-3 text-[11.5px] text-slate-400 dark:text-slate-500"
         >
@@ -150,7 +235,13 @@
       </section>
 
       <div v-reveal="80" class="h-full min-h-0">
-        <StatsTagWall class="h-full" />
+        <StatsTagWall
+          class="h-full"
+          :tags="tags"
+          :loading="loading && !loaded"
+          :error="!loaded ? loadError : ''"
+          @retry="loadStats"
+        />
       </div>
     </div>
 
@@ -187,22 +278,35 @@
               :class="hoveredGroup ? 'scale-125 animate-pulse' : ''"
             />
             <span class="font-[huoxie] tracking-[0.05em]">
-              {{ hoveredGroup ? hoveredGroup.label : '近 12 个月' }}
+              <template v-if="loading && !loaded">正在计算…</template>
+              <template v-else>{{ hoveredGroup ? hoveredGroup.label : '近 12 个月' }}</template>
             </span>
             <span class="font-[huoxie] text-[13px] text-amber-700 dark:text-amber-300">
-              {{ hoveredGroup ? hoveredGroup.articles.length : recentTotal }} 篇
+              <template v-if="loading && !loaded">—</template>
+              <template v-else>
+                {{ hoveredGroup ? hoveredGroup.articles.length : recentTotal }} 篇
+              </template>
             </span>
           </div>
         </div>
 
         <div class="relative mt-3 h-[270px] sm:h-[300px] lg:h-auto lg:min-h-[250px] lg:flex-1">
           <StatsChart
+            v-if="loaded && recentTotal > 0"
             class="cursor-crosshair"
             :option="trendChartOption"
             aria-label="近十二个月文章发布数量折线图"
             @hover="handleTrendHover"
             @select="openMonth"
           />
+          <div
+            v-else-if="loading && !loaded"
+            class="chart-skeleton is-line"
+            aria-hidden="true"
+          ></div>
+          <div v-else class="chart-empty">
+            {{ !loaded && loadError ? '发布数据加载失败' : '还没有发布记录' }}
+          </div>
         </div>
 
         <div
@@ -213,7 +317,10 @@
             点击折线上的月份，月度归档会跟着展开
           </span>
           <span class="font-[huoxie] tracking-[0.05em]">
-            月均 {{ averagePerMonth }} 篇 · 峰值 {{ peakMonth?.articles.length ?? 0 }} 篇
+            <template v-if="loaded">
+              月均 {{ averagePerMonth }} 篇 · 峰值 {{ peakMonth?.articles.length ?? 0 }} 篇
+            </template>
+            <template v-else>月均 — · 峰值 —</template>
           </span>
         </div>
       </section>
@@ -224,6 +331,8 @@
           class="h-full"
           :groups="monthlyArticles"
           :hovered-month="hoveredMonth"
+          :loading="loading && !loaded"
+          :error="!loaded ? loadError : ''"
         />
       </div>
     </div>
@@ -325,11 +434,76 @@ import StatsChart from './StatsChart.vue'
 import StatsMetricCard from './StatsMetricCard.vue'
 import StatsMonthlyLog from './StatsMonthlyLog.vue'
 import StatsTagWall from './StatsTagWall.vue'
-import { categoryStats, monthlyArticles, statsOverview } from '@/data/stats'
-import { tagWall } from '@/data/tags'
+import { fetchCategories, fetchTags, type PublicCategory, type PublicTag } from '@/api/posts'
+import {
+  fetchPostArchive,
+  fetchSiteStats,
+  type PostArchiveRow,
+  type SiteStatsRow,
+} from '@/api/stats'
+import type { CategoryStat, MonthlyArticles } from '@/data/stats'
+import { siteLaunchDate } from '@/data/articles'
+import { buildMonthlyArchive } from '@/utils/stats'
 import { vReveal } from '@/directives/reveal'
 
 const router = useRouter()
+
+/* ---------------- 页面数据 ----------------
+ * 顶部数字、分类、标签、月度归档都来自 Supabase。
+ * 四个请求并行发，任何一步失败都走同一套错误提示和重试。
+ */
+const siteStats = ref<SiteStatsRow | null>(null)
+const categories = ref<PublicCategory[]>([])
+const tags = ref<PublicTag[]>([])
+const archiveRows = ref<PostArchiveRow[]>([])
+
+const loading = ref(true)
+const loaded = ref(false)
+const loadError = ref('')
+
+// 刷新时只认最后一次请求，避免旧结果覆盖新结果
+let requestId = 0
+
+async function loadStats() {
+  const current = ++requestId
+  loading.value = true
+  loadError.value = ''
+
+  try {
+    const [statsRow, categoryRows, tagRows, posts] = await Promise.all([
+      fetchSiteStats(),
+      fetchCategories(),
+      fetchTags(),
+      fetchPostArchive(),
+    ])
+
+    if (current !== requestId) return
+
+    siteStats.value = statsRow
+    categories.value = categoryRows
+    tags.value = tagRows
+    archiveRows.value = posts
+    loaded.value = true
+
+    // 刷新后原来展开的月份可能已经不在最近 12 个月里，自动切到最新月份
+    if (!monthlyArticles.value.some((group) => group.month === activeMonth.value)) {
+      activeMonth.value = monthlyArticles.value[0]?.month ?? ''
+    }
+  } catch (error) {
+    if (current !== requestId) return
+
+    console.error('[stats] 加载统计数据失败', error)
+    loadError.value = loaded.value
+      ? '刷新失败了，当前显示的是上一次的数据'
+      : '统计数据加载失败了'
+  } finally {
+    if (current === requestId) loading.value = false
+  }
+}
+
+onMounted(() => {
+  void loadStats()
+})
 
 /* ---------------- 主题 ----------------
  * 全站主题由 TopNavigation 写 <html class="dark">，这里盯着根节点的 class 变化，
@@ -356,14 +530,37 @@ onBeforeUnmount(() => {
 /* ---------------- 顶部四个数字 ---------------- */
 const DAY_MS = 86_400_000
 
+function formatDay(value: string | null | undefined) {
+  if (!value) return '--'
+
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return '--'
+
+  const pad = (num: number) => String(num).padStart(2, '0')
+  return `${date.getFullYear()}.${pad(date.getMonth() + 1)}.${pad(date.getDate())}`
+}
+
+const updatedLabel = computed(() => formatDay(siteStats.value?.last_updated_at))
+const launchLabel = siteLaunchDate.split('-').join('.')
+
 const runningDays = computed(() => {
-  const start = new Date(`${statsOverview.launchDate}T00:00:00`).getTime()
-  const end = new Date(`${statsOverview.updatedAt}T00:00:00`).getTime()
+  const start = new Date(`${siteLaunchDate}T00:00:00`).getTime()
+  const endSource = siteStats.value?.last_updated_at
+    ? new Date(siteStats.value.last_updated_at)
+    : new Date()
+  const end = new Date(
+    endSource.getFullYear(),
+    endSource.getMonth(),
+    endSource.getDate(),
+  ).getTime()
   return Math.max(1, Math.floor((end - start) / DAY_MS) + 1)
 })
 
-const launchLabel = statsOverview.launchDate.split('-').join('.')
-const updatedLabel = statsOverview.updatedAt.split('-').join('.')
+const statusLabel = computed(() => {
+  if (loading.value && !loaded.value) return '正在汇总数据…'
+  if (loadError.value && !loaded.value) return '数据暂不可用'
+  return `数据更新于 ${updatedLabel.value}`
+})
 
 interface MetricItem {
   label: string
@@ -378,16 +575,19 @@ interface MetricItem {
 const metrics = computed<MetricItem[]>(() => [
   {
     label: '文章总数',
-    value: statsOverview.articleCount,
+    value: siteStats.value?.article_count ?? categories.value.reduce(
+      (total, category) => total + (category.post_count ?? 0),
+      0,
+    ),
     unit: '篇',
-    hint: '四个分类累计',
+    hint: `${categories.value.length} 个分类累计`,
     icon: 'article',
     accent: 'blue',
     delay: 0,
   },
   {
     label: '标签总数',
-    value: statsOverview.tagCount,
+    value: siteStats.value?.tag_count ?? tags.value.length,
     unit: '个',
     hint: '覆盖全部写作主题',
     icon: 'tag',
@@ -396,7 +596,7 @@ const metrics = computed<MetricItem[]>(() => [
   },
   {
     label: '评论总数',
-    value: statsOverview.commentCount,
+    value: siteStats.value?.comment_count ?? 0,
     unit: '条',
     hint: '含回复与楼中楼',
     icon: 'comment',
@@ -415,18 +615,64 @@ const metrics = computed<MetricItem[]>(() => [
 ])
 
 /* ---------------- 分类玫瑰图 ---------------- */
-const categoryTotal = computed(() => categoryStats.reduce((total, item) => total + item.value, 0))
+const categoryTotal = computed(() =>
+  categories.value.reduce((total, category) => total + (category.post_count ?? 0), 0),
+)
+
+/**
+ * 分类颜色按 slug 固定，不随排名变化：
+ * 开发笔记蓝、生活记录橙、科技产品紫、我的吐槽青。
+ * 后台以后新增分类时，再用备用色板按出现顺序补色。
+ */
+const KNOWN_CATEGORY_COLORS: Record<string, { light: string; dark: string }> = {
+  dev: { light: '#2a78d6', dark: '#3987e5' },
+  life: { light: '#eb6834', dark: '#d95926' },
+  tech: { light: '#6250d6', dark: '#9085e9' },
+  talk: { light: '#1baf7a', dark: '#199e70' },
+}
+
+const FALLBACK_CATEGORY_COLORS = [
+  { light: '#2a78d6', dark: '#3987e5' },
+  { light: '#eb6834', dark: '#d95926' },
+  { light: '#6250d6', dark: '#9085e9' },
+  { light: '#1baf7a', dark: '#199e70' },
+  { light: '#be3f78', dark: '#e06a9b' },
+  { light: '#8a6d1f', dark: '#c7a94a' },
+  { light: '#0e7490', dark: '#2bb3c9' },
+  { light: '#6d4bc7', dark: '#a28bea' },
+]
+
+const categoryStats = computed<CategoryStat[]>(() =>
+  categories.value
+    .map((category, index) => {
+      const fallback = FALLBACK_CATEGORY_COLORS[index % FALLBACK_CATEGORY_COLORS.length] ?? {
+        light: '#2a78d6',
+        dark: '#3987e5',
+      }
+      const color = KNOWN_CATEGORY_COLORS[category.slug] ?? fallback
+
+      return {
+        name: category.name,
+        value: category.post_count ?? 0,
+        lightColor: color.light,
+        darkColor: color.dark,
+      }
+    })
+    // 图表按文章数从多到少；颜色在排序前已经按分类身份分配好
+    .sort((a, b) => b.value - a.value),
+)
 
 /**
  * 同一份数据同时喂给图表和图例，颜色不会对不上。
- * 四个分类各用蓝、橙、紫、青中的一个色相，扇区相邻顺序也按这个次序排，
- * 避免橙黄、蓝紫这类容易混的近邻色挨在一起；暗色模式另取一档亮度。
+ * 暗色模式另取一档亮度，不是把浅色直接反过来。
  */
 const categoryPalette = computed(() =>
-  categoryStats.map((item) => ({
+  categoryStats.value.map((item) => ({
     ...item,
     color: isDark.value ? item.darkColor : item.lightColor,
-    percent: Math.round((item.value / categoryTotal.value) * 100),
+    percent: categoryTotal.value
+      ? Math.round((item.value / categoryTotal.value) * 100)
+      : 0,
   })),
 )
 
@@ -440,20 +686,19 @@ const focusCategory = computed(
 const focusLabel = computed(() => focusCategory.value?.name ?? '累计文章')
 const focusValue = computed(() => focusCategory.value?.percent ?? categoryTotal.value)
 const focusHint = computed(() =>
-  focusCategory.value ? `${focusCategory.value.value} 篇` : '四个分类汇总',
+  focusCategory.value
+    ? `${focusCategory.value.value} 篇`
+    : `${categories.value.length} 个分类汇总`,
 )
 
-/** 分类页用 query 里的下标切换分类，这里保持同一套映射 */
-const CATEGORY_INDEX: Record<string, number> = {
-  开发笔记: 0,
-  生活记录: 1,
-  我的吐槽: 2,
-  科技产品: 3,
-}
+/** 分类名 → slug，点击图例或扇区时和分类页使用同一种 query */
+const categorySlugByName = computed(
+  () => new Map(categories.value.map((category) => [category.name, category.slug])),
+)
 
 function categoryQuery(name: string) {
-  const index = CATEGORY_INDEX[name]
-  return index === undefined ? {} : { classify: String(index) }
+  const slug = categorySlugByName.value.get(name)
+  return slug ? { classify: slug } : {}
 }
 
 function handleCategoryHover(name: string | null) {
@@ -461,9 +706,9 @@ function handleCategoryHover(name: string | null) {
 }
 
 function openCategory(name: string) {
-  const index = CATEGORY_INDEX[name]
-  if (index === undefined) return
-  router.push({ name: 'category', query: { classify: String(index) } })
+  const slug = categorySlugByName.value.get(name)
+  if (!slug) return
+  router.push({ name: 'category', query: { classify: slug } })
 }
 
 const chartSurface = computed(() => (isDark.value ? '#0d1424' : '#ffffff'))
@@ -518,40 +763,46 @@ const categoryChartOption = computed<EChartsCoreOption>(() => ({
       animationEasing: 'elasticOut',
       animationDuration: 850,
       animationDelay: (index: number) => index * 90,
-      data: categoryPalette.value.map((item) => ({
-        name: item.name,
-        value: item.value,
-        itemStyle: { color: item.color },
-      })),
+      // 文章数为 0 的分类不画扇区，图例里仍然保留，避免 minAngle 画出误导性的小色块
+      data: categoryPalette.value
+        .filter((item) => item.value > 0)
+        .map((item) => ({
+          name: item.name,
+          value: item.value,
+          itemStyle: { color: item.color },
+        })),
     },
   ],
 }))
 
 /* ---------------- 发布趋势 ---------------- */
+// 由真实文章发布时间整理出最近 12 个月，空月份也会保留
+const monthlyArticles = computed(() => buildMonthlyArchive(archiveRows.value, 12))
+
 /** 数据按“新 -> 旧”存，折线图需要“旧 -> 新”，这里翻一次就够 */
-const chronologicalMonths = computed(() => [...monthlyArticles].reverse())
+const chronologicalMonths = computed(() => [...monthlyArticles.value].reverse())
 
 const recentTotal = computed(() =>
-  monthlyArticles.reduce((total, group) => total + group.articles.length, 0),
+  monthlyArticles.value.reduce((total, group) => total + group.articles.length, 0),
 )
 
 const averagePerMonth = computed(() =>
-  (recentTotal.value / Math.max(1, monthlyArticles.length)).toFixed(1),
+  (recentTotal.value / Math.max(1, monthlyArticles.value.length)).toFixed(1),
 )
 
 const peakMonth = computed(() => {
-  let best: (typeof monthlyArticles)[number] | null = null
-  for (const group of monthlyArticles) {
+  let best: MonthlyArticles | null = null
+  for (const group of monthlyArticles.value) {
     if (!best || group.articles.length > best.articles.length) best = group
   }
   return best
 })
 
-const activeMonth = ref(monthlyArticles[0]?.month ?? '')
+const activeMonth = ref('')
 const hoveredMonth = ref<string | null>(null)
 
 const hoveredGroup = computed(
-  () => monthlyArticles.find((group) => group.month === hoveredMonth.value) ?? null,
+  () => monthlyArticles.value.find((group) => group.month === hoveredMonth.value) ?? null,
 )
 
 function handleTrendHover(name: string | null) {
@@ -560,13 +811,13 @@ function handleTrendHover(name: string | null) {
     return
   }
   // mouseover 有时会把系列名（“发布文章”）也抛过来，这里只认真正的年月
-  if (monthlyArticles.some((group) => group.month === name)) hoveredMonth.value = name
+  if (monthlyArticles.value.some((group) => group.month === name)) hoveredMonth.value = name
 }
 
 function openMonth(name: string) {
   // 最高的那个点带了一个 markPoint，点它时名字是“最高”，这里翻回对应的月份
   const month = name === '最高' ? peakMonth.value?.month : name
-  if (!month || !monthlyArticles.some((group) => group.month === month)) return
+  if (!month || !monthlyArticles.value.some((group) => group.month === month)) return
   activeMonth.value = month
   hoveredMonth.value = null
 }
@@ -590,7 +841,7 @@ const trendChartOption = computed<EChartsCoreOption>(() => {
           ? (params as { axisValue?: string; data?: number }[])
           : []
         const point = list[0]
-        const group = monthlyArticles.find((item) => item.month === point?.axisValue)
+        const group = monthlyArticles.value.find((item) => item.month === point?.axisValue)
         const value = typeof point?.data === 'number' ? point.data : 0
         const muted = isDark.value ? '#94a3b8' : '#64748b'
 
@@ -706,7 +957,9 @@ const highlights = computed(() => [
     value: peakMonth.value?.label ?? '——',
     detail: peakMonth.value
       ? `${peakMonth.value.articles.length} 篇 · 月均 ${averagePerMonth.value} 篇`
-      : '暂无数据',
+      : loading.value && !loaded.value
+        ? '正在统计…'
+        : '暂无数据',
     icon: 'peak',
     chip: 'border-amber-100 from-amber-50 to-white text-amber-600 dark:border-amber-400/20 dark:from-amber-400/[0.12] dark:to-transparent dark:text-amber-300',
   },
@@ -715,14 +968,20 @@ const highlights = computed(() => [
     value: categoryPalette.value[0]?.name ?? '——',
     detail: categoryPalette.value[0]
       ? `${categoryPalette.value[0].value} 篇 · 占 ${categoryPalette.value[0].percent}%`
-      : '暂无数据',
+      : loading.value && !loaded.value
+        ? '正在统计…'
+        : '暂无数据',
     icon: 'category',
     chip: 'border-violet-100 from-violet-50 to-white text-violet-600 dark:border-violet-400/20 dark:from-violet-400/[0.12] dark:to-transparent dark:text-violet-300',
   },
   {
     label: '出现最多的标签',
-    value: tagWall[0] ? `# ${tagWall[0].name}` : '——',
-    detail: tagWall[0] ? `${tagWall[0].count} 次` : '暂无数据',
+    value: tags.value[0] ? `# ${tags.value[0].name}` : '——',
+    detail: tags.value[0]
+      ? `${tags.value[0].post_count ?? 0} 次`
+      : loading.value && !loaded.value
+        ? '正在统计…'
+        : '暂无数据',
     icon: 'tag',
     chip: 'border-teal-100 from-teal-50 to-white text-teal-600 dark:border-teal-400/20 dark:from-teal-400/[0.12] dark:to-transparent dark:text-teal-300',
   },
@@ -730,6 +989,140 @@ const highlights = computed(() => [
 </script>
 
 <style scoped>
+/* ---------- 图表加载 / 空状态 ---------- */
+.chart-skeleton {
+  position: absolute;
+  inset: 16px;
+  border-radius: 16px;
+  background: linear-gradient(110deg, #edf1f6 8%, #f9fbff 18%, #edf1f6 33%);
+  background-size: 220% 100%;
+  animation: stats-shimmer 1.6s linear infinite;
+}
+
+/* 玫瑰图的占位做成一个圆环，和真实图形的轮廓接近 */
+.chart-skeleton.is-round {
+  inset: 50% auto auto 50%;
+  width: 216px;
+  height: 216px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    transparent 0 33%,
+    #edf1f6 34% 72%,
+    transparent 73%
+  );
+  animation: stats-pulse 1.5s ease-in-out infinite;
+}
+
+.chart-skeleton.is-line {
+  inset: 36px 14px 12px;
+  border-radius: 14px;
+  opacity: 0.75;
+}
+
+.chart-empty {
+  position: absolute;
+  inset: 10px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed #e2e8f0;
+  border-radius: 16px;
+  font-family: 'huoxie', sans-serif;
+  font-size: 15px;
+  color: #94a3b8;
+}
+
+@keyframes stats-shimmer {
+  from {
+    background-position: 120% 0;
+  }
+
+  to {
+    background-position: -120% 0;
+  }
+}
+
+@keyframes stats-pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+/* 图例占位 */
+.legend-skeleton {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(248, 250, 252, 0.65);
+}
+
+.legend-skeleton-dot {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+  border-radius: 999px;
+  background: #edf1f6;
+  animation: stats-pulse 1.5s ease-in-out infinite;
+}
+
+.legend-skeleton-line {
+  width: 68px;
+  height: 12px;
+  border-radius: 999px;
+  background: #edf1f6;
+  animation: stats-pulse 1.5s ease-in-out infinite;
+}
+
+:global(html.dark .chart-skeleton) {
+  background: linear-gradient(
+    110deg,
+    rgba(148, 163, 184, 0.14) 8%,
+    rgba(148, 163, 184, 0.24) 18%,
+    rgba(148, 163, 184, 0.14) 33%
+  );
+  background-size: 220% 100%;
+}
+
+:global(html.dark .chart-skeleton.is-round) {
+  background: radial-gradient(
+    circle,
+    transparent 0 33%,
+    rgba(148, 163, 184, 0.18) 34% 72%,
+    transparent 73%
+  );
+}
+
+:global(html.dark .chart-empty) {
+  border-color: rgba(148, 163, 184, 0.16);
+  color: #64748b;
+}
+
+:global(html.dark .legend-skeleton) {
+  background: rgba(148, 163, 184, 0.05);
+}
+
+:global(html.dark .legend-skeleton-dot),
+:global(html.dark .legend-skeleton-line) {
+  background: rgba(148, 163, 184, 0.18);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chart-skeleton,
+  .legend-skeleton-dot,
+  .legend-skeleton-line {
+    animation: none;
+  }
+}
+
 /* 顶部文字按顺序浮上来 */
 .stats-rise {
   animation: stats-rise 0.75s cubic-bezier(0.22, 0.8, 0.3, 1) both;

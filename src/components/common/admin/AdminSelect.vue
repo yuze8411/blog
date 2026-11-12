@@ -4,7 +4,7 @@
   >
     <select
       class="admin-select-native h-full w-full cursor-pointer appearance-none rounded-xl bg-transparent pl-3.5 pr-9 text-[13px] text-slate-600 focus:outline-none dark:text-slate-300"
-      aria-label="按文章状态筛选"
+      :aria-label="props.ariaLabel"
       @change="change"
       v-model="selectValue"
     >
@@ -41,9 +41,13 @@ interface options {
 }
 interface props {
   options: options
+  /** 下拉框的无障碍名称，不同管理页可以换成自己的提示 */
+  ariaLabel?: string
 }
 const emit = defineEmits(['change'])
-let props = defineProps<props>()
+let props = withDefaults(defineProps<props>(), {
+  ariaLabel: '按文章状态筛选',
+})
 let selectValue = ref('')
 // 状态改变时的回调
 function change() {

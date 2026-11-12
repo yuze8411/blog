@@ -113,3 +113,14 @@ export async function getCurrentUser(): Promise<AdminUser | null> {
   if (error || !data.user) return null
   return toAdminUser(data.user)
 }
+
+/**
+ * 前台评论区专用：只读本地会话，不额外请求服务端。
+ * 用来决定是否显示“以博主身份评论”和博主头像；
+ * 真正能不能写入仍由数据库 RLS 根据 auth.uid() 判断，前端身份只影响展示。
+ */
+export async function getSessionUser(): Promise<AdminUser | null> {
+  const { data, error } = await supabase.auth.getSession()
+  if (error || !data.session?.user) return null
+  return toAdminUser(data.session.user)
+}

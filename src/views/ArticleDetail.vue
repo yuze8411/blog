@@ -20,7 +20,7 @@
   <!-- 正文 -->
   <template v-else-if="virtureData">
     <ArticleData :virtureData="virtureData"></ArticleData>
-    <ArticleContent :virtureData="virtureData"></ArticleContent>
+    <ArticleContent :virtureData="virtureData" @count-change="handleCommentCount"></ArticleContent>
   </template>
 
   <SiteFooter></SiteFooter>
@@ -114,6 +114,11 @@ async function loadArticle() {
   } finally {
     if (current === requestId) loading.value = false
   }
+}
+
+/** 评论区加载完成或发表成功后，把顶部显示的评论数同步成真实值 */
+function handleCommentCount(count: number) {
+  if (virtureData.value) virtureData.value.commentNum = count
 }
 
 onUnmounted(() => {

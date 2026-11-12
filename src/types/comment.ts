@@ -3,6 +3,10 @@ export interface CommentUser {
   uname: string
   uemail?: string
   ulink?: string
+  /** 当前展示用的头像；QQ 邮箱会换算成 QQ 头像，博主则用自己的头像 */
+  avatar?: string
+  /** 当前身份是否是博主，回复框据此隐藏昵称 / 邮箱输入 */
+  isOwner?: boolean
 }
 
 /** 一级评论提交的数据 */
@@ -16,6 +20,8 @@ export interface CommentReplyPayload extends CommentUser {
   content: string
   /** 被 @ 的昵称 */
   replyTo?: string
+  /** 被回复的那条评论 id（一级或二级），用于写入 reply_to_id */
+  replyToId?: string
 }
 
 /** 二级评论 */

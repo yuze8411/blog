@@ -31,7 +31,7 @@
       <div class="w-full h-[1px] bg-gray-200 dark:bg-[#243247] mt-[6px]"></div>
       <div class="article-prose w-full mt-6 pt-5" v-html="htmlContent"></div>
     </div>
-    <Comment></Comment>
+    <Comment :post-id="virtureData.id" @count-change="emit('countChange', $event)"></Comment>
   </div>
 </template>
 
@@ -41,6 +41,11 @@ import type { ArticleDetailProps } from '@/types'
 import { md, renderMarkdown } from '@/utils/markdown'
 
 const props = defineProps<ArticleDetailProps>()
+
+const emit = defineEmits<{
+  /** 评论加载 / 发表后同步给详情页顶部 */
+  countChange: [count: number]
+}>()
 
 let htmlContent = ref('')
 // 用户可能在同一页面里切换到另一篇文章，用递增 id 只接收最后一次渲染结果
