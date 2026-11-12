@@ -20,7 +20,7 @@
       <MessageWallFloating />
     </div>
 
-    <TopNavigation variant="plain" />
+    <TopNavigation variant="light" />
 
     <main class="relative z-10">
       <MessageWallContent

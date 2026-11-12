@@ -9,8 +9,7 @@ import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 import { handleWeather } from './api/weather.ts'
 import { handleGithubContributions } from './api/githubcontributions.ts'
 import { handleDeepSeek } from './api/deepseek.ts'
-import { handleCommentReview } from './api/comment-review.ts'
-import { handleMessageReview } from './api/message-review.ts'
+import { handleCommentReview, handleMessageReview } from './server/review.ts'
 
 /** 这些响应头由 Node 的 http 模块自己管理，转发时要去掉 */
 const HOP_BY_HOP_HEADERS = new Set([
