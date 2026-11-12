@@ -97,13 +97,13 @@ const router = createRouter({
         {
           path: 'manage/categories',
           name: 'adminManageCategories',
-          component: AdminPlaceholder,
+          component: () => import('@/views/admin/AdminCategoryManage.vue'),
           meta: { title: '分类管理' },
         },
         {
           path: 'manage/tags',
           name: 'adminManageTags',
-          component: AdminPlaceholder,
+          component: () => import('@/views/admin/AdminTagManage.vue'),
           meta: { title: '标签管理' },
         },
         {
@@ -115,7 +115,7 @@ const router = createRouter({
         {
           path: 'manage/travel',
           name: 'adminManageTravel',
-          component: AdminPlaceholder,
+          component: () => import('@/views/admin/AdminTravelManage.vue'),
           meta: { title: '游记管理' },
         },
         {

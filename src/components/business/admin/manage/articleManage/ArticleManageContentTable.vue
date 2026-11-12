@@ -220,10 +220,11 @@
     <AdminBlank :title="title" v-if="!isTable" class="min-h-0 flex-1" />
 
     <!-- 分页条：把列表数据和当前页传下去，翻页事件原样往上抛 -->
-    <ArticleManageContentPage
+    <AdminPagination
       v-if="isTable"
-      :articleList="articleList"
+      :list="articleList"
       :current-page="searchquery?.page ?? 1"
+      unit="篇"
       class="mt-3 shrink-0"
       @pageJump="pageJump"
     />
@@ -232,6 +233,7 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, watch } from 'vue'
 import AdminBlank from '@/components/common/admin/AdminBlank.vue'
+import AdminPagination from '@/components/common/admin/AdminPagination.vue'
 import type { ArticleManageRow } from './types'
 
 // 获取文章列表数据

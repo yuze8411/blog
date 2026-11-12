@@ -164,9 +164,9 @@
 
     <AdminBlank v-if="!isTable" :title="title" class="min-h-0 flex-1" />
 
-    <ArticleManageContentPage
+    <AdminPagination
       v-if="isTable"
-      :articleList="commentList"
+      :list="commentList"
       :current-page="searchquery?.page ?? 1"
       unit="条"
       class="mt-3 shrink-0"
@@ -179,7 +179,7 @@
 import { computed, nextTick, ref, watch } from 'vue'
 import type { AdminCommentRow, AdminCommentStatus } from '@/api/adminComments'
 import AdminBlank from '@/components/common/admin/AdminBlank.vue'
-import ArticleManageContentPage from '@/components/business/admin/manage/articleManage/ArticleManageContentPage.vue'
+import AdminPagination from '@/components/common/admin/AdminPagination.vue'
 import CommentAvatar from '@/components/common/comment/CommentAvatar.vue'
 import { formatDate } from '@/utils/date'
 import type { CommentSearchState } from './types'

@@ -144,6 +144,45 @@
       </div>
     </section>
 
+    <!-- 首次加载：先铺一层骨架屏，避免空状态一闪而过 -->
+    <section
+      v-else-if="initialLoading"
+      class="mt-7 grid items-start gap-5 lg:gap-6"
+      :style="{ gridTemplateColumns: `repeat(${columnCount}, minmax(0, 1fr))` }"
+      aria-label="照片加载中"
+      aria-busy="true"
+    >
+      <div
+        v-for="columnIndex of columnCount"
+        :key="columnIndex"
+        class="flex min-w-0 flex-col gap-5 lg:gap-6"
+      >
+        <div
+          v-for="rowIndex of 2"
+          :key="rowIndex"
+          class="animate-pulse rounded-2xl bg-slate-200/80 ring-1 ring-slate-200/60 dark:bg-slate-800/70 dark:ring-slate-700/50"
+          :style="{ height: `${200 + ((columnIndex + rowIndex) % 3) * 40}px` }"
+          aria-hidden="true"
+        ></div>
+      </div>
+    </section>
+
+    <!-- 加载失败 -->
+    <div
+      v-else-if="error"
+      class="mt-16 flex flex-col items-center gap-3 rounded-3xl border border-dashed border-slate-200 py-20 text-center dark:border-slate-800"
+    >
+      <IconFont name="tupian" class="text-[38px] text-slate-300 dark:text-slate-600" />
+      <p class="font-[huoxie] text-[16px] text-slate-400 dark:text-slate-500">{{ error }}</p>
+      <button
+        type="button"
+        class="mt-1 rounded-full border border-sky-200 bg-sky-50 px-4 py-1.5 text-[13px] text-sky-700 transition-colors hover:bg-sky-100 dark:border-sky-900 dark:bg-sky-950/40 dark:text-sky-300 dark:hover:bg-sky-900/50"
+        @click="emit('retry')"
+      >
+        重新加载
+      </button>
+    </div>
+
     <!-- 空状态 -->
     <div
       v-else
@@ -151,12 +190,16 @@
     >
       <IconFont name="tupian" class="text-[38px] text-slate-300 dark:text-slate-600" />
       <p class="font-[huoxie] text-[16px] text-slate-400 dark:text-slate-500">
-        这个标签下还没有照片
+        {{ travelImages.length ? '这个标签下还没有照片' : '游记里还没有照片' }}
       </p>
     </div>
 
     <!-- 滚动加载哨兵 -->
-    <div ref="sentinel" class="mt-9 flex min-h-[70px] flex-col items-center justify-center gap-2">
+    <div
+      v-if="!error"
+      ref="sentinel"
+      class="mt-9 flex min-h-[70px] flex-col items-center justify-center gap-2"
+    >
       <template v-if="loading">
         <span class="travel-loader" aria-hidden="true"></span>
         <p class="font-[huoxie] text-[12px] tracking-[0.15em] text-slate-400 dark:text-slate-500">
@@ -196,9 +239,18 @@ const props = withDefaults(
     travelImages: TravelImage[]
     /** 每次加载的照片数量 */
     pageSize?: number
+    /** 首次请求数据中 */
+    initialLoading?: boolean
+    /** 首次请求失败时的提示文字，空字符串表示没有错误 */
+    error?: string
   }>(),
-  { pageSize: 9 },
+  { pageSize: 9, initialLoading: false, error: '' },
 )
+
+const emit = defineEmits<{
+  /** 加载失败后点「重新加载」 */
+  retry: []
+}>()
 
 const ALL_TAG = '全部'
 const PAGE_SIZE = props.pageSize
