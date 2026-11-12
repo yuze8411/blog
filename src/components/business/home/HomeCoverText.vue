@@ -14,7 +14,7 @@ import { ref, onMounted, onUnmounted } from 'vue'
 const text = ref('')
 const textData = [
   '浮生若梦人间寄，得失循环莫悲喜。',
-  '花有重开日，人物在少年。',
+  '花有重开日，人无在少年。',
   '遇事不决可问春风，春风不语，即随本心。',
   'while(true)console.log("努力的一天！")',
 ]

@@ -85,7 +85,7 @@ const imgStcArr: CarouselItem[] = [
     description: 'https://blog.csdn.net/2403_87566238?type=blog',
   },
   {
-    text: '这是我的GitHub，咕咕嘎嘎！',
+    text: '我的GitHub，博客开源，欢迎star。',
     description: 'https://github.com/yuze8411',
   },
   {
