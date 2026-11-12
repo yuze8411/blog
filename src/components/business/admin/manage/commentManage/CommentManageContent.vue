@@ -12,7 +12,7 @@
       </div>
 
       <div class="flex flex-wrap items-center justify-end gap-2">
-        <!-- AI 先给建议，再人工微调，最后批量通过 -->
+        <!-- AI 先给建议，再人工微调，最后同时应用通过 / 不通过 -->
         <button
           type="button"
           class="comment-tool-button is-ai"
@@ -79,10 +79,12 @@
       @selection-change="handleSelectionChange"
     />
 
-    <!-- AI 审核弹窗：AI 建议 + 手动调整 + 一次性通过 -->
-    <CommentManageAiReview
+    <!-- AI 审核弹窗：AI 建议 + 手动调整 + 一次性应用通过 / 不通过 -->
+    <AdminAiReview
       v-model="aiVisible"
-      :items="aiItems"
+      :items="aiDialogItems"
+      noun="评论"
+      title="AI 评论审核"
       :loading="aiLoading"
       :submitting="aiSubmitting"
       :error="aiError"
@@ -130,10 +132,14 @@ import {
   type AdminCommentRow,
 } from '@/api/adminComments'
 import { reviewComments } from '@/api/commentReview'
+import AdminAiReview from '@/components/common/admin/AdminAiReview.vue'
+import type {
+  AdminAiReviewDecision,
+  AdminAiReviewItem,
+} from '@/components/common/admin/aiReviewTypes'
 import AdminConfirm from '@/components/common/admin/AdminConfirm.vue'
 import AdminDeleteButton from '@/components/common/admin/AdminDeleteButton.vue'
 import { useAdminAlert } from '@/components/common/admin/useAdminAlert'
-import CommentManageAiReview from './CommentManageAiReview.vue'
 import CommentManageContentTable from './CommentManageContentTable.vue'
 import type { AiReviewItem, CommentSearchState } from './types'
 
@@ -373,6 +379,23 @@ const aiItems = ref<AiReviewItem[]>([])
 /** 本次送去 AI 的评论，重试时复用同一批，不用重新勾选 */
 const aiTargets = ref<AdminCommentRow[]>([])
 
+/** 把评论专用的行数据转成通用审核弹窗需要的展示结构 */
+const aiDialogItems = computed<AdminAiReviewItem[]>(() =>
+  aiItems.value.map((item) => ({
+    id: item.comment.id,
+    nickname: item.comment.nickname,
+    avatarUrl: item.comment.avatar_url,
+    content: item.comment.content,
+    badges: [...(item.comment.is_owner ? ['博主'] : []), ...(item.comment.root_id ? ['回复'] : [])],
+    meta: item.comment.reply_to_nickname
+      ? `回复 @${item.comment.reply_to_nickname} · ${item.comment.post_title}`
+      : item.comment.post_title,
+    aiPass: item.aiPass,
+    reason: item.reason,
+    pass: item.pass,
+  })),
+)
+
 function openAiReview() {
   if (actionLoading.value) return
 
@@ -440,47 +463,89 @@ function retryAiReview() {
   void runAiReview(aiTargets.value)
 }
 
-async function confirmAiReview(ids: string[]) {
-  if (aiSubmitting.value || !ids.length) return
+async function confirmAiReview(decision: AdminAiReviewDecision) {
+  if (aiSubmitting.value) return
 
-  const idSet = new Set(ids)
+  const passIdSet = new Set(decision.passIds)
+  const rejectIdSet = new Set(decision.rejectIds)
   const byId = new Map(aiItems.value.map((item) => [item.comment.id, item.comment]))
-  const rows: AdminCommentRow[] = []
+  const passRows: AdminCommentRow[] = []
+  const rejectRows: AdminCommentRow[] = []
   let skippedReplies = 0
 
   for (const item of aiItems.value) {
-    if (!idSet.has(item.comment.id)) continue
+    const row = item.comment
+
+    if (rejectIdSet.has(row.id)) {
+      rejectRows.push(row)
+      continue
+    }
+    if (!passIdSet.has(row.id)) continue
 
     // 回复所属的主评论也在这次结果里，但博主把它设成了不通过：
     // 不能只放行回复，否则前台会出现没有主评论的孤儿回复。
-    const rootId = item.comment.root_id
-    if (rootId && byId.has(rootId) && !idSet.has(rootId)) {
+    const rootId = row.root_id
+    if (rootId && byId.has(rootId) && rejectIdSet.has(rootId)) {
       skippedReplies += 1
       continue
     }
 
-    rows.push(item.comment)
+    passRows.push(row)
   }
 
-  if (!rows.length) {
-    adminAlert.warning('选中的回复所属主评论没有通过，请先通过主评论')
+  if (!passRows.length && !rejectRows.length) {
+    adminAlert.warning('没有可以应用的审核结果')
     return
   }
 
   aiSubmitting.value = true
-  try {
-    const result = await approveComments(rows)
-    const rootTip = result.rootApproved ? `，并顺带通过了 ${result.rootApproved} 条主评论` : ''
-    const skipTip = skippedReplies ? `，跳过 ${skippedReplies} 条主评论未通过的回复` : ''
-    aiVisible.value = false
-    adminAlert.success(`已通过 ${result.approved} 条评论${rootTip}${skipTip}`)
-    emit('refresh')
-  } catch (error) {
-    console.error('[commentManage] AI 审核批量通过失败', error)
-    adminAlert.error(adminCommentErrorMessage(error))
-  } finally {
-    aiSubmitting.value = false
+  const errors: unknown[] = []
+  let approved = 0
+  let rootApproved = 0
+  let hidden = 0
+  let childHidden = 0
+
+  // 通过和不通过是两组独立更新，任何一组失败都不影响另一组已经写入的结果
+  if (passRows.length) {
+    try {
+      const result = await approveComments(passRows)
+      approved = result.approved
+      rootApproved = result.rootApproved
+    } catch (error) {
+      console.error('[commentManage] AI 审核批量通过失败', error)
+      errors.push(error)
+    }
   }
+
+  if (rejectRows.length) {
+    try {
+      const result = await hideComments(rejectRows)
+      hidden = result.hidden
+      childHidden = result.childHidden
+    } catch (error) {
+      console.error('[commentManage] AI 审核批量不通过失败', error)
+      errors.push(error)
+    }
+  }
+
+  aiSubmitting.value = false
+  aiVisible.value = false
+  emit('refresh')
+
+  const parts: string[] = []
+  if (approved) parts.push(`通过 ${approved} 条`)
+  if (hidden) parts.push(`不通过 ${hidden} 条`)
+  if (rootApproved) parts.push(`顺带通过 ${rootApproved} 条主评论`)
+  if (childHidden) parts.push(`连带隐藏 ${childHidden} 条回复`)
+  if (skippedReplies) parts.push(`跳过 ${skippedReplies} 条主评论未通过的回复`)
+
+  if (errors.length) {
+    const doneTip = parts.length ? `已完成：${parts.join('，')}。` : ''
+    adminAlert.error(`${doneTip}${adminCommentErrorMessage(errors[0])}`)
+    return
+  }
+
+  adminAlert.success(`AI 审核已应用：${parts.join('，')}`)
 }
 
 function aiErrorMessage(error: unknown) {

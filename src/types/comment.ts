@@ -54,6 +54,8 @@ export interface CommentAvatarProps {
   name: string
   src?: string
   size?: number
+  /** 没有头像时的兜底配色；warm 用于暖色页面，cool 用于白灰为主的页面 */
+  tone?: 'default' | 'warm' | 'cool'
 }
 
 /** CommentReply 组件 props */

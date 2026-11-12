@@ -53,6 +53,12 @@ const router = createRouter({
       component: () => import('@/views/About.vue'),
     },
     {
+      path: '/message',
+      name: 'messageWall',
+      component: () => import('@/views/MessageWall.vue'),
+      meta: { title: '留言墙' },
+    },
+    {
       path: '/admin',
       name: 'admin',
       component: () => import('@/layouts/AdminLayout.vue'),
@@ -117,6 +123,12 @@ const router = createRouter({
           name: 'adminManageTravel',
           component: () => import('@/views/admin/AdminTravelManage.vue'),
           meta: { title: '游记管理' },
+        },
+        {
+          path: 'manage/messages',
+          name: 'adminManageMessages',
+          component: () => import('@/views/admin/AdminMessageManage.vue'),
+          meta: { title: '留言管理' },
         },
         {
           path: 'settings',

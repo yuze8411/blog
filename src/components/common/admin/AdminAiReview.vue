@@ -18,7 +18,7 @@
           class="ai-review-card relative flex max-h-[90vh] w-full max-w-[880px] flex-col overflow-hidden rounded-2xl border border-slate-200/70 bg-white shadow-[0_28px_70px_-30px_rgba(15,23,42,0.4)] focus:outline-none dark:border-slate-700/80 dark:bg-slate-900 dark:shadow-[0_28px_70px_-30px_rgba(0,0,0,0.9)]"
           role="dialog"
           aria-modal="true"
-          aria-label="AI 评论审核"
+          :aria-label="dialogLabel"
           tabindex="-1"
         >
           <!-- 头部 -->
@@ -31,10 +31,10 @@
               </span>
               <div class="min-w-0">
                 <h2 class="text-[16px] font-semibold text-slate-800 dark:text-slate-100">
-                  AI 评论审核
+                  {{ dialogTitle }}
                 </h2>
                 <p class="mt-0.5 text-[12px] leading-5 text-slate-500 dark:text-slate-400">
-                  AI 先给建议，你可以逐条改掉不同意的判断，再一起通过。
+                  {{ dialogDescription }}
                 </p>
               </div>
             </div>
@@ -42,7 +42,7 @@
             <button
               type="button"
               class="ai-review-close"
-              aria-label="关闭 AI 审核"
+              :aria-label="`关闭${dialogLabel}`"
               :disabled="loading || submitting"
               @click="close"
             >
@@ -58,7 +58,7 @@
                 <span class="ai-review-spinner" aria-hidden="true"></span>
                 <div>
                   <p class="text-[13px] font-medium text-slate-600 dark:text-slate-300">
-                    AI 正在阅读这 {{ items.length }} 条评论…
+                    AI 正在阅读这 {{ items.length }} 条{{ noun }}…
                   </p>
                   <p class="mt-0.5 text-[11px] text-slate-400 dark:text-slate-500">
                     识别广告、攻击、刷屏等内容，通常需要几秒钟。
@@ -76,7 +76,7 @@
               </div>
             </div>
 
-            <!-- AI 调用失败：保留重试，不丢已勾选的评论 -->
+            <!-- AI 调用失败：保留重试，不丢已勾选的内容 -->
             <div v-else-if="error" class="ai-review-error">
               <span class="ai-review-error-icon">
                 <el-icon :size="20"><WarningFilled /></el-icon>
@@ -99,14 +99,14 @@
             <div v-else class="space-y-3">
               <article
                 v-for="item in localItems"
-                :key="item.comment.id"
+                :key="item.id"
                 class="ai-review-item"
                 :class="item.pass ? 'is-pass' : 'is-reject'"
               >
                 <div class="flex min-w-0 flex-1 items-start gap-3">
                   <CommentAvatar
-                    :name="item.comment.nickname"
-                    :src="item.comment.avatar_url || undefined"
+                    :name="item.nickname"
+                    :src="item.avatarUrl || undefined"
                     :size="36"
                   />
 
@@ -115,26 +115,26 @@
                       <span
                         class="truncate text-[13.5px] font-medium text-slate-700 dark:text-slate-200"
                       >
-                        {{ item.comment.nickname }}
+                        {{ item.nickname }}
                       </span>
-                      <span v-if="item.comment.is_owner" class="ai-review-badge is-owner"
-                        >博主</span
+                      <span
+                        v-for="badge in item.badges ?? []"
+                        :key="badge"
+                        class="ai-review-badge"
+                        :class="badge === '博主' ? 'is-owner' : 'is-reply'"
                       >
-                      <span v-if="item.comment.root_id" class="ai-review-badge is-reply">回复</span>
-                      <span class="truncate text-[11px] text-slate-400 dark:text-slate-500">
-                        {{ item.comment.post_title }}
+                        {{ badge }}
+                      </span>
+                      <span
+                        v-if="item.meta"
+                        class="truncate text-[11px] text-slate-400 dark:text-slate-500"
+                      >
+                        {{ item.meta }}
                       </span>
                     </div>
 
-                    <p
-                      v-if="item.comment.reply_to_nickname"
-                      class="mt-1 text-[11.5px] text-slate-400 dark:text-slate-500"
-                    >
-                      回复 @{{ item.comment.reply_to_nickname }}
-                    </p>
-
-                    <div class="ai-review-content mt-2" :title="item.comment.content">
-                      {{ item.comment.content }}
+                    <div class="ai-review-content mt-2" :title="item.content">
+                      {{ item.content }}
                     </div>
 
                     <div class="mt-2.5 flex flex-wrap items-center gap-2">
@@ -171,7 +171,7 @@
                 <!-- 最终决定：默认跟随 AI，博主可以手动切换 -->
                 <div class="ai-review-decision shrink-0">
                   <span class="ai-review-decision-label">最终决定</span>
-                  <div class="ai-review-segmented" role="group" aria-label="是否通过这条评论">
+                  <div class="ai-review-segmented" role="group" :aria-label="`是否通过这条${noun}`">
                     <button
                       type="button"
                       class="ai-decision-btn is-pass"
@@ -208,11 +208,15 @@
                 <span class="font-medium tabular-nums text-emerald-600 dark:text-emerald-400">
                   {{ suggestedPassCount }}
                 </span>
-                条 · 你选择了
+                条 · 你将通过
                 <span class="font-medium tabular-nums text-sky-600 dark:text-sky-400">
                   {{ passCount }}
                 </span>
-                / {{ localItems.length }} 条
+                条、不通过
+                <span class="font-medium tabular-nums text-rose-500 dark:text-rose-400">
+                  {{ rejectCount }}
+                </span>
+                条
               </template>
             </p>
 
@@ -228,13 +232,13 @@
               <button
                 type="button"
                 class="ai-review-confirm"
-                :disabled="loading || submitting || Boolean(error) || passCount === 0"
+                :disabled="loading || submitting || Boolean(error) || localItems.length === 0"
                 @click="confirm"
               >
                 <el-icon v-if="submitting" :size="13" class="animate-spin">
                   <Loading />
                 </el-icon>
-                {{ submitting ? '通过中…' : `通过所选 ${passCount} 条` }}
+                {{ submitting ? '处理中…' : '应用审核结果' }}
               </button>
             </div>
           </footer>
@@ -256,31 +260,49 @@ import {
   WarningFilled,
 } from '@element-plus/icons-vue'
 import CommentAvatar from '@/components/common/comment/CommentAvatar.vue'
-import type { AiReviewItem } from './types'
+import type { AdminAiReviewDecision, AdminAiReviewItem } from './aiReviewTypes'
 
 const props = withDefaults(
   defineProps<{
     modelValue: boolean
-    items: AiReviewItem[]
+    items: AdminAiReviewItem[]
     loading?: boolean
     submitting?: boolean
     error?: string
+    /** 当前审核对象，用来拼接标题和提示，例如「评论」「留言」 */
+    noun?: string
+    title?: string
+    description?: string
   }>(),
   {
     loading: false,
     submitting: false,
     error: '',
+    noun: '内容',
+    title: '',
+    description: '',
   },
 )
 
 const emit = defineEmits<{
   'update:modelValue': [value: boolean]
-  confirm: [ids: string[]]
+  confirm: [decision: AdminAiReviewDecision]
   retry: []
 }>()
 
 const dialogRef = ref<HTMLElement | null>(null)
-const localItems = ref<AiReviewItem[]>([])
+const localItems = ref<AdminAiReviewItem[]>([])
+
+const dialogLabel = computed(() => props.title || `AI ${props.noun}审核`)
+const dialogTitle = computed(() => {
+  if (props.title) return props.title
+  return `AI ${props.noun}审核`
+})
+const dialogDescription = computed(
+  () =>
+    props.description ||
+    'AI 先给建议，你可以逐条改掉不同意的判断，再一次性应用通过和不通过的结果。',
+)
 
 // 复制一份 AI 结果，手动调整只影响弹窗内的最终决定，不改父级数据
 watch(
@@ -292,7 +314,9 @@ watch(
 )
 
 const passItems = computed(() => localItems.value.filter((item) => item.pass))
+const rejectItems = computed(() => localItems.value.filter((item) => !item.pass))
 const passCount = computed(() => passItems.value.length)
+const rejectCount = computed(() => rejectItems.value.length)
 const suggestedPassCount = computed(
   () => localItems.value.filter((item) => item.aiPass === true).length,
 )
@@ -307,11 +331,11 @@ function onMaskClick() {
 }
 
 function confirm() {
-  if (props.loading || props.submitting || props.error || !passItems.value.length) return
-  emit(
-    'confirm',
-    passItems.value.map((item) => item.comment.id),
-  )
+  if (props.loading || props.submitting || props.error || !localItems.value.length) return
+  emit('confirm', {
+    passIds: passItems.value.map((item) => item.id),
+    rejectIds: rejectItems.value.map((item) => item.id),
+  })
 }
 
 function onKeydown(event: KeyboardEvent) {
@@ -751,14 +775,14 @@ onBeforeUnmount(() => {
 }
 
 .ai-review-confirm {
-  border: 1px solid #34d399;
-  background: linear-gradient(135deg, #34d399 0%, #059669 100%);
+  border: 1px solid #60a5fa;
+  background: linear-gradient(135deg, #60a5fa 0%, #2563eb 100%);
   color: #fff;
-  box-shadow: 0 6px 14px -10px rgba(5, 150, 105, 0.8);
+  box-shadow: 0 6px 14px -10px rgba(37, 99, 235, 0.8);
 }
 
 .ai-review-confirm:hover:not(:disabled) {
-  background: linear-gradient(135deg, #10b981 0%, #047857 100%);
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
 }
 
 .ai-review-cancel:disabled,

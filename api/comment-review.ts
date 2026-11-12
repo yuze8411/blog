@@ -32,6 +32,13 @@ interface DeepSeekPayload {
   choices?: { message?: { content?: string } }[]
 }
 
+/** 评论 / 留言审核共用同一套流程，这里只替换提示词和称呼 */
+export interface ReviewOptions {
+  systemPrompt?: string
+  /** 展示在错误提示里的名词，例如「评论」「留言」 */
+  itemLabel?: string
+}
+
 const MAX_COMMENTS = 20
 const MAX_CONTENT_LENGTH = 1200
 
@@ -184,7 +191,10 @@ function parseResults(payload: unknown): ReviewResult[] {
 export async function handleCommentReview(
   request: Request,
   env: CommentReviewEnv,
+  options: ReviewOptions = {},
 ): Promise<Response> {
+  const itemLabel = options.itemLabel ?? '评论'
+
   if (request.method !== 'POST') {
     return jsonResponse({ msg: '仅支持 POST 请求' }, 405)
   }
@@ -198,16 +208,17 @@ export async function handleCommentReview(
   const authError = await verifyOwner(request, env)
   if (authError) return authError
 
-  let body: { comments?: unknown }
+  let body: { items?: unknown; comments?: unknown }
   try {
-    body = (await request.json()) as { comments?: unknown }
+    body = (await request.json()) as { items?: unknown; comments?: unknown }
   } catch {
     return jsonResponse({ msg: '请求体不是合法的 JSON' }, 400)
   }
 
-  const comments = normalizeComments(body.comments)
+  // items 是新的通用字段；保留 comments 兼容旧版前端
+  const comments = normalizeComments(body.items ?? body.comments)
   if (!comments) {
-    return jsonResponse({ msg: `一次最多审核 ${MAX_COMMENTS} 条评论，且内容不能为空` }, 400)
+    return jsonResponse({ msg: `一次最多审核 ${MAX_COMMENTS} 条${itemLabel}，且内容不能为空` }, 400)
   }
 
   const baseUrl = (env.DEEPSEEK_BASE_URL || 'https://api.deepseek.com').replace(/\/+$/, '')
@@ -222,8 +233,8 @@ export async function handleCommentReview(
       body: JSON.stringify({
         model: env.DEEPSEEK_MODEL || 'deepseek-flash',
         messages: [
-          { role: 'system', content: SYSTEM_PROMPT },
-          { role: 'user', content: JSON.stringify({ comments }) },
+          { role: 'system', content: options.systemPrompt ?? SYSTEM_PROMPT },
+          { role: 'user', content: JSON.stringify({ items: comments }) },
         ],
         temperature: 0.1,
         max_tokens: 1600,
@@ -234,14 +245,14 @@ export async function handleCommentReview(
 
     if (!upstream.ok) {
       const detail = await upstream.text()
-      console.error('DeepSeek 评论审核返回错误：', upstream.status, detail)
+      console.error(`DeepSeek ${itemLabel}审核返回错误：`, upstream.status, detail)
       return jsonResponse({ msg: `AI 审核服务返回异常（${upstream.status}）` }, 502)
     }
 
     const payload = (await upstream.json()) as DeepSeekPayload
     const content = payload.choices?.[0]?.message?.content
     if (!content) {
-      console.error('DeepSeek 评论审核没有返回内容')
+      console.error(`DeepSeek ${itemLabel}审核没有返回内容`)
       return jsonResponse({ msg: 'AI 没有返回审核结果，请重试' }, 502)
     }
 
@@ -249,13 +260,13 @@ export async function handleCommentReview(
     try {
       parsed = parseJsonContent(content)
     } catch (error) {
-      console.error('DeepSeek 评论审核结果不是合法 JSON：', content.slice(0, 300), error)
+      console.error(`DeepSeek ${itemLabel}审核结果不是合法 JSON：`, content.slice(0, 300), error)
       return jsonResponse({ msg: 'AI 返回格式异常，请重试' }, 502)
     }
 
     const resultMap = new Map(parseResults(parsed).map((item) => [item.id, item]))
 
-    // 以请求里的评论为准逐条输出；AI 漏掉的条目按“不通过”处理，交给博主手动确认。
+    // 以请求里的内容为准逐条输出；AI 漏掉的条目按“不通过”处理，交给博主手动确认。
     const results = comments.map((comment) => {
       const found = resultMap.get(comment.id)
       return {
@@ -267,7 +278,7 @@ export async function handleCommentReview(
 
     return jsonResponse({ results }, 200)
   } catch (error) {
-    console.error('DeepSeek 评论审核请求失败：', error)
+    console.error(`DeepSeek ${itemLabel}审核请求失败：`, error)
     return jsonResponse({ msg: '请求 AI 审核服务异常，请稍后重试' }, 502)
   }
 }

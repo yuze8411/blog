@@ -69,7 +69,7 @@
             <el-menu-item index="/admin/data/comments">评论数据</el-menu-item>
           </el-sub-menu>
 
-          <!-- 管理：文章、分类、标签、评论、游记 -->
+          <!-- 管理：文章、分类、标签、评论、游记、留言 -->
           <el-sub-menu index="manage">
             <template #title>
               <el-icon><Management /></el-icon>
@@ -80,6 +80,7 @@
             <el-menu-item index="/admin/manage/tags">标签管理</el-menu-item>
             <el-menu-item index="/admin/manage/comments">评论管理</el-menu-item>
             <el-menu-item index="/admin/manage/travel">游记管理</el-menu-item>
+            <el-menu-item index="/admin/manage/messages">留言管理</el-menu-item>
           </el-sub-menu>
 
           <el-menu-item index="/admin/settings">
@@ -105,7 +106,7 @@
             <p class="text-[12px] font-medium text-slate-600 dark:text-slate-300">站点运行中</p>
           </div>
           <p class="mt-1 text-[11px] leading-5 text-slate-400 dark:text-slate-500">
-            文章、相册与评论的管理入口
+            文章、相册、评论与留言的管理入口
           </p>
         </div>
 

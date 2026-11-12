@@ -12,7 +12,9 @@
       </div>
 
       <div class="flex items-center gap-1.5">
-        <span class="text-[10px] tracking-[0.22em] text-gray-400 dark:text-gray-500">SITE DATA</span>
+        <span class="text-[10px] tracking-[0.22em] text-gray-400 dark:text-gray-500"
+          >SITE DATA</span
+        >
         <!-- 手动刷新：重新拉一次统计数据 -->
         <button
           type="button"
@@ -38,7 +40,10 @@
       </div>
     </div>
 
-    <dl class="mt-3 border-t border-gray-100 dark:border-gray-700/60" :aria-busy="loading && !loaded">
+    <dl
+      class="mt-3 border-t border-gray-100 dark:border-gray-700/60"
+      :aria-busy="loading && !loaded"
+    >
       <div
         v-for="item in statRows"
         :key="item.label"
@@ -153,13 +158,13 @@ const statRows = computed(() => [
     label: '文章数',
     value: formatNumber(display.article_count),
     unit: '篇',
-    icon: 'xiangzi',
+    icon: 'wenzhang',
   },
   {
     label: '分类数',
     value: formatNumber(display.category_count),
     unit: '个',
-    icon: 'fenlei1',
+    icon: 'fenlei4-copy',
   },
   {
     label: '标签数',
@@ -183,13 +188,13 @@ const statRows = computed(() => [
     label: '评论数',
     value: formatNumber(display.comment_count),
     unit: '条',
-    icon: 'pinglun',
+    icon: 'pinglun1',
   },
   {
     label: '运行时长',
     value: formatNumber(runningDays.value),
     unit: '天',
-    icon: 'rili',
+    icon: 'renjundancichulishichang',
   },
   {
     label: '最后更新时间',

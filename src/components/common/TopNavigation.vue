@@ -1,7 +1,10 @@
 <template>
   <nav
     class="nav-root fixed top-0 left-0 w-full z-[100]"
-    :class="isAutoHidden ? 'nav-root--auto h-4' : 'h-16'"
+    :class="[
+      isAutoHidden ? 'nav-root--auto h-4' : 'h-16',
+      { 'is-warm': isWarm, 'is-plain': isPlain },
+    ]"
     @mouseleave="openMenu = ''"
   >
     <!-- 默认收起时，顶部留一小条触发区，鼠标移上来导航就会滑出 -->
@@ -276,8 +279,8 @@ import { onMounted, onUnmounted } from 'vue'
 
 const props = withDefaults(
   defineProps<{
-    /** light：浅色页面（如标签墙）使用浅色底 + 深色字，保证可读性 */
-    variant?: 'default' | 'light'
+    /** light：浅色页面（如标签墙）使用浅色底 + 深色字；warm：暖色页面使用米白底 + 陶土色；plain：纯白页面使用白底 + 中性灰 */
+    variant?: 'default' | 'light' | 'warm' | 'plain'
     /** visible：正常展示；hidden：默认收起，鼠标移到页面顶部或键盘聚焦时滑出 */
     visibility?: 'visible' | 'hidden'
   }>(),
@@ -285,6 +288,8 @@ const props = withDefaults(
 )
 
 const isLight = computed(() => props.variant === 'light')
+const isWarm = computed(() => props.variant === 'warm')
+const isPlain = computed(() => props.variant === 'plain')
 const isAutoHidden = computed(() => props.visibility === 'hidden')
 
 const openMenu = ref('')
@@ -297,10 +302,18 @@ function isActive(item: { name: string; path: string }) {
   const active =
     item.name === 'home' ? activePath.value === item.path : activePath.value.startsWith(item.path)
 
-  // 滚动后导航变浅：普通项转黑字，激活项用更深的蓝色保证对比度
+  // 滚动后导航变浅：普通项转黑字，激活项用更深的强调色保证对比度
   if (active) {
+    if (isPlain.value) return 'text-zinc-900 dark:text-zinc-100'
+    if (isWarm.value) return 'text-[#9a5f57] dark:text-[#e8b4ac]'
     if (isLight.value) return 'text-sky-700 dark:text-sky-400'
     return scrolled.value ? 'text-sky-600 dark:text-sky-400' : 'text-sky-200'
+  }
+  if (isPlain.value) {
+    return 'text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100'
+  }
+  if (isWarm.value) {
+    return 'text-stone-600 hover:text-[#a6665e] dark:text-stone-300 dark:hover:text-[#e8b4ac]'
   }
   if (isLight.value) {
     return 'text-slate-700 hover:text-sky-600 dark:text-gray-300 dark:hover:text-sky-400'
@@ -318,8 +331,14 @@ watch(activePath, () => {
 // ---------- 滚动后加深导航栏背景并加阴影 ----------
 const scrolled = ref(false)
 
-// 滚动后文字/品牌字转深色，未滚动时保持白色；浅色主题下始终使用深色字
+// 滚动后文字/品牌字转深色，未滚动时保持白色；浅色 / 暖色主题下始终使用深色字
 const labelClass = computed(() => {
+  if (isPlain.value) {
+    return 'text-zinc-800 hover:text-zinc-950 dark:text-zinc-100 dark:hover:text-white'
+  }
+  if (isWarm.value) {
+    return 'text-stone-800 hover:text-[#a6665e] dark:text-stone-100 dark:hover:text-[#e8b4ac]'
+  }
   if (isLight.value) {
     return 'text-slate-800 hover:text-sky-600 dark:text-gray-100 dark:hover:text-sky-400'
   }
@@ -328,8 +347,18 @@ const labelClass = computed(() => {
     : 'text-white hover:text-sky-200 dark:text-gray-300 dark:hover:text-sky-400'
 })
 
-// 导航栏底色：浅色页面用与标签页一致的淡靛蓝，深色页面沿用原样式
+// 导航栏底色：浅色页面用与标签页一致的淡靛蓝；暖色页面用米白，深色页面沿用原样式
 const navClass = computed(() => {
+  if (isPlain.value) {
+    return scrolled.value
+      ? 'bg-white/95 shadow-[0_6px_24px_rgba(63,63,70,0.1)] dark:bg-[#0b0c0e]/95 dark:shadow-[0_6px_24px_rgba(0,0,0,0.5)]'
+      : 'bg-white/80 shadow-none dark:bg-[#0b0c0e]/55'
+  }
+  if (isWarm.value) {
+    return scrolled.value
+      ? 'bg-[#fdfcfa]/95 shadow-[0_6px_24px_rgba(95,82,72,0.12)] dark:bg-[#0b0c0e]/95 dark:shadow-[0_6px_24px_rgba(0,0,0,0.5)]'
+      : 'bg-[#fdfcfa]/80 shadow-none dark:bg-[#0b0c0e]/55'
+  }
   if (isLight.value) {
     return scrolled.value
       ? 'bg-[#eef2ff]/95 shadow-[0_6px_24px_rgba(148,163,184,0.18)] dark:bg-gray-900/95 dark:shadow-[0_6px_24px_rgba(0,0,0,0.5)]'
@@ -378,6 +407,81 @@ onMounted(() => {
 </script>
 
 <style scoped>
+/* ---------- 纯白页面：下拉菜单和主题开关都使用中性灰 ---------- */
+.nav-root.is-plain .absolute > div {
+  border-color: #e9ebee;
+  background-color: rgba(255, 255, 255, 0.96);
+}
+
+.nav-root.is-plain .absolute a {
+  color: #71717a;
+}
+
+.nav-root.is-plain .absolute a:hover {
+  background-color: #f4f4f5;
+  color: #18181b;
+}
+
+:global(html.dark) .nav-root.is-plain .absolute > div {
+  border-color: #2b2d30;
+  background-color: rgba(18, 18, 20, 0.97);
+}
+
+:global(html.dark) .nav-root.is-plain .absolute a {
+  color: #a1a1aa;
+}
+
+:global(html.dark) .nav-root.is-plain .absolute a:hover {
+  background-color: rgba(255, 255, 255, 0.06);
+  color: #fafafa;
+}
+
+.nav-root.is-plain .slider {
+  background-color: #d4d4d8;
+}
+
+.nav-root.is-plain #input:focus + .slider {
+  box-shadow: 0 0 1px #a1a1aa;
+}
+
+/* ---------- 暖色页面：下拉菜单的 hover 也换成陶土色，不出现蓝色 ---------- */
+.nav-root.is-warm .absolute > div {
+  border-color: #ece7e1;
+  background-color: rgba(255, 255, 255, 0.96);
+}
+
+.nav-root.is-warm .absolute a {
+  color: #7a6c63;
+}
+
+.nav-root.is-warm .absolute a:hover {
+  background-color: #faf3ee;
+  color: #a6665e;
+}
+
+:global(html.dark) .nav-root.is-warm .absolute > div {
+  border-color: #34302d;
+  background-color: rgba(18, 18, 20, 0.97);
+}
+
+:global(html.dark) .nav-root.is-warm .absolute a {
+  color: #b8b0a9;
+}
+
+:global(html.dark) .nav-root.is-warm .absolute a:hover {
+  background-color: rgba(120, 80, 70, 0.2);
+  color: #e8b4ac;
+}
+
+/* 暖色页面上的主题开关也收成陶土色，避免蓝色跳出来 */
+.nav-root.is-warm .slider {
+  background-color: #c48a7e;
+}
+
+.nav-root.is-warm #input:focus + .slider {
+  box-shadow: 0 0 1px #c48a7e;
+}
+
 /* ---------- About 页：默认收起的导航 ---------- */
 /* 收起状态：整条导航向上滑出画面，只留下顶部一条很窄的触发区 */
 .nav-root--auto .nav-bar {

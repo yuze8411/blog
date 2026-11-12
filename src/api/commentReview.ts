@@ -46,8 +46,8 @@ function normalizeResults(input: unknown): ReviewCommentResult[] {
   return results
 }
 
-function requestReview(token: string, body: string) {
-  return fetch('/api/comment-review', {
+function requestReview(endpoint: string, token: string, body: string) {
+  return fetch(endpoint, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -57,7 +57,12 @@ function requestReview(token: string, body: string) {
   })
 }
 
-export async function reviewComments(
+/**
+ * 评论和留言审核共用的请求流程：
+ * 带登录 token、token 过期时刷新一次、统一解析结果。
+ */
+export async function requestAiReview(
+  endpoint: string,
   comments: ReviewCommentInput[],
 ): Promise<ReviewCommentResult[]> {
   const { data: sessionData } = await supabase.auth.getSession()
@@ -66,8 +71,8 @@ export async function reviewComments(
     throw new Error('登录状态已失效，请重新登录后再使用 AI 审核')
   }
 
-  const body = JSON.stringify({ comments })
-  let response = await requestReview(token, body)
+  const body = JSON.stringify({ items: comments })
+  let response = await requestReview(endpoint, token, body)
 
   // access token 刚好过期时服务端会返回 401。
   // 主动刷新一次会话再重试，避免让博主再点一遍。
@@ -76,7 +81,7 @@ export async function reviewComments(
     const nextToken = refreshed.session?.access_token
     if (nextToken && nextToken !== token) {
       token = nextToken
-      response = await requestReview(token, body)
+      response = await requestReview(endpoint, token, body)
     }
   }
 
@@ -98,4 +103,9 @@ export async function reviewComments(
   }
 
   return results
+}
+
+/** 评论审核：沿用原来的调用方式 */
+export function reviewComments(comments: ReviewCommentInput[]): Promise<ReviewCommentResult[]> {
+  return requestAiReview('/api/comment-review', comments)
 }

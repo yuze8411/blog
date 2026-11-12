@@ -10,6 +10,7 @@ import { handleWeather } from './api/weather.ts'
 import { handleGithubContributions } from './api/githubcontributions.ts'
 import { handleDeepSeek } from './api/deepseek.ts'
 import { handleCommentReview } from './api/comment-review.ts'
+import { handleMessageReview } from './api/message-review.ts'
 
 /** 这些响应头由 Node 的 http 模块自己管理，转发时要去掉 */
 const HOP_BY_HOP_HEADERS = new Set([
@@ -138,6 +139,15 @@ export default defineConfig(({ mode }) => {
       ),
       createLocalApiPlugin('local-comment-review-api', '/api/comment-review', (request) =>
         handleCommentReview(request, {
+          DEEPSEEK_API_KEY: env.DEEPSEEK_API_KEY,
+          DEEPSEEK_MODEL: env.DEEPSEEK_MODEL,
+          DEEPSEEK_BASE_URL: env.DEEPSEEK_BASE_URL,
+          SUPABASE_URL: env.VITE_SUPABASE_URL,
+          SUPABASE_ANON_KEY: env.VITE_SUPABASE_ANON_KEY,
+        }),
+      ),
+      createLocalApiPlugin('local-message-review-api', '/api/message-review', (request) =>
+        handleMessageReview(request, {
           DEEPSEEK_API_KEY: env.DEEPSEEK_API_KEY,
           DEEPSEEK_MODEL: env.DEEPSEEK_MODEL,
           DEEPSEEK_BASE_URL: env.DEEPSEEK_BASE_URL,
