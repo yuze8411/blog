@@ -3,7 +3,9 @@
     <!-- ========== 小标题 + 当前年份 + 左右按钮 ========== -->
     <div class="mb-7 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
       <div>
-        <p class="inline-flex items-center gap-2 font-[huoxie] text-[10px] tracking-[0.35em] text-amber-200/60">
+        <p
+          class="inline-flex items-center gap-2 font-[huoxie] text-[10px] tracking-[0.35em] text-amber-200/60"
+        >
           <span class="h-px w-6 bg-gradient-to-r from-transparent to-amber-500/70" />
           TIMELINE · 时光轴
         </p>
@@ -14,9 +16,7 @@
 
       <div class="flex items-end justify-between gap-6 sm:justify-end">
         <div class="text-left sm:text-right">
-          <p class="font-[huoxie] text-[9px] tracking-[0.28em] text-slate-500">
-            NOW READING
-          </p>
+          <p class="font-[huoxie] text-[9px] tracking-[0.28em] text-slate-500">NOW READING</p>
           <p class="mt-1 font-[huoxie] text-[32px] leading-none tracking-[0.08em] text-amber-300">
             {{ activeYear }}
           </p>
@@ -30,7 +30,13 @@
             aria-label="查看上一个节点"
             @click="scrollByStep(-1)"
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="h-4 w-4 transition-transform group-hover:-translate-x-0.5">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              class="h-4 w-4 transition-transform group-hover:-translate-x-0.5"
+            >
               <path d="M15 18 9 12l6-6" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
           </button>
@@ -42,7 +48,13 @@
             aria-label="查看下一个节点"
             @click="scrollByStep(1)"
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="h-4 w-4 transition-transform group-hover:translate-x-0.5">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              class="h-4 w-4 transition-transform group-hover:translate-x-0.5"
+            >
               <path d="m9 18 6-6-6-6" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
           </button>
@@ -66,15 +78,26 @@
       @keydown.left.prevent="scrollByStep(-1)"
       @keydown.right.prevent="scrollByStep(1)"
     >
-      <div class="relative" :style="{ width: `${trackWidth}px`, height: `${TRACK_HEIGHT}px` }">
+      <div
+        class="relative mx-auto"
+        :style="{ width: `${trackWidth}px`, height: `${TRACK_HEIGHT}px` }"
+      >
         <!-- 时光线本体：一条横贯左右的金线，上面有两束缓慢流动的光 -->
         <div class="pointer-events-none absolute inset-x-0 z-0" :style="{ top: `${TRACK_Y}px` }">
-          <div class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-300/25 to-transparent" />
-          <div class="absolute inset-x-0 -top-[2px] h-[5px] bg-gradient-to-r from-transparent via-amber-400/20 to-transparent blur-[2px]" />
+          <div
+            class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-300/25 to-transparent"
+          />
+          <div
+            class="absolute inset-x-0 -top-[2px] h-[5px] bg-gradient-to-r from-transparent via-amber-400/20 to-transparent blur-[2px]"
+          />
           <span class="beam beam-a" />
           <span class="beam beam-b" />
-          <span class="absolute -left-1 top-1/2 h-2 w-2 -translate-y-1/2 rotate-45 rounded-[2px] bg-amber-500/45" />
-          <span class="absolute -right-1 top-1/2 h-2 w-2 -translate-y-1/2 rotate-45 rounded-[2px] bg-amber-500/45" />
+          <span
+            class="absolute -left-1 top-1/2 h-2 w-2 -translate-y-1/2 rotate-45 rounded-[2px] bg-amber-500/45"
+          />
+          <span
+            class="absolute -right-1 top-1/2 h-2 w-2 -translate-y-1/2 rotate-45 rounded-[2px] bg-amber-500/45"
+          />
         </div>
 
         <template v-for="(article, index) in articles" :key="article.id">
@@ -133,12 +156,12 @@
               top: `${isUp(index) ? TRACK_Y + 18 : TRACK_Y - 46}px`,
             }"
           >
-            <span class="font-[huoxie] text-[24px] leading-none tracking-[0.08em] text-amber-200/85">
+            <span
+              class="font-[huoxie] text-[24px] leading-none tracking-[0.08em] text-amber-200/85"
+            >
               {{ yearOf(index) }}
             </span>
-            <span class="font-[huoxie] text-[9px] tracking-[0.22em] text-slate-500">
-              YEAR
-            </span>
+            <span class="font-[huoxie] text-[9px] tracking-[0.22em] text-slate-500"> YEAR </span>
           </div>
 
           <!-- 节点：旋转 45° 的小金块 + 一圈会呼吸的方框 -->
@@ -147,9 +170,15 @@
               class="node relative -translate-x-1/2 -translate-y-1/2"
               :class="index === activeIndex ? 'node-active' : ''"
             >
-              <span class="node-halo absolute left-1/2 top-1/2 h-10 w-10 -translate-x-1/2 -translate-y-1/2 rounded-full bg-amber-400/15 blur-[2px]" />
-              <span class="node-ring absolute left-1/2 top-1/2 h-7 w-7 -translate-x-1/2 -translate-y-1/2 rotate-45 rounded-[5px] border border-amber-300/35" />
-              <span class="node-core absolute left-1/2 top-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rotate-45 rounded-[2px] bg-gradient-to-br from-amber-200 via-amber-400 to-amber-600 shadow-[0_0_10px_rgba(245,185,66,0.9)]" />
+              <span
+                class="node-halo absolute left-1/2 top-1/2 h-10 w-10 -translate-x-1/2 -translate-y-1/2 rounded-full bg-amber-400/15 blur-[2px]"
+              />
+              <span
+                class="node-ring absolute left-1/2 top-1/2 h-7 w-7 -translate-x-1/2 -translate-y-1/2 rotate-45 rounded-[5px] border border-amber-300/35"
+              />
+              <span
+                class="node-core absolute left-1/2 top-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rotate-45 rounded-[2px] bg-gradient-to-br from-amber-200 via-amber-400 to-amber-600 shadow-[0_0_10px_rgba(245,185,66,0.9)]"
+              />
             </div>
           </div>
         </template>
@@ -158,9 +187,7 @@
 
     <!-- ========== 底部进度条：看一眼就知道走到哪了 ========== -->
     <div class="mt-5 flex items-center gap-4">
-      <span class="font-[huoxie] text-[9px] tracking-[0.22em] text-slate-500">
-        起点
-      </span>
+      <span class="font-[huoxie] text-[9px] tracking-[0.22em] text-slate-500"> 起点 </span>
       <div class="relative h-px flex-1 overflow-hidden rounded-full bg-amber-100/10">
         <span
           class="absolute left-0 top-0 h-full rounded-full bg-gradient-to-r from-amber-200 to-amber-400 transition-[width] duration-200 ease-out"
@@ -171,9 +198,7 @@
           :style="{ left: `${Math.min(98, Math.max(2, progress * 100))}%` }"
         />
       </div>
-      <span class="font-[huoxie] text-[9px] tracking-[0.22em] text-slate-500">
-        未完
-      </span>
+      <span class="font-[huoxie] text-[9px] tracking-[0.22em] text-slate-500"> 未完 </span>
     </div>
   </section>
 </template>
@@ -206,7 +231,9 @@ const maxScroll = ref(0)
 const viewportWidth = ref(0)
 
 /** 整条轨道有多宽：首尾各留出一段空隙，第一张和最后一张卡片才不会贴边 */
-const trackWidth = computed(() => TRACK_PADDING * 2 + Math.max(0, props.articles.length - 1) * ITEM_WIDTH)
+const trackWidth = computed(
+  () => TRACK_PADDING * 2 + Math.max(0, props.articles.length - 1) * ITEM_WIDTH,
+)
 
 /** 第 index 个节点在轨道里的横坐标 */
 function nodeX(index: number) {

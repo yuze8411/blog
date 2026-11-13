@@ -125,6 +125,12 @@ const router = createRouter({
           meta: { title: '游记管理' },
         },
         {
+          path: 'manage/milestones',
+          name: 'adminManageMilestones',
+          component: () => import('@/views/admin/AdminMilestoneManage.vue'),
+          meta: { title: '时光管理' },
+        },
+        {
           path: 'manage/messages',
           name: 'adminManageMessages',
           component: () => import('@/views/admin/AdminMessageManage.vue'),

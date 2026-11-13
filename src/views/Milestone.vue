@@ -41,26 +41,23 @@
     </RouterLink>
 
     <main class="relative z-10">
-      <MilestoneContent :articles="milestones" />
+      <MilestoneContent
+        :articles="milestones"
+        :loading="loading"
+        :error="loadError"
+        @retry="loadMilestones"
+      />
     </main>
   </div>
 </template>
 
 <script setup lang="ts">
-import { onBeforeUnmount } from 'vue'
+import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { RouterLink } from 'vue-router'
+import { fetchMilestones } from '@/api/milestones'
 import MilestoneContent from '@/components/business/milestone/MilestoneContent.vue'
 import MilestoneGoldParticles from '@/components/business/milestone/MilestoneGoldParticles.vue'
 import type { MilestoneArticle } from '@/types'
-
-import demo from '@/assets/images/demoTextImages/demo.jpg'
-import demo2 from '@/assets/images/demoTextImages/demo2.jpg'
-import demo3 from '@/assets/images/demoTextImages/demo3.jpg'
-import demo4 from '@/assets/images/demoTextImages/demo4.jpg'
-import mycover from '@/assets/images/mycover.jpg'
-import back from '@/assets/images/back.jpg'
-import back2 from '@/assets/images/back2.jpg'
-import mountain from '@/assets/images/8385-mountains-55067_1920 (1).png'
 
 /* ---------------- 主题 ----------------
  * 这个页面只做暗色版本，所以进来就给 <html> 挂上 dark，
@@ -75,90 +72,47 @@ onBeforeUnmount(() => {
 })
 
 /* ---------------- 文章节点 ----------------
- * 数据先直接放在这里，后端接好之后换成接口返回即可。
- * 顺序就是时间线的顺序，从早到晚排列。
+ * 后台只决定「哪些文章出现在时光轴」，
+ * 前台按文章发布时间从早到晚自动排列，所以这里不需要再排序。
  */
-const milestones: MilestoneArticle[] = [
-  {
-    id: 'milestone-2023-03-18',
-    date: '2023-03-18',
-    title: '把博客搬到自己的域名下',
-    excerpt: '从一张白纸开始，域名、DNS、证书，来来回回折腾了整整一个周末。',
-    tags: ['建站', '折腾'],
-    cover: demo,
-    readTime: '6 分钟',
-  },
-  {
-    id: 'milestone-2023-07-02',
-    date: '2023-07-02',
-    title: 'Vue 3 组合式 API 入门笔记',
-    excerpt: '第一次把选项式写法换成 script setup，像把抽屉里的线重新理了一遍。',
-    tags: ['Vue', '前端'],
-    cover: demo2,
-    readTime: '9 分钟',
-  },
-  {
-    id: 'milestone-2023-12-24',
-    date: '2023-12-24',
-    title: '冬夜里的第一百篇文章',
-    excerpt: '窗外很冷，屏幕很亮。写完这一篇，博客刚好攒到一百篇。',
-    tags: ['写作', '复盘'],
-    cover: back,
-    readTime: '5 分钟',
-  },
-  {
-    id: 'milestone-2024-04-06',
-    date: '2024-04-06',
-    title: '用 Pinia 重构状态管理',
-    excerpt: '把散落在组件里的状态收拢到 store，代码终于有了一个清楚的骨架。',
-    tags: ['Vue', 'Pinia'],
-    cover: demo3,
-    readTime: '8 分钟',
-  },
-  {
-    id: 'milestone-2024-09-15',
-    date: '2024-09-15',
-    title: '博客二期：评论区的诞生',
-    excerpt: '从一条留言开始，搭起用户、评论、回复三张表，也第一次认真处理权限。',
-    tags: ['Supabase', '全栈'],
-    cover: mycover,
-    readTime: '12 分钟',
-  },
-  {
-    id: 'milestone-2025-01-20',
-    date: '2025-01-20',
-    title: '给文章页加上目录与阅读进度',
-    excerpt: '长文章需要一个落脚点。目录、锚点、阅读进度条，一样都不能少。',
-    tags: ['前端', '交互'],
-    cover: demo4,
-    readTime: '7 分钟',
-  },
-  {
-    id: 'milestone-2025-06-08',
-    date: '2025-06-08',
-    title: '端午，去了一趟嵩山',
-    excerpt: '山不算高，云很近。回来之后，把照片和心情一起放进了游记页。',
-    tags: ['旅行', '嵩山'],
-    cover: mountain,
-    readTime: '10 分钟',
-  },
-  {
-    id: 'milestone-2026-02-14',
-    date: '2026-02-14',
-    title: '用 Supabase 搭起博客后端',
-    excerpt: '匿名访客、登录博主、行级权限——后端的第一条边界终于画清楚了。',
-    tags: ['Supabase', '后端'],
-    cover: back2,
-    readTime: '14 分钟',
-  },
-  {
-    id: 'milestone-2026-10-01',
-    date: '2026-10-01',
-    title: 'Milestone：把时间铺成一条金色的河',
-    excerpt: '当文章多到记不住顺序，就想给它们做一条横着的时光线。',
-    tags: ['建站', '里程碑'],
-    cover: demo,
-    readTime: '11 分钟',
-  },
-]
+const milestones = ref<MilestoneArticle[]>([])
+const loading = ref(true)
+const loadError = ref('')
+
+let requestId = 0
+
+function errorMessage(error: unknown) {
+  const text = error instanceof Error ? error.message : ''
+
+  if (/could not find the table|does not exist|schema cache/i.test(text)) {
+    return '时光轴的数据表还没有准备好，请先在 Supabase 执行 sql.text 里的第 12 段 SQL。'
+  }
+  if (/failed to fetch|network|timeout/i.test(text)) {
+    return '时光线暂时没有连上，检查一下网络，再试一次吧。'
+  }
+
+  return '时光轴没有加载出来，稍后再试试。'
+}
+
+async function loadMilestones() {
+  const current = ++requestId
+  loading.value = true
+  loadError.value = ''
+
+  try {
+    const rows = await fetchMilestones()
+    if (current !== requestId) return
+    milestones.value = rows
+  } catch (error) {
+    if (current !== requestId) return
+    console.error('[milestone] 获取时光轴文章失败', error)
+    loadError.value = errorMessage(error)
+  } finally {
+    if (current === requestId) loading.value = false
+  }
+}
+
+onMounted(() => {
+  void loadMilestones()
+})
 </script>

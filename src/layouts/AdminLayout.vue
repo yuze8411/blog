@@ -69,7 +69,7 @@
             <el-menu-item index="/admin/data/comments">评论数据</el-menu-item>
           </el-sub-menu>
 
-          <!-- 管理：文章、分类、标签、评论、游记、留言 -->
+          <!-- 管理：文章、分类、标签、评论、游记、时光、留言 -->
           <el-sub-menu index="manage">
             <template #title>
               <el-icon><Management /></el-icon>
@@ -80,6 +80,7 @@
             <el-menu-item index="/admin/manage/tags">标签管理</el-menu-item>
             <el-menu-item index="/admin/manage/comments">评论管理</el-menu-item>
             <el-menu-item index="/admin/manage/travel">游记管理</el-menu-item>
+            <el-menu-item index="/admin/manage/milestones">时光管理</el-menu-item>
             <el-menu-item index="/admin/manage/messages">留言管理</el-menu-item>
           </el-sub-menu>
 

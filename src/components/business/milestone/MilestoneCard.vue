@@ -1,6 +1,9 @@
 <template>
   <RouterLink
-    :to="{ name: 'articleDetail', query: { textId: article.id } }"
+    :to="{
+      name: 'articleDetail',
+      query: article.slug ? { slug: article.slug } : { id: article.id },
+    }"
     class="milestone-card group relative flex gap-3 overflow-hidden rounded-[20px] border border-amber-100/10 bg-[#111827]/80 p-3 shadow-[0_22px_50px_-34px_rgba(0,0,0,0.95)] backdrop-blur-md transition-all duration-500 hover:border-amber-300/25 hover:bg-[#151d30]/90 hover:shadow-[0_28px_58px_-30px_rgba(245,185,66,0.22)] sm:gap-3.5 sm:p-3.5"
     :class="side === 'up' ? 'hover:-translate-y-1' : 'hover:translate-y-1'"
     :aria-label="`阅读文章：${article.title}`"
@@ -27,10 +30,18 @@
 
     <div class="flex min-w-0 flex-1 flex-col">
       <!-- 日期 + 阅读时间：卡片里的小字信息 -->
-      <div class="flex items-center justify-between gap-2 font-[huoxie] text-[10px] tracking-[0.1em] text-amber-200/55">
+      <div
+        class="flex items-center justify-between gap-2 font-[huoxie] text-[10px] tracking-[0.1em] text-amber-200/55"
+      >
         <span>{{ monthDay }}</span>
         <span class="inline-flex items-center gap-1">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="h-3 w-3">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            class="h-3 w-3"
+          >
             <circle cx="12" cy="12" r="8.5" />
             <path d="M12 7.5V12l3 1.8" stroke-linecap="round" stroke-linejoin="round" />
           </svg>
@@ -63,7 +74,13 @@
         <span
           class="grid h-6 w-6 shrink-0 place-items-center rounded-full border border-amber-200/15 bg-slate-800 text-amber-200 transition-all duration-300 group-hover:border-amber-300/40 group-hover:bg-amber-400 group-hover:text-slate-900"
         >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-3 w-3">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            class="h-3 w-3"
+          >
             <path d="M7 17 17 7M9 7h8v8" stroke-linecap="round" stroke-linejoin="round" />
           </svg>
         </span>
