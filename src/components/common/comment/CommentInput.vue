@@ -96,7 +96,7 @@
         maxlength="2000"
         :disabled="submitting"
         aria-label="评论内容"
-        placeholder="快点咕咕，不然让你变成黄焖咕咕、炸咕咕、地锅咕咕……"
+        placeholder="众里寻他千百度，慕然回首，那人却在灯火阑珊处..."
         class="comment-field comment-textarea"
       ></textarea>
     </div>

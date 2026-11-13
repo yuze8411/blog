@@ -11,7 +11,7 @@
         >
           <IconFont name="chicken" class="mr-1 text-[20px]" />咕咕?
         </span>
-        <h2 class="tracking-[2px] text-[#2f4a77] dark:text-gray-100">咕咕窝</h2>
+        <h2 class="tracking-[2px] text-[#2f4a77] dark:text-gray-100">咕咕咕</h2>
         <span
           class="flex items-center gap-1 font-sans text-[13px] text-gray-400 dark:text-gray-500"
         >
@@ -24,7 +24,7 @@
         <template v-if="loading && !loaded">正在数咕咕…</template>
         <template v-else-if="loadError && !loaded">咕咕们暂时躲起来了</template>
         <template v-else>
-          共 <span class="comment-count">{{ totalCount }}</span> 条咕咕 · 友善发言，咕咕有责
+          共 <span class="comment-count">{{ totalCount }}</span> 条咕咕 · 友善发言，人人有责
         </template>
       </p>
     </header>

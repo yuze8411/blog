@@ -49,6 +49,66 @@
   box-sizing: border-box;
 }
 
+/* ========== 页面主滚动条 ==========
+ * 只处理 html 的视口滚动条，也就是页面内容溢出后最右侧那一条。
+ * 组件内部的横向滚动、代码块、目录等仍然使用各自的滚动条样式。
+ *
+ * 思路：轨道完全透明，滑块留出透明边框，只露出中间细细的一条，
+ * 默认低对比度，悬停时再稍微加深，不抢页面内容。
+ */
+html::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+html::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+html::-webkit-scrollbar-thumb {
+  border: 4px solid transparent;
+  border-radius: 999px;
+  background-color: rgba(100, 116, 139, 0.32);
+  background-clip: content-box;
+}
+
+html::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(71, 85, 105, 0.52);
+}
+
+html::-webkit-scrollbar-thumb:active {
+  background-color: rgba(51, 65, 85, 0.68);
+}
+
+html::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+html.dark::-webkit-scrollbar-thumb {
+  background-color: rgba(148, 163, 184, 0.28);
+}
+
+html.dark::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(203, 213, 225, 0.44);
+}
+
+html.dark::-webkit-scrollbar-thumb:active {
+  background-color: rgba(226, 232, 240, 0.58);
+}
+
+/* Firefox 等不支持 ::-webkit-scrollbar 的浏览器走标准属性。
+ * 放在 @supports 里，避免 Chrome 用标准属性覆盖上面的自定义滑块。 */
+@supports not selector(::-webkit-scrollbar) {
+  html {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(100, 116, 139, 0.38) transparent;
+  }
+
+  html.dark {
+    scrollbar-color: rgba(148, 163, 184, 0.34) transparent;
+  }
+}
+
 /* ========== 入场动画 ========== */
 /* 滚动进入视口：由 v-reveal 指令切换 reveal-init -> reveal-in */
 .reveal-init {

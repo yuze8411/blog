@@ -66,8 +66,9 @@ function drawWave(
     ctx.fillStyle = grad
     ctx.shadowColor = 'rgba(3, 7, 18, 0.9)'
   } else {
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.7)'
-    ctx.shadowColor = 'rgba(255, 255, 255, 0.7)' // 阴影颜色
+    // 浅色主题：波浪与下方内容区同色，底部能自然衔接
+    ctx.fillStyle = 'rgba(244, 248, 252, 0.72)'
+    ctx.shadowColor = 'rgba(244, 248, 252, 0.72)' // 阴影颜色
   }
   ctx.shadowBlur = 60 // 阴影模糊大小
   ctx.shadowOffsetX = 3 // X偏移

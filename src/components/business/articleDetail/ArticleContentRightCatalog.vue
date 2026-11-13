@@ -296,13 +296,13 @@ onUnmounted(() => {
 }
 
 .toc-link:hover {
-  background: rgba(95, 166, 221, 0.06);
-  color: #3f74ad;
+  background: rgba(139, 192, 226, 0.08);
+  color: #3f719b;
 }
 
 .toc-link-active {
-  background: rgba(95, 166, 221, 0.09);
-  color: #2f4a77;
+  background: rgba(139, 192, 226, 0.14);
+  color: #3f719b;
 }
 
 .dark .toc-link {
@@ -377,16 +377,16 @@ onUnmounted(() => {
 }
 
 .toc-link:hover .toc-marker {
-  --marker: #5fa6dd;
+  --marker: #7fb4d6;
 }
 
-/* 当前项：标识填成主题蓝，并带一圈很淡的光晕 */
+/* 当前项：标识填成雾蓝，并带一圈很淡的光晕 */
 .toc-link-active .toc-marker {
-  --marker: #3f74ad;
+  --marker: #6ba3c9;
 
   border-color: var(--marker);
   background: var(--marker);
-  box-shadow: 0 0 0 3px rgba(95, 166, 221, 0.16);
+  box-shadow: 0 0 0 3px rgba(139, 192, 226, 0.18);
 }
 
 .dark .toc-link-active .toc-marker {
