@@ -136,7 +136,7 @@
           <!-- 一级：探索（有下拉） -->
           <li class="group relative h-full hidden sm:block" @mouseenter="openMenu = 'explore'">
             <RouterLink
-              to="/explore"
+              to="/stats"
               class="h-full flex items-center gap-2 px-5 text-[17px] font-medium transition-colors"
               :class="isActive({ name: 'explore', path: '/explore' })"
             >
