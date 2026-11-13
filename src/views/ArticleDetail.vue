@@ -145,7 +145,7 @@ watch(
   justify-content: center;
   gap: 10px;
   padding: 80px 24px;
-  background: rgb(250, 250, 250);
+  background: #fff;
   text-align: center;
   font-family: 'huoxie', sans-serif;
 }

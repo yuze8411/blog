@@ -96,32 +96,28 @@ onMounted(renderArticle)
    颜色统一用变量，方便后续微调；
    代码块（pre / pre code）的配色留给 shiki，这里只保留基础间距。 */
 .article-prose {
-  /* 用低饱和的雾蓝做点缀，深色只保留在正文文字和链接上，保证可读性 */
-  --prose-text: #4a5a6b;
-  --prose-heading: #34495e;
-  --prose-muted: #7b8b9d;
+  /* 正文保持纯白底，把淡蓝色留给标题、链接、引用等局部元素 */
+  --prose-text: #475569;
+  --prose-heading: #2f4356;
+  --prose-muted: #7c8b9c;
   --prose-accent: #6ba3c9;
-  --prose-accent-2: #b3d9ef;
+  --prose-accent-2: #b9ddf3;
   --prose-link: #3f719b;
   --prose-link-hover: #2f6288;
-  --prose-accent-soft: rgba(139, 192, 226, 0.12);
-  --prose-zebra: rgba(139, 192, 226, 0.06);
-  --prose-border: #dfeaf4;
+  --prose-accent-soft: rgba(139, 192, 226, 0.14);
+  --prose-zebra: rgba(139, 192, 226, 0.07);
+  --prose-border: #e5eef7;
   --prose-inline-bg: #eef7fd;
   --prose-mark: rgba(172, 214, 241, 0.5);
-  --prose-selection: rgba(142, 203, 255, 0.38);
+  --prose-selection: rgba(142, 203, 255, 0.35);
   --prose-card-shadow: 0 14px 40px -38px rgba(53, 96, 128, 0.45);
 
   margin-top: 1.5rem;
-  padding: 1.65rem 1.9rem 1.9rem;
-  border: 1px solid var(--prose-border);
+  padding: 1.9rem 2.1rem 2.1rem;
+  border: 1px solid #e8f0f7;
   border-radius: 16px;
-  background:
-    radial-gradient(90% 60% at 0% 0%, rgba(196, 224, 243, 0.26), transparent 70%),
-    linear-gradient(180deg, #f7fbfe, #eff7fd);
-  box-shadow:
-    var(--prose-card-shadow),
-    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  background: #fff;
+  box-shadow: 0 18px 44px -40px rgba(46, 87, 118, 0.42);
   font-size: 16px;
   line-height: 1.95;
   letter-spacing: 0.01em;
@@ -198,18 +194,14 @@ onMounted(renderArticle)
   );
 }
 
-/* h2 用一层很淡的雾蓝渐变做“章节卡片”，不再压深色竖条 */
+/* h2：整行宽的淡蓝章节卡片，不再让颜色在右侧淡出 */
 .article-prose :deep(h2) {
   position: relative;
   margin: 2.25rem 0 1rem;
-  padding: 0.5rem 0.95rem 0.5rem 1.05rem;
+  padding: 0.55rem 1rem 0.55rem 1.1rem;
   border-radius: 10px;
-  background: linear-gradient(
-    90deg,
-    rgba(174, 213, 240, 0.34),
-    rgba(174, 213, 240, 0.1) 56%,
-    transparent 94%
-  );
+  background: linear-gradient(90deg, #eef8fe, #f7fbff 72%, #eef8fe);
+  box-shadow: inset 0 0 0 1px rgba(185, 221, 243, 0.45);
   font-size: 24px;
 }
 
@@ -312,6 +304,7 @@ onMounted(renderArticle)
 
 .article-prose :deep(li::marker) {
   color: var(--prose-accent);
+  font-weight: 600;
 }
 
 .article-prose :deep(li > ul),
@@ -319,34 +312,33 @@ onMounted(renderArticle)
   margin: 0.35rem 0 0;
 }
 
-/* ---------- 链接：淡蓝小卡片，悬停时轻微提亮 ---------- */
+/* ---------- 链接：正文里是淡蓝荧光笔效果，独立成段时升级为整行卡片 ---------- */
 .article-prose :deep(a) {
-  margin: 0 0.05em;
-  padding: 0.06em 0.36em;
-  border: 1px solid rgba(151, 196, 225, 0.45);
-  border-radius: 6px;
-  background: linear-gradient(180deg, #f9fcff, #eaf5fd);
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.85) inset,
-    0 3px 9px -8px rgba(46, 87, 118, 0.6);
+  padding: 0.04em 0.12em;
+  border-radius: 4px;
+  background: linear-gradient(180deg, transparent 60%, rgba(179, 221, 243, 0.32) 60%);
   color: var(--prose-link);
-  text-decoration: none;
+  text-decoration: underline;
+  text-decoration-color: rgba(107, 163, 201, 0.42);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
   box-decoration-break: clone;
   -webkit-box-decoration-break: clone;
   transition:
     color 0.2s ease,
-    border-color 0.2s ease,
     background-color 0.2s ease,
-    box-shadow 0.2s ease;
+    text-decoration-color 0.2s ease;
 }
 
 .article-prose :deep(a:hover) {
-  border-color: rgba(123, 178, 214, 0.72);
-  background: #e9f5fd;
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.9) inset,
-    0 5px 12px -10px rgba(46, 87, 118, 0.78);
+  background: rgba(185, 221, 243, 0.28);
   color: var(--prose-link-hover);
+  text-decoration-color: currentColor;
+}
+
+.article-prose :deep(a:focus-visible) {
+  outline: 2px solid rgba(63, 113, 155, 0.35);
+  outline-offset: 2px;
 }
 
 .article-prose :deep(a strong),
@@ -354,7 +346,6 @@ onMounted(renderArticle)
   color: inherit;
 }
 
-/* 外链在卡片右上角加一个小小的箭头，减少“点出去”的突兀感 */
 .article-prose :deep(a[href^='http'])::after {
   content: '↗';
   margin-left: 0.16em;
@@ -363,7 +354,7 @@ onMounted(renderArticle)
   vertical-align: 0.08em;
 }
 
-/* 标题里的链接不套卡片，避免破坏标题的留白 */
+/* 标题里的链接保持纯文字 */
 .article-prose :deep(h1 a),
 .article-prose :deep(h2 a),
 .article-prose :deep(h3 a),
@@ -376,6 +367,7 @@ onMounted(renderArticle)
   background: none;
   box-shadow: none;
   color: inherit;
+  text-decoration: none;
 }
 
 .article-prose :deep(h1 a[href^='http'])::after,
@@ -385,6 +377,49 @@ onMounted(renderArticle)
 .article-prose :deep(h5 a[href^='http'])::after,
 .article-prose :deep(h6 a[href^='http'])::after {
   content: none;
+}
+
+/* 段落里只有一条链接时，铺满整行的链接卡片 */
+.article-prose :deep(p > a:only-child) {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  margin: 0.35rem 0;
+  padding: 0.85rem 1.1rem;
+  border: 1px solid #dceaf6;
+  border-radius: 12px;
+  background: linear-gradient(90deg, #f2f9ff, #fbfdff);
+  box-shadow: 0 10px 26px -28px rgba(46, 87, 118, 0.55);
+  color: var(--prose-link);
+  line-height: 1.7;
+  text-decoration: none;
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.article-prose :deep(p > a:only-child)::after {
+  content: '→';
+  margin-left: auto;
+  padding-left: 0.9rem;
+  color: var(--prose-accent);
+  font-size: 0.95em;
+  opacity: 0.8;
+}
+
+.article-prose :deep(p > a:only-child[href^='http'])::after {
+  content: '↗';
+}
+
+.article-prose :deep(p > a:only-child:hover) {
+  border-color: #c3dff2;
+  background: linear-gradient(90deg, #eaf6fe, #f8fcff);
+  box-shadow: 0 14px 30px -28px rgba(46, 87, 118, 0.7);
+  color: var(--prose-link-hover);
+  transform: translateY(-1px);
 }
 
 /* ---------- 引用：浅蓝卡片，左侧留一条淡色书签边 ---------- */
@@ -459,6 +494,10 @@ onMounted(renderArticle)
   background: var(--prose-zebra);
 }
 
+.article-prose :deep(tbody tr:hover) {
+  background: rgba(139, 192, 226, 0.1);
+}
+
 /* ---------- 图片与分割线 ---------- */
 .article-prose :deep(img) {
   display: block;
@@ -500,11 +539,22 @@ onMounted(renderArticle)
   padding: 1rem 1.1rem;
   border: 1px solid var(--prose-border);
   border-radius: 12px;
-  background-color: #f8fbfe !important;
+  background-color: #f5fafe !important;
   box-shadow: 0 14px 34px -36px rgba(50, 90, 120, 0.55);
   overflow-x: auto;
   font-size: 13.5px;
   line-height: 1.75;
+  scrollbar-width: thin;
+  scrollbar-color: #cbdfef transparent;
+}
+
+.article-prose :deep(pre.shiki::-webkit-scrollbar) {
+  height: 6px;
+}
+
+.article-prose :deep(pre.shiki::-webkit-scrollbar-thumb) {
+  border-radius: 999px;
+  background: #cbdfef;
 }
 
 .article-prose :deep(pre.shiki code) {
@@ -527,23 +577,32 @@ onMounted(renderArticle)
 .dark .article-prose :deep(h2) {
   background: linear-gradient(
     90deg,
-    rgba(95, 166, 221, 0.16),
-    rgba(95, 166, 221, 0.04) 56%,
-    transparent 94%
+    rgba(95, 166, 221, 0.18),
+    rgba(95, 166, 221, 0.08) 72%,
+    rgba(95, 166, 221, 0.14)
   );
+  box-shadow: inset 0 0 0 1px rgba(95, 166, 221, 0.12);
 }
 
 .dark .article-prose :deep(a) {
-  border-color: rgba(142, 203, 255, 0.22);
-  background: linear-gradient(180deg, rgba(95, 166, 221, 0.15), rgba(95, 166, 221, 0.08));
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.035) inset,
-    0 3px 10px -9px rgba(0, 0, 0, 0.9);
+  background: linear-gradient(180deg, transparent 60%, rgba(95, 166, 221, 0.24) 60%);
+  text-decoration-color: rgba(142, 203, 255, 0.42);
 }
 
 .dark .article-prose :deep(a:hover) {
-  border-color: rgba(142, 203, 255, 0.4);
-  background: rgba(95, 166, 221, 0.2);
+  background: rgba(95, 166, 221, 0.18);
+  text-decoration-color: currentColor;
+}
+
+.dark .article-prose :deep(p > a:only-child) {
+  border-color: rgba(142, 203, 255, 0.2);
+  background: linear-gradient(90deg, rgba(95, 166, 221, 0.14), rgba(95, 166, 221, 0.06));
+  box-shadow: 0 12px 30px -30px rgba(0, 0, 0, 0.9);
+}
+
+.dark .article-prose :deep(p > a:only-child:hover) {
+  border-color: rgba(142, 203, 255, 0.34);
+  background: linear-gradient(90deg, rgba(95, 166, 221, 0.2), rgba(95, 166, 221, 0.1));
 }
 
 .dark .article-prose :deep(:not(pre) > code) {
@@ -568,6 +627,10 @@ onMounted(renderArticle)
 
 .dark .article-prose :deep(th) {
   background: linear-gradient(180deg, rgba(95, 166, 221, 0.16), rgba(95, 166, 221, 0.08));
+}
+
+.dark .article-prose :deep(tbody tr:hover) {
+  background: rgba(95, 166, 221, 0.08);
 }
 
 .dark .article-prose :deep(img) {
