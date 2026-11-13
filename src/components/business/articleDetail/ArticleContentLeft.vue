@@ -4,6 +4,25 @@
     class="w-full md:w-[90%] lg:w-[72%] xl:w-[77%] mx-auto transition-width group px-2"
   >
     <div class="w-full overflow-auto">
+      <div v-if="summary" class="article-summary" role="note" aria-label="文章摘要">
+        <div class="article-summary-head">
+          <svg
+            viewBox="0 0 20 20"
+            fill="currentColor"
+            class="article-summary-icon"
+            aria-hidden="true"
+          >
+            <path
+              fill-rule="evenodd"
+              clip-rule="evenodd"
+              d="M4.5 2A1.5 1.5 0 0 0 3 3.5v13A1.5 1.5 0 0 0 4.5 18h11a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 15.5 6H12V3.5A1.5 1.5 0 0 0 10.5 2h-6Zm6 .5V6h3.5L10.5 2.5ZM6 9.25a.75.75 0 0 1 .75-.75h6.5a.75.75 0 0 1 0 1.5h-6.5A.75.75 0 0 1 6 9.25Zm0 3a.75.75 0 0 1 .75-.75h6.5a.75.75 0 0 1 0 1.5h-6.5a.75.75 0 0 1-.75-.75Z"
+            />
+          </svg>
+          <span class="text-[#4477dd] text-[15px]">文章摘要</span>
+        </div>
+        <p class="article-summary-text">{{ summary }}</p>
+      </div>
+
       <div
         class="text-gray-900 dark:text-[#e8eff8] font-[huoxie] text-[26px] max-w-full line-clamp-2 mt-2"
       >
@@ -36,11 +55,33 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import type { ArticleDetailProps } from '@/types'
 import { md, renderMarkdown } from '@/utils/markdown'
 
 const props = defineProps<ArticleDetailProps>()
+
+const SUMMARY_FALLBACK_LENGTH = 140
+
+/** 优先使用文章摘要；没有摘要时从正文里粗略截一段，保证摘要卡片始终有内容 */
+const summary = computed(() => {
+  const excerpt = props.virtureData.excerpt?.trim()
+  if (excerpt) return excerpt
+
+  const plain = (props.virtureData.content || '')
+    .replace(/```[\s\S]*?```/g, ' ')
+    .replace(/!\[[^\]]*\]\([^)]*\)/g, ' ')
+    .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/[#>*`~_[\]()!-]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+
+  if (!plain) return ''
+  return plain.length > SUMMARY_FALLBACK_LENGTH
+    ? `${plain.slice(0, SUMMARY_FALLBACK_LENGTH)}…`
+    : plain
+})
 
 const emit = defineEmits<{
   /** 评论加载 / 发表后同步给详情页顶部 */
@@ -92,6 +133,76 @@ onMounted(renderArticle)
 </script>
 
 <style scoped>
+/* ========== 标题上方的摘要卡片 ========== */
+.article-summary {
+  position: relative;
+  margin: 0.4rem 0 0.15rem;
+  padding: 0.8rem 1rem 0.85rem 1.1rem;
+  overflow: hidden;
+  border: 1px solid #d9e9f5;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #f4faff 0%, #eef7fd 62%, #f9fcff 100%);
+  box-shadow: 0 12px 28px -30px rgba(46, 87, 118, 0.5);
+  margin-bottom: 14px;
+}
+
+.article-summary::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(180deg, #b9ddf3, #7fb4d6);
+}
+
+.article-summary-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #5c92b8;
+  font-family: 'huoxie', sans-serif;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+}
+
+.article-summary-icon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.article-summary-text {
+  display: -webkit-box;
+  margin-top: 5px;
+  overflow: hidden;
+  color: #5e7184;
+  font-size: 14px;
+  line-height: 1.85;
+  letter-spacing: 0.01em;
+  word-break: break-word;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+.dark .article-summary {
+  border-color: rgba(142, 203, 255, 0.2);
+  background: linear-gradient(135deg, rgba(95, 166, 221, 0.13), rgba(15, 25, 40, 0.5));
+  box-shadow: 0 12px 28px -30px rgba(0, 0, 0, 0.9);
+}
+
+.dark .article-summary::before {
+  background: linear-gradient(180deg, #8ecbff, #5fa6dd);
+}
+
+.dark .article-summary-head {
+  color: #8ecbff;
+}
+
+.dark .article-summary-text {
+  color: #aab9cb;
+}
+
 /* ========== markdown 正文样式 ==========
    颜色统一用变量，方便后续微调；
    代码块（pre / pre code）的配色留给 shiki，这里只保留基础间距。 */
@@ -663,6 +774,16 @@ onMounted(renderArticle)
 
 /* ---------- 小屏：正文卡片收窄留白，标题同步缩小 ---------- */
 @media (max-width: 640px) {
+  .article-summary {
+    padding: 0.72rem 0.85rem 0.78rem 1rem;
+    border-radius: 11px;
+  }
+
+  .article-summary-text {
+    font-size: 13.5px;
+    line-height: 1.8;
+  }
+
   .article-prose {
     margin-top: 1.25rem;
     padding: 1.2rem 1rem 1.4rem;

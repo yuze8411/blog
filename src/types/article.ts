@@ -24,6 +24,8 @@ export interface ArticleDetail {
   publishTime: string
   tags: string[]
   title: string
+  /** 文章摘要，详情页标题上方的摘要卡片使用 */
+  excerpt?: string
   commentNum: number
   content: string
 }

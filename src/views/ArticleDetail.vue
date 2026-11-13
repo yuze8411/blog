@@ -95,6 +95,7 @@ async function loadArticle() {
       publishTime: formatDate(post.published_at ?? post.created_at),
       tags: post.tags ?? [],
       title: post.title,
+      excerpt: post.excerpt?.trim() ?? '',
       commentNum: post.comment_count ?? 0,
       content,
     }
