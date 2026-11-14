@@ -18,7 +18,11 @@
         </div>
       </div>
 
-      <span v-if="streaming" class="ai-stream-badge" :class="isRewrite ? 'is-rewrite' : 'is-modify'">
+      <span
+        v-if="streaming"
+        class="ai-stream-badge"
+        :class="isRewrite ? 'is-rewrite' : 'is-modify'"
+      >
         <span class="ai-stream-dot" />
         {{ isRewrite ? 'AI 重写中' : 'AI 修改中' }}
       </span>
@@ -31,24 +35,20 @@
       </span>
     </header>
 
-    <el-scrollbar class="min-h-0 flex-1 bg-slate-50/30 dark:bg-slate-950/20">
+    <el-scrollbar ref="scrollRef" class="min-h-0 flex-1 bg-slate-50/30 dark:bg-slate-950/20">
       <div class="mx-auto w-full max-w-3xl px-6 py-6 sm:px-8">
         <h1 v-if="title.trim()" class="preview-title">{{ title }}</h1>
 
         <div v-if="content.trim()" class="preview-prose" v-html="html"></div>
 
-        <el-empty
-          v-else
-          description="还没有内容，先在左侧编辑区写点什么吧"
-          :image-size="84"
-        />
+        <el-empty v-else description="还没有内容，先在左侧编辑区写点什么吧" :image-size="84" />
       </div>
     </el-scrollbar>
   </section>
 </template>
 
 <script setup lang="ts">
-import { computed, onBeforeUnmount, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import { View } from '@element-plus/icons-vue'
 import { md, renderMarkdown } from '@/utils/markdown'
 
@@ -64,8 +64,38 @@ const props = defineProps<{
 const isRewrite = computed(() => props.mode === 'rewrite')
 
 const html = ref('')
+const scrollRef = ref<{
+  setScrollTop: (offset: number) => void
+  wrapRef?: HTMLElement
+}>()
 let renderToken = 0
 let timer: number | undefined
+let followFrame = 0
+
+/**
+ * AI 流式写入时，让预览始终跟到最新内容。
+ * 只有内容已经超出容器才滚动；否则保持容器原样不动。
+ */
+function followLatest() {
+  if (!props.streaming) return
+
+  void nextTick(() => {
+    cancelAnimationFrame(followFrame)
+    followFrame = requestAnimationFrame(() => {
+      const scrollbar = scrollRef.value
+      if (!scrollbar) return
+
+      const wrap = scrollbar.wrapRef
+      if (!wrap) {
+        scrollbar.setScrollTop(Number.MAX_SAFE_INTEGER)
+        return
+      }
+
+      if (wrap.scrollHeight <= wrap.clientHeight + 1) return
+      scrollbar.setScrollTop(wrap.scrollHeight)
+    })
+  })
+}
 
 /**
  * 内容一变就先同步渲染（打字 / 流式输出时立刻能看到），
@@ -75,6 +105,7 @@ watch(
   () => props.content,
   (value) => {
     html.value = md.render(value || '')
+    followLatest()
 
     window.clearTimeout(timer)
     const token = ++renderToken
@@ -82,7 +113,11 @@ watch(
       try {
         const rendered = await renderMarkdown(value || '')
         // 期间内容又变了就丢弃这次结果，避免旧内容覆盖新内容
-        if (token === renderToken) html.value = rendered
+        if (token === renderToken) {
+          html.value = rendered
+          // 代码高亮后布局可能变高，再跟一次底部
+          followLatest()
+        }
       } catch {
         // 渲染失败就继续用同步渲染的结果
       }
@@ -91,7 +126,10 @@ watch(
   { immediate: true },
 )
 
-onBeforeUnmount(() => window.clearTimeout(timer))
+onBeforeUnmount(() => {
+  window.clearTimeout(timer)
+  cancelAnimationFrame(followFrame)
+})
 </script>
 
 <style scoped>
