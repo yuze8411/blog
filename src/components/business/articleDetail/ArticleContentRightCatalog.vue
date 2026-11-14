@@ -57,7 +57,7 @@
     <nav
       v-if="toc.length"
       ref="navRef"
-      class="catalog-scroll mt-2 max-h-[calc(100vh-220px)] overflow-y-auto"
+      class="catalog-scroll mt-2 max-h-[calc(100vh-420px)] overflow-y-auto"
       aria-label="文章目录"
     >
       <a
