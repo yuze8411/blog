@@ -14,7 +14,9 @@
           <h2 class="text-[13.5px] font-semibold text-slate-700 dark:text-slate-200">
             AI 写作助手
           </h2>
-          <p class="mt-0.5 text-[10.5px] text-slate-400 dark:text-slate-500">修改 · 重写正文</p>
+          <p class="mt-0.5 text-[10.5px] text-slate-400 dark:text-slate-500">
+            {{ allowRewrite ? '修改 · 重写正文' : '润色 · 修改正文' }}
+          </p>
         </div>
       </div>
       <span class="model-tag">
@@ -35,11 +37,17 @@
             <el-icon :size="24"><MagicStick /></el-icon>
           </span>
           <p class="mt-3 text-[13px] font-medium text-slate-600 dark:text-slate-200">
-            让 AI 帮你改文章
+            {{ allowRewrite ? '让 AI 帮你改文章' : '让 AI 帮你打磨随笔' }}
           </p>
           <p class="mt-1 text-[11px] leading-5 text-slate-400 dark:text-slate-500">
-            「修改」保留原文结构，只是按你的要求调整；<br />
-            「重写」会按新思路重写全文。
+            <template v-if="allowRewrite">
+              「修改」保留原文结构，只是按你的要求调整；<br />
+              「重写」会按新思路重写全文。
+            </template>
+            <template v-else>
+              只会基于当前正文润色、调整结构，<br />
+              不会凭空重写或改变文章本意。
+            </template>
           </p>
           <div class="mt-4 flex w-full flex-col gap-2">
             <button
@@ -82,10 +90,7 @@
                 {{ message.time }}
               </span>
             </div>
-            <div
-              class="bubble"
-              :class="message.role === 'user' ? 'bubble-user' : 'bubble-ai'"
-            >
+            <div class="bubble" :class="message.role === 'user' ? 'bubble-user' : 'bubble-ai'">
               {{ message.content }}
             </div>
           </div>
@@ -125,7 +130,11 @@
         :autosize="{ minRows: 2, maxRows: 4 }"
         resize="none"
         :disabled="busy"
-        placeholder="描述想怎么改，比如：把第二段写得更口语化"
+        :placeholder="
+          allowRewrite
+            ? '描述想怎么改，比如：把第二段写得更口语化'
+            : '描述想怎么润色，比如：优化一下文章结构'
+        "
         @keydown.enter.exact.prevent="send('modify')"
       />
       <div class="mt-2 flex items-center justify-between gap-2">
@@ -142,6 +151,7 @@
             <el-icon class="mr-1"><EditPen /></el-icon>修改
           </el-button>
           <el-button
+            v-if="allowRewrite"
             size="small"
             type="warning"
             plain
@@ -161,11 +171,25 @@ import { nextTick, ref, watch } from 'vue'
 import { EditPen, MagicStick, RefreshLeft } from '@element-plus/icons-vue'
 import type { AiChatMessage } from './types'
 
-const props = defineProps<{
-  messages: AiChatMessage[]
-  busy: boolean
-  mode: 'modify' | 'rewrite' | null
-}>()
+const props = withDefaults(
+  defineProps<{
+    messages: AiChatMessage[]
+    busy: boolean
+    mode: 'modify' | 'rewrite' | null
+    /** 是否显示「重写」按钮；随笔页只允许修改 */
+    allowRewrite?: boolean
+    /** 空状态下展示的快捷提示词 */
+    suggestions?: string[]
+  }>(),
+  {
+    allowRewrite: true,
+    suggestions: () => [
+      '把开头写得更吸引人一些',
+      '把全文语气改得更口语化',
+      '给每个小节补充一个例子',
+    ],
+  },
+)
 
 const emit = defineEmits<{
   send: [payload: { mode: 'modify' | 'rewrite'; text: string }]
@@ -177,13 +201,9 @@ const modelName = 'DeepSeek Flash'
 const input = ref('')
 const scrollRef = ref<{ setScrollTop: (offset: number) => void }>()
 
-const suggestions = [
-  '把开头写得更吸引人一些',
-  '把全文语气改得更口语化',
-  '给每个小节补充一个例子',
-]
-
 function send(mode: 'modify' | 'rewrite') {
+  if (!props.allowRewrite && mode === 'rewrite') return
+
   const text = input.value.trim()
   if (!text || props.busy) return
   emit('send', { mode, text })

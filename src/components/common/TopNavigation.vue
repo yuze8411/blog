@@ -153,44 +153,57 @@
                 class="absolute left-1/2 top-full -translate-x-1/2 pt-2"
               >
                 <div
-                  class="flex gap-1 rounded-xl bg-white/80 dark:bg-gray-900/95 backdrop-blur-md border border-gray-100 dark:border-gray-700 px-3 py-2 shadow-lg shadow-gray-200/60 dark:shadow-gray-950"
+                  class="rounded-xl bg-white/80 dark:bg-gray-900/95 backdrop-blur-md border border-gray-100 dark:border-gray-700 px-3 py-2 shadow-lg shadow-gray-200/60 dark:shadow-gray-950"
                 >
-                  <RouterLink
-                    to="/stats"
-                    class="flex items-center gap-2 px-3 py-2 rounded-lg text-[16px] text-gray-600 hover:text-sky-500 hover:bg-sky-50 dark:text-gray-400 dark:hover:text-sky-400 dark:hover:bg-gray-800 transition-colors"
-                  >
-                    <span class="text-[18px] leading-none">
-                      <IconFont name="tongjiguanli" />
-                    </span>
-                    <span class="text-nowrap">统计</span>
-                  </RouterLink>
-                  <RouterLink
-                    to="/tags"
-                    class="flex items-center gap-2 px-3 py-2 rounded-lg text-[16px] text-gray-600 hover:text-sky-500 hover:bg-sky-50 dark:text-gray-400 dark:hover:text-sky-400 dark:hover:bg-gray-800 transition-colors"
-                  >
-                    <span class="text-[18px] leading-none">
-                      <IconFont name="biaoqian1" />
-                    </span>
-                    <span class="text-nowrap">标签墙</span>
-                  </RouterLink>
-                  <RouterLink
-                    to="/about"
-                    class="flex items-center gap-2 px-3 py-2 rounded-lg text-[16px] text-gray-600 hover:text-sky-500 hover:bg-sky-50 dark:text-gray-400 dark:hover:text-sky-400 dark:hover:bg-gray-800 transition-colors"
-                  >
-                    <span class="text-[18px] leading-none">
-                      <IconFont name="jumao" />
-                    </span>
-                    <span class="text-nowrap">关于我</span>
-                  </RouterLink>
-                  <RouterLink
-                    to="/message"
-                    class="flex items-center gap-2 px-3 py-2 rounded-lg text-[16px] text-gray-600 hover:text-sky-500 hover:bg-sky-50 dark:text-gray-400 dark:hover:text-sky-400 dark:hover:bg-gray-800 transition-colors"
-                  >
-                    <span class="text-[18px] leading-none">
-                      <IconFont name="liuyan" />
-                    </span>
-                    <span class="text-nowrap">留言墙</span>
-                  </RouterLink>
+                  <div class="flex gap-1">
+                    <RouterLink
+                      to="/stats"
+                      class="flex items-center gap-2 px-3 py-2 rounded-lg text-[16px] text-gray-600 hover:text-sky-500 hover:bg-sky-50 dark:text-gray-400 dark:hover:text-sky-400 dark:hover:bg-gray-800 transition-colors"
+                    >
+                      <span class="text-[18px] leading-none">
+                        <IconFont name="tongjiguanli" />
+                      </span>
+                      <span class="text-nowrap">统计</span>
+                    </RouterLink>
+                    <RouterLink
+                      to="/tags"
+                      class="flex items-center gap-2 px-3 py-2 rounded-lg text-[16px] text-gray-600 hover:text-sky-500 hover:bg-sky-50 dark:text-gray-400 dark:hover:text-sky-400 dark:hover:bg-gray-800 transition-colors"
+                    >
+                      <span class="text-[18px] leading-none">
+                        <IconFont name="biaoqian1" />
+                      </span>
+                      <span class="text-nowrap">标签墙</span>
+                    </RouterLink>
+                    <RouterLink
+                      to="/about"
+                      class="flex items-center gap-2 px-3 py-2 rounded-lg text-[16px] text-gray-600 hover:text-sky-500 hover:bg-sky-50 dark:text-gray-400 dark:hover:text-sky-400 dark:hover:bg-gray-800 transition-colors"
+                    >
+                      <span class="text-[18px] leading-none">
+                        <IconFont name="jumao" />
+                      </span>
+                      <span class="text-nowrap">关于我</span>
+                    </RouterLink>
+                    <RouterLink
+                      to="/message"
+                      class="flex items-center gap-2 px-3 py-2 rounded-lg text-[16px] text-gray-600 hover:text-sky-500 hover:bg-sky-50 dark:text-gray-400 dark:hover:text-sky-400 dark:hover:bg-gray-800 transition-colors"
+                    >
+                      <span class="text-[18px] leading-none">
+                        <IconFont name="liuyan" />
+                      </span>
+                      <span class="text-nowrap">留言墙</span>
+                    </RouterLink>
+                  </div>
+                  <div class="flex gap-1 mt-1">
+                    <RouterLink
+                      to="/indiction"
+                      class="flex items-center gap-2 px-3 py-2 rounded-lg text-[16px] text-gray-600 hover:text-sky-500 hover:bg-sky-50 dark:text-gray-400 dark:hover:text-sky-400 dark:hover:bg-gray-800 transition-colors"
+                    >
+                      <span class="text-[18px] leading-none">
+                        <IconFont name="TV" />
+                      </span>
+                      <span class="text-nowrap">随笔</span>
+                    </RouterLink>
+                  </div>
                 </div>
               </div>
             </transition>

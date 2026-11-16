@@ -1,7 +1,7 @@
 <template>
   <div class="relative h-[520px] w-full overflow-hidden sm:h-[600px]">
     <img
-      src="@/assets/images/demoTextImages/demo4.jpg"
+      src="https://gmnabqqeadmyngvidnqf.supabase.co/storage/v1/object/public/blog-image/12019-plouzane-1758197_1920.jpg"
       alt=""
       class="h-full w-full object-cover object-center"
     />

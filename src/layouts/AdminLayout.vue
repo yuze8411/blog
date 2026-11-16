@@ -81,6 +81,7 @@
             <el-menu-item index="/admin/manage/comments">评论管理</el-menu-item>
             <el-menu-item index="/admin/manage/travel">游记管理</el-menu-item>
             <el-menu-item index="/admin/manage/milestones">时光管理</el-menu-item>
+            <el-menu-item index="/admin/manage/essays">随笔管理</el-menu-item>
             <el-menu-item index="/admin/manage/messages">留言管理</el-menu-item>
           </el-sub-menu>
 
@@ -107,7 +108,7 @@
             <p class="text-[12px] font-medium text-slate-600 dark:text-slate-300">站点运行中</p>
           </div>
           <p class="mt-1 text-[11px] leading-5 text-slate-400 dark:text-slate-500">
-            文章、相册、评论与留言的管理入口
+            文章、随笔、相册、评论与留言的管理入口
           </p>
         </div>
 

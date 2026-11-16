@@ -59,6 +59,12 @@ const router = createRouter({
       meta: { title: '留言墙' },
     },
     {
+      path: '/indiction',
+      name: 'indiction',
+      component: () => import('@/views/Indiction.vue'),
+      meta: { title: '随笔' },
+    },
+    {
       path: '/admin',
       name: 'admin',
       component: () => import('@/layouts/AdminLayout.vue'),
@@ -129,6 +135,18 @@ const router = createRouter({
           name: 'adminManageMilestones',
           component: () => import('@/views/admin/AdminMilestoneManage.vue'),
           meta: { title: '时光管理' },
+        },
+        {
+          path: 'manage/essays',
+          name: 'adminManageEssays',
+          component: () => import('@/views/admin/AdminEssayManage.vue'),
+          meta: { title: '随笔管理' },
+        },
+        {
+          path: 'essayedit',
+          name: 'adminEssayEdit',
+          component: () => import('@/views/admin/AdminEssayEdit.vue'),
+          meta: { title: '写随笔' },
         },
         {
           path: 'manage/messages',
