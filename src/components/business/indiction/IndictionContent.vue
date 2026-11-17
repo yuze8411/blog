@@ -2,7 +2,7 @@
   <section class="indiction-content">
     <div class="indiction-inner">
       <div v-if="essays.length" class="indiction-feed-head">
-        <p class="indiction-eyebrow">DAILY NOTES</p>
+        <p class="indiction-eyebrow">INDICTION 诏示的意思 哈哈</p>
         <p class="indiction-summary">
           共 <span>{{ total }}</span> 篇随笔 · 生活、学习和一些慢慢写下来的碎碎念
         </p>
@@ -198,15 +198,18 @@ onBeforeUnmount(() => {
   overflow: hidden;
   min-height: 60vh;
   padding: 58px 20px 90px;
-  background-color: #f7fafd;
+  /* 底色不跟卡片一起用蓝，改成暖白底 + 杏 / 紫 / 奶油 / 玫瑰几团很淡的光晕 */
+  background-color: #fcfaf8;
   background-image:
     linear-gradient(180deg, #fff 0, rgba(255, 255, 255, 0) 190px),
-    radial-gradient(circle at 12% 6%, rgba(186, 224, 241, 0.28), transparent 38%),
-    radial-gradient(circle at 88% 24%, rgba(219, 205, 243, 0.22), transparent 36%),
-    radial-gradient(circle at 50% 82%, rgba(188, 219, 244, 0.22), transparent 42%),
-    linear-gradient(rgba(120, 160, 200, 0.07) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(120, 160, 200, 0.07) 1px, transparent 1px);
+    radial-gradient(circle at 10% 7%, rgba(250, 219, 190, 0.2), transparent 38%),
+    radial-gradient(circle at 89% 20%, rgba(224, 210, 243, 0.17), transparent 36%),
+    radial-gradient(circle at 12% 84%, rgba(248, 235, 193, 0.14), transparent 40%),
+    radial-gradient(circle at 80% 76%, rgba(247, 211, 219, 0.15), transparent 42%),
+    linear-gradient(rgba(166, 148, 152, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(166, 148, 152, 0.045) 1px, transparent 1px);
   background-size:
+    auto,
     auto,
     auto,
     auto,
@@ -433,14 +436,16 @@ onBeforeUnmount(() => {
 }
 
 .dark .indiction-content {
-  background-color: #030712;
+  background-color: #0e0b10;
   background-image:
-    radial-gradient(circle at 12% 6%, rgba(55, 105, 135, 0.16), transparent 38%),
-    radial-gradient(circle at 88% 24%, rgba(90, 75, 130, 0.13), transparent 36%),
-    radial-gradient(circle at 50% 82%, rgba(55, 95, 130, 0.14), transparent 42%),
-    linear-gradient(rgba(148, 163, 184, 0.055) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(148, 163, 184, 0.055) 1px, transparent 1px);
+    radial-gradient(circle at 10% 7%, rgba(155, 100, 60, 0.08), transparent 38%),
+    radial-gradient(circle at 89% 20%, rgba(105, 80, 140, 0.07), transparent 36%),
+    radial-gradient(circle at 12% 84%, rgba(150, 120, 60, 0.055), transparent 40%),
+    radial-gradient(circle at 80% 76%, rgba(135, 70, 90, 0.06), transparent 42%),
+    linear-gradient(rgba(160, 145, 140, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(160, 145, 140, 0.04) 1px, transparent 1px);
   background-size:
+    auto,
     auto,
     auto,
     auto,

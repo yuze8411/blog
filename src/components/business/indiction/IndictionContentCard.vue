@@ -60,7 +60,7 @@
             title="点赞，可以连续点"
             @click="like"
           >
-            <svg class="essay-heart" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+            <svg class="essay-heart" viewBox="0 0 20 20" fill="red" aria-hidden="true">
               <path
                 d="M9.65 17.15a.9.9 0 0 0 .7 0c.26-.1 6.4-3.68 6.4-8.4A4.35 4.35 0 0 0 12.4 4.4c-.98 0-1.9.37-2.4 1.02-.5-.65-1.42-1.02-2.4-1.02A4.35 4.35 0 0 0 3.25 8.75c0 4.72 6.14 8.3 6.4 8.4Z"
               />
@@ -76,7 +76,7 @@
             :aria-expanded="commentsOpen"
             @click="commentsOpen = !commentsOpen"
           >
-            <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+            <svg viewBox="0 0 20 20" fill="skyblue" aria-hidden="true">
               <path
                 d="M3.5 3.75A1.75 1.75 0 0 1 5.25 2h9.5A1.75 1.75 0 0 1 16.5 3.75v7.5A1.75 1.75 0 0 1 14.75 13H9.06l-3.2 2.77A.75.75 0 0 1 4.67 15.2V13h-.92A1.75 1.75 0 0 1 2 11.25v-7.5A1.75 1.75 0 0 1 3.5 3.75Z"
               />

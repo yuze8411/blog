@@ -46,11 +46,11 @@ function drawWave(
   if (document.documentElement.classList.contains('dark')) {
     // 暗色主题：波浪换成内容区底色，顶部半透明、底部收严实，和下面的内容区无缝衔接
     const grad = ctx.createLinearGradient(0, baseY - waveHeight, 0, logicalH)
-    grad.addColorStop(0, 'rgba(3, 7, 18, 0.55)')
-    grad.addColorStop(0.55, 'rgba(3, 7, 18, 0.92)')
-    grad.addColorStop(1, 'rgba(3, 7, 18, 1)')
+    grad.addColorStop(0, 'rgba(14, 11, 16, 0.55)')
+    grad.addColorStop(0.55, 'rgba(14, 11, 16, 0.92)')
+    grad.addColorStop(1, 'rgba(14, 11, 16, 1)')
     ctx.fillStyle = grad
-    ctx.shadowColor = 'rgba(3, 7, 18, 0.9)'
+    ctx.shadowColor = 'rgba(14, 11, 16, 0.9)'
   } else {
     ctx.fillStyle = 'rgba(255, 255, 255, 0.7)'
     ctx.shadowColor = 'rgba(255, 255, 255, 0.7)' // 阴影颜色
